@@ -216,3 +216,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# airm: cache + local env
+data/cmr_cache/*.json
+.env
+
+# experiment run outputs (timestamped)
+experiments/*/results/

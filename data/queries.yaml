@@ -1,0 +1,2185 @@
+- id: q000
+  question: Which dataset provides terrain elevation measurements?
+  relevant:
+  - C3565574177-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q001
+  question: Which dataset provides plant phenology measurements?
+  relevant:
+  - C2142771958-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q002
+  question: Which dataset provides canopy characteristics measurements?
+  relevant:
+  - C2142776747-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q003
+  question: Which dataset provides forests measurements?
+  relevant:
+  - C2237824918-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q004
+  question: Which dataset provides glacier elevation/ice sheet elevation measurements?
+  relevant:
+  - C3160943354-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q005
+  question: Which dataset provides terrain elevation measurements?
+  relevant:
+  - C2613553260-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q006
+  question: Which dataset provides canopy characteristics measurements?
+  relevant:
+  - C4048984730-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q007
+  question: Which dataset provides terrain elevation measurements?
+  relevant:
+  - C3566183500-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q008
+  question: Which dataset provides canopy characteristics measurements?
+  relevant:
+  - C4048983698-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q009
+  question: Which dataset provides canopy characteristics measurements?
+  relevant:
+  - C2763264702-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q010
+  question: Which dataset provides plant phenology measurements?
+  relevant:
+  - C3974616071-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q011
+  question: Which dataset provides canopy characteristics measurements?
+  relevant:
+  - C3974616135-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q012
+  question: Which dataset provides glacier elevation/ice sheet elevation measurements?
+  relevant:
+  - C3160917475-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q013
+  question: Which dataset provides vegetation height measurements?
+  relevant:
+  - C3049900163-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q014
+  question: Which dataset provides canopy characteristics measurements?
+  relevant:
+  - C2763264695-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q015
+  question: Which dataset provides lidar measurements?
+  relevant:
+  - C2763264737-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q016
+  question: Which dataset provides top of atmosphere (toa) reflectance measurements?
+  relevant:
+  - C3387017341-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q017
+  question: Which dataset provides top of atmosphere (toa) reflectance measurements?
+  relevant:
+  - C2854338930-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q018
+  question: Which dataset provides vegetation height measurements?
+  relevant:
+  - C3387017544-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q019
+  question: Which dataset provides cloud height measurements?
+  relevant:
+  - C2873770864-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q020
+  question: Which dataset provides cloud optical depth/thickness measurements?
+  relevant:
+  - C2873771242-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q021
+  question: Which dataset provides cloud top height measurements?
+  relevant:
+  - C2873772357-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q022
+  question: Which dataset provides cloud optical depth/thickness measurements?
+  relevant:
+  - C2873772844-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q023
+  question: Which dataset provides polarized reflectance measurements?
+  relevant:
+  - C2873773072-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q024
+  question: Which dataset provides cloud base height measurements?
+  relevant:
+  - C2873774167-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q025
+  question: Which dataset provides cloud optical depth/thickness measurements?
+  relevant:
+  - C2873774505-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q026
+  question: Which dataset provides cloud base height measurements?
+  relevant:
+  - C2873775475-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q027
+  question: Which dataset provides clouds measurements?
+  relevant:
+  - C2873775779-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q028
+  question: Which dataset provides polarized reflectance measurements?
+  relevant:
+  - C2873775922-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q029
+  question: Which dataset provides cloud height measurements?
+  relevant:
+  - C3387017705-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q030
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C2586786218-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q031
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C1588876556-EUMETSAT
+  notes: auto-seeded; verify and broaden relevance set
+- id: q032
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C1588876559-EUMETSAT
+  notes: auto-seeded; verify and broaden relevance set
+- id: q033
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C1996881146-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q034
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C2036880657-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q035
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C2036877535-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q036
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C1940475563-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q037
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C2036881712-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q038
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C2036881727-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q039
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C2036881720-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q040
+  question: Which dataset provides sea surface foundation temperature measurements?
+  relevant:
+  - C2036881735-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q041
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C2036877754-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q042
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C2036877745-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q043
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C2036881956-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q044
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C2036878045-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q045
+  question: Which dataset provides sea surface foundation temperature measurements?
+  relevant:
+  - C2205102254-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q046
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C2036878052-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q047
+  question: Which dataset provides sea surface foundation temperature measurements?
+  relevant:
+  - C2205105895-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q048
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C2036878103-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q049
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C2731041317-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q050
+  question: Which dataset provides sea surface subskin temperature measurements?
+  relevant:
+  - C2744809790-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q051
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C2596983413-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q052
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C2596986276-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q053
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C2731035022-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q054
+  question: Which dataset provides sea surface subskin temperature measurements?
+  relevant:
+  - C2744808497-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q055
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C1940473819-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q056
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C1996881456-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q057
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C3378626164-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q058
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C2600786104-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q059
+  question: Which dataset provides sea surface temperature measurements?
+  relevant:
+  - C2036877487-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q060
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C3177837864-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q061
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C3177837840-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q062
+  question: Which dataset provides brightness temperature measurements?
+  relevant:
+  - C3243521611-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q063
+  question: Which dataset provides brightness temperature measurements?
+  relevant:
+  - C3243521560-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q064
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C3177838875-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q065
+  question: Which dataset provides brightness temperature measurements?
+  relevant:
+  - C3628319333-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q066
+  question: Which dataset provides brightness temperature measurements?
+  relevant:
+  - C3228765563-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q067
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C1214598331-SCIOPS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q068
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C2759458713-NSIDCV0
+  notes: auto-seeded; verify and broaden relevance set
+- id: q069
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C1886605827-LANCEAMSR2
+  notes: auto-seeded; verify and broaden relevance set
+- id: q070
+  question: Which dataset provides brightness temperature measurements?
+  relevant:
+  - C1886605830-LANCEAMSR2
+  notes: auto-seeded; verify and broaden relevance set
+- id: q071
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C3965229925-NSIDCV0
+  notes: auto-seeded; verify and broaden relevance set
+- id: q072
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C1988932647-NSIDCV0
+  notes: auto-seeded; verify and broaden relevance set
+- id: q073
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C3660239710-NSIDCV0
+  notes: auto-seeded; verify and broaden relevance set
+- id: q074
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C1386246292-NSIDCV0
+  notes: auto-seeded; verify and broaden relevance set
+- id: q075
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C3965227403-NSIDCV0
+  notes: auto-seeded; verify and broaden relevance set
+- id: q076
+  question: Which dataset provides sea ice speed measurements?
+  relevant:
+  - C3677617030-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q077
+  question: Which dataset provides sea ice speed measurements?
+  relevant:
+  - C3882362637-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q078
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C2244302262-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q079
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C2244302298-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q080
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C2244296466-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q081
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C1239566352-EUMETSAT
+  notes: auto-seeded; verify and broaden relevance set
+- id: q082
+  question: Which dataset provides earth science reanalyses/assimilation models measurements?
+  relevant:
+  - C1990404815-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q083
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C1990404820-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q084
+  question: Which dataset provides earth science reanalyses/assimilation models measurements?
+  relevant:
+  - C1991543763-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q085
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C1991543764-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q086
+  question: Which dataset provides ice depth/thickness measurements?
+  relevant:
+  - C1991543821-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q087
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C1632006975-NSIDCV0
+  notes: auto-seeded; verify and broaden relevance set
+- id: q088
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C2244306790-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q089
+  question: Which dataset provides sea ice concentration measurements?
+  relevant:
+  - C2244306128-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q090
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C3324212563-FEDEO
+  notes: auto-seeded; verify and broaden relevance set
+- id: q091
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C3324213481-FEDEO
+  notes: auto-seeded; verify and broaden relevance set
+- id: q092
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C4017533851-FEDEO
+  notes: auto-seeded; verify and broaden relevance set
+- id: q093
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C4017534732-FEDEO
+  notes: auto-seeded; verify and broaden relevance set
+- id: q094
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C3327360235-FEDEO
+  notes: auto-seeded; verify and broaden relevance set
+- id: q095
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C3327360139-FEDEO
+  notes: auto-seeded; verify and broaden relevance set
+- id: q096
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C3327359664-FEDEO
+  notes: auto-seeded; verify and broaden relevance set
+- id: q097
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C3327358997-FEDEO
+  notes: auto-seeded; verify and broaden relevance set
+- id: q098
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C1748058432-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q099
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C1748046084-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q100
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2269057787-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q101
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2524245159-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q102
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2343115255-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q103
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2565788881-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q104
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2565794007-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q105
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2269056084-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q106
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2545303088-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q107
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2565805783-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q108
+  question: Which dataset provides emissivity measurements?
+  relevant:
+  - C2545314555-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q109
+  question: Which dataset provides emissivity measurements?
+  relevant:
+  - C2545314559-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q110
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2076090826-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q111
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2565794018-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q112
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2565805789-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q113
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2545303093-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q114
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2343114808-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q115
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2545314550-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q116
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2565788885-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q117
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2565805799-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q118
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2076114664-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q119
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2565791036-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q120
+  question: Which dataset provides precipitation rate measurements?
+  relevant:
+  - C2368306937-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q121
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C2179081499-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q122
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C2179081538-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q123
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C2179081553-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q124
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C2179081525-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q125
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C2179081590-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q126
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C2259345545-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q127
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C2179081680-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q128
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C4054954501-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q129
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C2259345563-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q130
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C2179081580-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q131
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C2264133875-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q132
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C2179081668-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q133
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C2259345611-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q134
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C4054955013-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q135
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C4054954995-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q136
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C4054955113-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q137
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C4054955082-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q138
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C4054955139-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q139
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C4054955176-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q140
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C4054955204-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q141
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C2179081652-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q142
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C4054955116-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q143
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C2179081663-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q144
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C4054955342-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q145
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C2259345585-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q146
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C4054955386-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q147
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C2259345631-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q148
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C4054955314-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q149
+  question: Which dataset provides atmospheric water vapor measurements?
+  relevant:
+  - C4054955324-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q150
+  question: Which dataset provides soil moisture measurements?
+  relevant:
+  - C2548143472-FEDEO
+  notes: auto-seeded; verify and broaden relevance set
+- id: q151
+  question: Which dataset provides soil moisture measurements?
+  relevant:
+  - C2548142979-FEDEO
+  notes: auto-seeded; verify and broaden relevance set
+- id: q152
+  question: Which dataset provides root zone soil moisture measurements?
+  relevant:
+  - C3480440870-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q153
+  question: Which dataset provides brightness temperature measurements?
+  relevant:
+  - C2938664763-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q154
+  question: Which dataset provides root zone soil moisture measurements?
+  relevant:
+  - C3480440639-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q155
+  question: Which dataset provides brightness temperature measurements?
+  relevant:
+  - C2938663471-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q156
+  question: Which dataset provides brightness temperature measurements?
+  relevant:
+  - C2938664585-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q157
+  question: Which dataset provides brightness temperature measurements?
+  relevant:
+  - C2938663676-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q158
+  question: Which dataset provides brightness temperature measurements?
+  relevant:
+  - C3630967661-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q159
+  question: Which dataset provides brightness temperature measurements?
+  relevant:
+  - C2938663609-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q160
+  question: Which dataset provides surface soil moisture measurements?
+  relevant:
+  - C3177836984-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q161
+  question: Which dataset provides soil moisture/water content measurements?
+  relevant:
+  - C1569839798-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q162
+  question: Which dataset provides brightness temperature measurements?
+  relevant:
+  - C3433987597-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q163
+  question: Which dataset provides soil classification measurements?
+  relevant:
+  - C3480441264-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q164
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2074890845-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q165
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2074860916-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q166
+  question: Which dataset provides brightness temperature measurements?
+  relevant:
+  - C3433987475-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q167
+  question: Which dataset provides sigma naught measurements?
+  relevant:
+  - C2872766452-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q168
+  question: Which dataset provides brightness temperature measurements?
+  relevant:
+  - C2872767144-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q169
+  question: Which dataset provides sigma naught measurements?
+  relevant:
+  - C2812935277-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q170
+  question: Which dataset provides soil classification measurements?
+  relevant:
+  - C4114263189-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q171
+  question: Which dataset provides soil classification measurements?
+  relevant:
+  - C4114263002-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q172
+  question: Which dataset provides snow/ice measurements?
+  relevant:
+  - C2709879276-SCIOPS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q173
+  question: Which dataset provides attitude characteristics measurements?
+  relevant:
+  - C3412875143-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q174
+  question: Which dataset provides soil depth measurements?
+  relevant:
+  - C3463203940-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q175
+  question: Which dataset provides soil depth measurements?
+  relevant:
+  - C3565295489-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q176
+  question: Which dataset provides brightness temperature measurements?
+  relevant:
+  - C3327092113-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q177
+  question: Which dataset provides soil moisture/water content measurements?
+  relevant:
+  - C4219861950-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q178
+  question: Which dataset provides snow/ice measurements?
+  relevant:
+  - C2709879072-SCIOPS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q179
+  question: Which dataset provides soil temperature measurements?
+  relevant:
+  - C2736725173-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q180
+  question: Which dataset provides aerosol extinction measurements?
+  relevant:
+  - C1460503190-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q181
+  question: Which dataset provides aerosol extinction measurements?
+  relevant:
+  - C2152047233-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q182
+  question: Which dataset provides aerosol optical depth/thickness measurements?
+  relevant:
+  - C1239900189-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q183
+  question: Which dataset provides aerosol optical depth/thickness measurements?
+  relevant:
+  - C2324689816-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q184
+  question: Which dataset provides aerosol optical depth/thickness measurements?
+  relevant:
+  - C1276812759-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q185
+  question: Which dataset provides aerosol optical depth/thickness measurements?
+  relevant:
+  - C1239900200-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q186
+  question: Which dataset provides aerosol extinction measurements?
+  relevant:
+  - C1266136096-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q187
+  question: Which dataset provides aerosol optical depth/thickness measurements?
+  relevant:
+  - C1276812824-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q188
+  question: Which dataset provides aerosol extinction measurements?
+  relevant:
+  - C3185856256-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q189
+  question: Which dataset provides absorbing aerosol optical depth/thickness measurements?
+  relevant:
+  - C4181303860-OMINRT
+  notes: auto-seeded; verify and broaden relevance set
+- id: q190
+  question: Which dataset provides aerosol optical depth/thickness measurements?
+  relevant:
+  - C1239900190-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q191
+  question: Which dataset provides aerosol extinction measurements?
+  relevant:
+  - C1266136062-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q192
+  question: Which dataset provides aerosol extinction measurements?
+  relevant:
+  - C1266136097-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q193
+  question: Which dataset provides aerosol extinction measurements?
+  relevant:
+  - C1239966755-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q194
+  question: Which dataset provides aerosol extinction measurements?
+  relevant:
+  - C1239966768-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q195
+  question: Which dataset provides absorbing aerosol optical depth/thickness measurements?
+  relevant:
+  - C1000000120-OMINRT
+  notes: auto-seeded; verify and broaden relevance set
+- id: q196
+  question: Which dataset provides aerosol optical depth/thickness measurements?
+  relevant:
+  - C1239900201-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q197
+  question: Which dataset provides aerosol optical depth/thickness measurements?
+  relevant:
+  - C1239900202-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q198
+  question: Which dataset provides aerosol optical depth/thickness measurements?
+  relevant:
+  - C1276812826-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q199
+  question: Which dataset provides aerosol extinction measurements?
+  relevant:
+  - C1266136095-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q200
+  question: Which dataset provides aerosol optical depth/thickness measurements?
+  relevant:
+  - C1614291328-LANCEMODIS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q201
+  question: Which dataset provides aerosol optical depth/thickness measurements?
+  relevant:
+  - C2407807500-LANCEMODIS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q202
+  question: Which dataset provides aerosol backscatter measurements?
+  relevant:
+  - C1379896587-LANCEMODIS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q203
+  question: Which dataset provides aerosol backscatter measurements?
+  relevant:
+  - C1426395436-LANCEMODIS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q204
+  question: Which dataset provides aerosol backscatter measurements?
+  relevant:
+  - C1426516654-LANCEMODIS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q205
+  question: Which dataset provides aerosol backscatter measurements?
+  relevant:
+  - C1379973697-LANCEMODIS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q206
+  question: Which dataset provides aerosol backscatter measurements?
+  relevant:
+  - C1427010664-LANCEMODIS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q207
+  question: Which dataset provides ocean chemistry measurements?
+  relevant:
+  - C3394587427-OB_DAAC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q208
+  question: Which dataset provides aerosol backscatter measurements?
+  relevant:
+  - C1379895060-LANCEMODIS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q209
+  question: Which dataset provides particulate matter measurements?
+  relevant:
+  - C3540908987-ESDIS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q210
+  question: Which dataset provides albedo measurements?
+  relevant:
+  - C2565093311-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q211
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3044685923-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q212
+  question: Which dataset provides albedo measurements?
+  relevant:
+  - C3091256524-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q213
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3028765772-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q214
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3173441659-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q215
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3173405448-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q216
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3044686669-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q217
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3050353608-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q218
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3173454072-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q219
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3173453979-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q220
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3091257892-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q221
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3091259856-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q222
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3047890423-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q223
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3091262825-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q224
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3091267534-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q225
+  question: Which dataset provides cloud fraction measurements?
+  relevant:
+  - C3173442560-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q226
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3024162910-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q227
+  question: Which dataset provides cloud fraction measurements?
+  relevant:
+  - C3173455266-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q228
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3608937672-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q229
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3824913190-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q230
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3824913325-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q231
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3824913775-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q232
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3608938798-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q233
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3090964320-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q234
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3173450415-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q235
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3173404788-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q236
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3291000346-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q237
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3291000593-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q238
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3091265854-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q239
+  question: Which dataset provides snow cover measurements?
+  relevant:
+  - C3824914219-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q240
+  question: Which dataset provides chlorophyll concentration measurements?
+  relevant:
+  - C3380709133-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q241
+  question: Which dataset provides ocean color measurements?
+  relevant:
+  - C3380708980-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q242
+  question: Which dataset provides chlorophyll concentration measurements?
+  relevant:
+  - C3620140256-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q243
+  question: Which dataset provides ocean color measurements?
+  relevant:
+  - C3384236979-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q244
+  question: Which dataset provides ocean color measurements?
+  relevant:
+  - C3406446219-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q245
+  question: Which dataset provides ocean color measurements?
+  relevant:
+  - C3407754974-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q246
+  question: Which dataset provides chlorophyll concentration measurements?
+  relevant:
+  - C3620139680-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q247
+  question: Which dataset provides ocean color measurements?
+  relevant:
+  - C3396928899-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q248
+  question: Which dataset provides ocean color measurements?
+  relevant:
+  - C3388381281-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q249
+  question: Which dataset provides ocean color measurements?
+  relevant:
+  - C3380708978-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q250
+  question: Which dataset provides ocean color measurements?
+  relevant:
+  - C3384236977-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q251
+  question: Which dataset provides ocean color measurements?
+  relevant:
+  - C3396928895-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q252
+  question: Which dataset provides ocean color measurements?
+  relevant:
+  - C3779578158-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q253
+  question: Which dataset provides ocean color measurements?
+  relevant:
+  - C3388381264-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q254
+  question: Which dataset provides chlorophyll concentration measurements?
+  relevant:
+  - C3620139643-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q255
+  question: Which dataset provides ocean color measurements?
+  relevant:
+  - C3779578213-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q256
+  question: Which dataset provides visible wavelengths measurements?
+  relevant:
+  - C3620139813-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q257
+  question: Which dataset provides chlorophyll concentration measurements?
+  relevant:
+  - C3620140255-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q258
+  question: Which dataset provides enhanced vegetation index (evi) measurements?
+  relevant:
+  - C3620140363-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q259
+  question: Which dataset provides ocean color measurements?
+  relevant:
+  - C3406446308-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q260
+  question: Which dataset provides visible wavelengths measurements?
+  relevant:
+  - C3620139782-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q261
+  question: Which dataset provides chlorophyll concentration measurements?
+  relevant:
+  - C3380709124-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q262
+  question: Which dataset provides ocean color measurements?
+  relevant:
+  - C3406446332-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q263
+  question: Which dataset provides ocean color measurements?
+  relevant:
+  - C3407755020-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q264
+  question: Which dataset provides ocean color measurements?
+  relevant:
+  - C3407754999-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q265
+  question: Which dataset provides aerosol particle properties measurements?
+  relevant:
+  - C3652817390-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q266
+  question: Which dataset provides visible wavelengths measurements?
+  relevant:
+  - C3620139797-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q267
+  question: Which dataset provides enhanced vegetation index (evi) measurements?
+  relevant:
+  - C3620139839-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q268
+  question: Which dataset provides chlorophyll concentration measurements?
+  relevant:
+  - C3384237428-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q269
+  question: Which dataset provides chlorophyll concentration measurements?
+  relevant:
+  - C3388381565-OB_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q270
+  question: Which dataset provides atmospheric carbon dioxide measurements?
+  relevant:
+  - C3880546355-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q271
+  question: Which dataset provides partial pressure of carbon dioxide measurements?
+  relevant:
+  - C2089377197-NOAA_NCEI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q272
+  question: Which dataset provides partial pressure of carbon dioxide measurements?
+  relevant:
+  - C2089379949-NOAA_NCEI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q273
+  question: Which dataset provides partial pressure of carbon dioxide measurements?
+  relevant:
+  - C2089379473-NOAA_NCEI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q274
+  question: Which dataset provides partial pressure of carbon dioxide measurements?
+  relevant:
+  - C2089377935-NOAA_NCEI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q275
+  question: Which dataset provides partial pressure of carbon dioxide measurements?
+  relevant:
+  - C2089372251-NOAA_NCEI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q276
+  question: Which dataset provides partial pressure of carbon dioxide measurements?
+  relevant:
+  - C2089372737-NOAA_NCEI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q277
+  question: Which dataset provides weathering measurements?
+  relevant:
+  - C2785296327-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q278
+  question: Which dataset provides trace gases/trace species measurements?
+  relevant:
+  - C1214593458-SCIOPS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q279
+  question: Which dataset provides aerosols measurements?
+  relevant:
+  - C1214592084-SCIOPS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q280
+  question: Which dataset provides ocean/lake records measurements?
+  relevant:
+  - C2103583013-NOAA_NCEI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q281
+  question: Which dataset provides carbon and hydrocarbon compounds measurements?
+  relevant:
+  - C2244301221-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q282
+  question: Which dataset provides carbon and hydrocarbon compounds measurements?
+  relevant:
+  - C2244305886-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q283
+  question: Which dataset provides carbon dioxide measurements?
+  relevant:
+  - C2244297227-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q284
+  question: Which dataset provides carbon dioxide measurements?
+  relevant:
+  - C2089378712-NOAA_NCEI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q285
+  question: Which dataset provides nitrous oxide measurements?
+  relevant:
+  - C2532072149-AMD_USAPDC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q286
+  question: Which dataset provides atmospheric pressure measurements?
+  relevant:
+  - C2089377271-NOAA_NCEI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q287
+  question: Which dataset provides carbon dioxide measurements?
+  relevant:
+  - C2244301260-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q288
+  question: Which dataset provides carbon dioxide measurements?
+  relevant:
+  - C2244301249-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q289
+  question: Which dataset provides carbon dioxide measurements?
+  relevant:
+  - C2244301236-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q290
+  question: Which dataset provides carbon and hydrocarbon compounds measurements?
+  relevant:
+  - C2244305834-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q291
+  question: Which dataset provides carbon dioxide measurements?
+  relevant:
+  - C2244294889-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q292
+  question: Which dataset provides carbon dioxide measurements?
+  relevant:
+  - C2244294840-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q293
+  question: Which dataset provides carbon dioxide measurements?
+  relevant:
+  - C1214311267-AU_AADC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q294
+  question: Which dataset provides carbon dioxide measurements?
+  relevant:
+  - C2244294959-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q295
+  question: Which dataset provides carbon dioxide measurements?
+  relevant:
+  - C2244294980-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q296
+  question: Which dataset provides carbon dioxide measurements?
+  relevant:
+  - C2244294529-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q297
+  question: Which dataset provides carbon dioxide measurements?
+  relevant:
+  - C2244295309-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q298
+  question: Which dataset provides dissolved gases measurements?
+  relevant:
+  - C2244294185-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q299
+  question: Which dataset provides carbon dioxide measurements?
+  relevant:
+  - C2244294935-AMD_KOPRI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q300
+  question: Which dataset provides vector labels measurements?
+  relevant:
+  - C2781412666-MLHUB
+  notes: auto-seeded; verify and broaden relevance set
+- id: q301
+  question: Which dataset provides raster labels measurements?
+  relevant:
+  - C2781411997-MLHUB
+  notes: auto-seeded; verify and broaden relevance set
+- id: q302
+  question: Which dataset provides land use/land cover measurements?
+  relevant:
+  - C3273595705-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q303
+  question: Which dataset provides land use/land cover classification measurements?
+  relevant:
+  - C3286094981-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q304
+  question: Which dataset provides land use/land cover classification measurements?
+  relevant:
+  - C3284165893-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q305
+  question: Which dataset provides land use/land cover classification measurements?
+  relevant:
+  - C3290952229-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q306
+  question: Which dataset provides land use/land cover classification measurements?
+  relevant:
+  - C3280820955-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q307
+  question: Which dataset provides land use/land cover classification measurements?
+  relevant:
+  - C2773245356-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q308
+  question: Which dataset provides land use/land cover classification measurements?
+  relevant:
+  - C2773252856-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q309
+  question: Which dataset provides land use/land cover classification measurements?
+  relevant:
+  - C1386205662-NSIDCV0
+  notes: auto-seeded; verify and broaden relevance set
+- id: q310
+  question: Which dataset provides land use/land cover classification measurements?
+  relevant:
+  - C1386205664-NSIDCV0
+  notes: auto-seeded; verify and broaden relevance set
+- id: q311
+  question: Which dataset provides land use/land cover measurements?
+  relevant:
+  - C2781624044-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q312
+  question: Which dataset provides deforestation measurements?
+  relevant:
+  - C2784835565-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q313
+  question: Which dataset provides vegetation cover measurements?
+  relevant:
+  - C1214591988-SCIOPS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q314
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C3540911787-ESDIS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q315
+  question: Which dataset provides land use/land cover classification measurements?
+  relevant:
+  - C2784890869-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q316
+  question: Which dataset provides reflectance measurements?
+  relevant:
+  - C2928013810-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q317
+  question: Which dataset provides land use/land cover classification measurements?
+  relevant:
+  - C2089385733-NOAA_NCEI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q318
+  question: Which dataset provides land use classes measurements?
+  relevant:
+  - C2231555370-CEOS_EXTRA
+  notes: auto-seeded; verify and broaden relevance set
+- id: q319
+  question: Which dataset provides land use/land cover classification measurements?
+  relevant:
+  - C2089381474-NOAA_NCEI
+  notes: auto-seeded; verify and broaden relevance set
+- id: q320
+  question: Which dataset provides reforestation measurements?
+  relevant:
+  - C1214470488-ASF
+  notes: auto-seeded; verify and broaden relevance set
+- id: q321
+  question: Which dataset provides reforestation measurements?
+  relevant:
+  - C1206487504-ASF
+  notes: auto-seeded; verify and broaden relevance set
+- id: q322
+  question: Which dataset provides surface pressure measurements?
+  relevant:
+  - C1233767548-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q323
+  question: Which dataset provides reforestation measurements?
+  relevant:
+  - C1214470533-ASF
+  notes: auto-seeded; verify and broaden relevance set
+- id: q324
+  question: Which dataset provides surface pressure measurements?
+  relevant:
+  - C1233767545-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q325
+  question: Which dataset provides surface pressure measurements?
+  relevant:
+  - C1933574500-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q326
+  question: Which dataset provides reforestation measurements?
+  relevant:
+  - C1327985661-ASF
+  notes: auto-seeded; verify and broaden relevance set
+- id: q327
+  question: Which dataset provides vegetation index measurements?
+  relevant:
+  - C2054610385-LAADS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q328
+  question: Which dataset provides reforestation measurements?
+  relevant:
+  - C1214470532-ASF
+  notes: auto-seeded; verify and broaden relevance set
+- id: q329
+  question: Which dataset provides surface pressure measurements?
+  relevant:
+  - C1933574580-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q330
+  question: Which dataset provides surface pressure measurements?
+  relevant:
+  - C2028928738-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q331
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2565791021-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q332
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2343113232-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q333
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2565794067-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q334
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2076106409-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q335
+  question: Which dataset provides surface pressure measurements?
+  relevant:
+  - C1575363595-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q336
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2565791024-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q337
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2565794064-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q338
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2872596186-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q339
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2885069180-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q340
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2872593540-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q341
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2076112011-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q342
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C1371013470-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q343
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2565794069-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q344
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2884981646-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q345
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2884983514-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q346
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2872600518-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q347
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2076108728-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q348
+  question: Which dataset provides land surface temperature measurements?
+  relevant:
+  - C2076105456-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q349
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C4057232489-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q350
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C1214584560-SCIOPS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q351
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2837150331-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q352
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2763298093-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q353
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2763370680-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q354
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2837150324-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q355
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2763298095-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q356
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2763298098-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q357
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2763370681-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q358
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2763370684-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q359
+  question: Which dataset provides evapotranspiration measurements?
+  relevant:
+  - C2113076269-LPCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q360
+  question: Which dataset provides wildfires measurements?
+  relevant:
+  - C1214620839-SCIOPS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q361
+  question: Which dataset provides soil temperature measurements?
+  relevant:
+  - C3234724704-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q362
+  question: Which dataset provides fire occurrence measurements?
+  relevant:
+  - C2162122340-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q363
+  question: Which dataset provides soil moisture/water content measurements?
+  relevant:
+  - C2854211353-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q364
+  question: Which dataset provides dominant species measurements?
+  relevant:
+  - C2143403376-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q365
+  question: Which dataset provides biomass measurements?
+  relevant:
+  - C3140252003-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q366
+  question: Which dataset provides vegetation cover measurements?
+  relevant:
+  - C2308231345-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q367
+  question: Which dataset provides nitrogen measurements?
+  relevant:
+  - C2162141870-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q368
+  question: Which dataset provides soil depth measurements?
+  relevant:
+  - C2612823595-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q369
+  question: Which dataset provides vegetation cover measurements?
+  relevant:
+  - C2111710292-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q370
+  question: Which dataset provides emissivity measurements?
+  relevant:
+  - C2731649004-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q371
+  question: Which dataset provides burned area measurements?
+  relevant:
+  - C2951624721-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q372
+  question: Which dataset provides carbon measurements?
+  relevant:
+  - C2143401918-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q373
+  question: Which dataset provides burned area measurements?
+  relevant:
+  - C2170972694-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q374
+  question: Which dataset provides emissions measurements?
+  relevant:
+  - C2389082906-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q375
+  question: Which dataset provides fire occurrence measurements?
+  relevant:
+  - C2631233127-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q376
+  question: Which dataset provides forests measurements?
+  relevant:
+  - C2767498872-ORNL_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q377
+  question: Which dataset provides gravity measurements?
+  relevant:
+  - C1214585912-SCIOPS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q378
+  question: Which dataset provides control surveys measurements?
+  relevant:
+  - C1214584987-SCIOPS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q379
+  question: Which dataset provides surface pressure measurements?
+  relevant:
+  - C1700900796-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q380
+  question: Which dataset provides land surface/agriculture indicators measurements?
+  relevant:
+  - C2283200566-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q381
+  question: Which dataset provides land surface/agriculture indicators measurements?
+  relevant:
+  - C1993409520-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q382
+  question: Which dataset provides surface pressure measurements?
+  relevant:
+  - C1700900822-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q383
+  question: Which dataset provides terrestrial water storage measurements?
+  relevant:
+  - C3195527175-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q384
+  question: Which dataset provides gravity measurements?
+  relevant:
+  - C3189951782-NSIDC_CPRD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q385
+  question: Which dataset provides glacier mass balance/ice sheet mass balance measurements?
+  relevant:
+  - C3206284786-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q386
+  question: Which dataset provides glacier mass balance/ice sheet mass balance measurements?
+  relevant:
+  - C3206299308-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q387
+  question: Which dataset provides ocean bottom pressure measurements?
+  relevant:
+  - C2263336836-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q388
+  question: Which dataset provides sea level rise measurements?
+  relevant:
+  - C3560326548-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q389
+  question: Which dataset provides sea level anomaly measurements?
+  relevant:
+  - C2263337642-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q390
+  question: Which dataset provides sea level rise measurements?
+  relevant:
+  - C3206302778-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q391
+  question: Which dataset provides ocean bottom pressure measurements?
+  relevant:
+  - C3215150173-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q392
+  question: Which dataset provides ocean bottom pressure measurements?
+  relevant:
+  - C3215162709-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q393
+  question: Which dataset provides terrestrial water storage measurements?
+  relevant:
+  - C2036877565-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q394
+  question: Which dataset provides terrestrial water storage measurements?
+  relevant:
+  - C3193285193-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q395
+  question: Which dataset provides water pressure measurements?
+  relevant:
+  - C3193289116-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q396
+  question: Which dataset provides terrestrial water storage measurements?
+  relevant:
+  - C3193293825-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q397
+  question: Which dataset provides water pressure measurements?
+  relevant:
+  - C3193298027-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q398
+  question: Which dataset provides terrestrial water storage measurements?
+  relevant:
+  - C3193302127-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q399
+  question: Which dataset provides water pressure measurements?
+  relevant:
+  - C3193304376-POCLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q400
+  question: Which dataset provides stratigraphic sequence measurements?
+  relevant:
+  - C1214613392-SCIOPS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q401
+  question: Which dataset provides terrain elevation measurements?
+  relevant:
+  - C2231957522-CEOS_EXTRA
+  notes: auto-seeded; verify and broaden relevance set
+- id: q402
+  question: Which dataset provides marine gravity field measurements?
+  relevant:
+  - C1214585774-SCIOPS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q403
+  question: Which dataset provides administrative divisions measurements?
+  relevant:
+  - C1214609008-SCIOPS
+  notes: auto-seeded; verify and broaden relevance set
+- id: q404
+  question: Which dataset provides gravity measurements?
+  relevant:
+  - C2231548572-CEOS_EXTRA
+  notes: auto-seeded; verify and broaden relevance set
+- id: q405
+  question: Which dataset provides crustal motion measurements?
+  relevant:
+  - C2231549485-CEOS_EXTRA
+  notes: auto-seeded; verify and broaden relevance set
+- id: q406
+  question: Which dataset provides geomagnetic forecasts measurements?
+  relevant:
+  - C2231551303-CEOS_EXTRA
+  notes: auto-seeded; verify and broaden relevance set
+- id: q407
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C3685912131-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q408
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C3685896625-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q409
+  question: Which dataset provides air quality measurements?
+  relevant:
+  - C1918209846-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q410
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C1266136037-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q411
+  question: Which dataset provides aerosol optical depth/thickness measurements?
+  relevant:
+  - C1239966818-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q412
+  question: Which dataset provides air quality measurements?
+  relevant:
+  - C3412185750-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q413
+  question: Which dataset provides tropospheric ozone measurements?
+  relevant:
+  - C1000000140-OMINRT
+  notes: auto-seeded; verify and broaden relevance set
+- id: q414
+  question: Which dataset provides tropospheric ozone measurements?
+  relevant:
+  - C1428966163-OMINRT
+  notes: auto-seeded; verify and broaden relevance set
+- id: q415
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C1386443916-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q416
+  question: Which dataset provides aerosol optical depth/thickness measurements?
+  relevant:
+  - C3377057082-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q417
+  question: Which dataset provides tropospheric ozone measurements?
+  relevant:
+  - C4181320377-OMINRT
+  notes: auto-seeded; verify and broaden relevance set
+- id: q418
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C1251051586-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q419
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C1251051468-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q420
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C1393527975-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q421
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C3377057175-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q422
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C1251051640-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q423
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C1251051650-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q424
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C1251051546-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q425
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C1251051523-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q426
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C3454342622-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q427
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C1251051657-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q428
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C1251051726-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q429
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C1251051137-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q430
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C1266136114-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q431
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C2930764281-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q432
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C2930726639-LARC_CLOUD
+  notes: auto-seeded; verify and broaden relevance set
+- id: q433
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C1266136103-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q434
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C1239966794-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q435
+  question: Which dataset provides atmospheric ozone measurements?
+  relevant:
+  - C1239966798-GES_DISC
+  notes: auto-seeded; verify and broaden relevance set
+- id: q436
+  question: Which dataset provides ozone measurements?
+  relevant:
+  - C1214591792-SCIOPS
+  notes: auto-seeded; verify and broaden relevance set
