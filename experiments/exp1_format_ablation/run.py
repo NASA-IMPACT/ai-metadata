@@ -60,8 +60,43 @@ DEFAULT_TEMPLATE = (
 )
 
 
+# Run-log file handle; set by ``open_run_log`` in main() so every ``log`` /
+# ``vlog`` call is also persisted to a timestamped file under the run dir.
+_LOG_FH = None
+
+
+def open_run_log(path: Path) -> None:
+    global _LOG_FH
+    _LOG_FH = path.open("w")
+
+
+def close_run_log() -> None:
+    global _LOG_FH
+    if _LOG_FH is not None:
+        _LOG_FH.close()
+        _LOG_FH = None
+
+
 def log(msg: str) -> None:
-    print(f"[exp1] {msg}", flush=True)
+    """Status line: printed and (if open) appended to the run log."""
+    line = f"[exp1] {msg}"
+    print(line, flush=True)
+    if _LOG_FH is not None:
+        _LOG_FH.write(line + "\n")
+        _LOG_FH.flush()
+
+
+def vlog(msg: str) -> None:
+    """Verbose dump: full text streamed to the console *and* the run log.
+
+    Used for per-query/per-model prompts and outputs. Each line is flushed as it
+    is produced so progress (including reasoning models' full <think> blocks) is
+    visible live on the CLI while the run proceeds. Silence it with --no-verbose.
+    """
+    print(msg, flush=True)
+    if _LOG_FH is not None:
+        _LOG_FH.write(msg + "\n")
+        _LOG_FH.flush()
 
 
 # --------------------------------------------------------------------------- #
@@ -179,11 +214,14 @@ def run_answer_stage(
     *,
     answer_k: int,
     max_tokens: int = 512,
+    verbose: bool = True,
 ) -> list[dict]:
     """For each (model, representation, sampled query), grade the LLM's pick.
 
     ``max_tokens`` is generous so reasoning models can finish a <think> block and
     still emit the concept-id (which ``extract_concept_id`` parses post-think).
+    When ``verbose``, every query and each model's raw output is written to the
+    run log (full text) and previewed on the console.
     """
     rows: list[dict] = []
     for rep, render_fn in RENDERERS.items():
@@ -196,7 +234,17 @@ def run_answer_stage(
                 continue
             prompt = build_answer_prompt(q.question, candidates)
             n_tokens = metrics.count_tokens(prompt)
+            if verbose:
+                cand_ids = [cid for cid, _ in candidates]
+                vlog(
+                    f"\n=== query {q.id} | representation={rep} | "
+                    f"difficulty={q.difficulty or '?'} ===\n"
+                    f"  question: {q.question}\n"
+                    f"  gold={q.relevant} candidates={cand_ids}"
+                )
             for model in models:
+                if verbose:
+                    vlog(f"  [{model}] querying…")
                 try:
                     out = complete(model, prompt, system=ANSWER_SYSTEM, max_tokens=max_tokens)
                 except ProviderUnavailable as exc:
@@ -209,15 +257,25 @@ def run_answer_stage(
                         "representation": rep,
                         "model": model,
                         "query_id": q.id,
+                        "difficulty": q.difficulty,
                         "predicted": pred,
                         "relevant": q.relevant,
                         "correct": bool(correct),
                         "prompt_tokens": n_tokens,
+                        "output_tokens": out.output_tokens,
+                        "output": out.text,
                         "retrieved_in_candidates": any(
                             cid in set(q.relevant) for cid in top_ids
                         ),
                     }
                 )
+                if verbose:
+                    mark = "✓" if correct else "✗"
+                    vlog(
+                        f"  [{model}] pred={pred} {mark} "
+                        f"(out_tokens={out.output_tokens})\n"
+                        f"    output: {out.text.strip()}"
+                    )
     return rows
 
 
@@ -403,10 +461,19 @@ def main() -> None:
     parser.add_argument("--answer-max-tokens", type=int, default=512)
     parser.add_argument("--no-answer", action="store_true")
     parser.add_argument("--no-tune", action="store_true")
+    parser.add_argument(
+        "--no-verbose",
+        action="store_true",
+        help="disable per-query/per-model output logging (still writes answers.jsonl)",
+    )
     args = parser.parse_args()
+    verbose = not args.no_verbose
 
     run_dir = new_run_dir(RESULTS_DIR)
+    log_path = run_dir / f"run-{run_dir.name}.log"
+    open_run_log(log_path)
     log(f"run dir: {run_dir} (also linked as results/latest)")
+    log(f"run log: {log_path}")
     corpus = load_corpus()
     queries = load_queries()
     corpus_by_id = {r["meta"]["concept-id"]: r for r in corpus}
@@ -456,6 +523,7 @@ def main() -> None:
             models,
             answer_k=args.answer_k,
             max_tokens=args.answer_max_tokens,
+            verbose=verbose,
         )
         write_jsonl(answer_rows, run_dir / "answers.jsonl")
 
@@ -493,7 +561,11 @@ def main() -> None:
         run_dir / "summary.md",
     )
     log(f"wrote {run_dir / 'summary.md'}")
+    log(f"verbose run log saved to {log_path}")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        close_run_log()

@@ -68,6 +68,7 @@ def test_answer_stage_end_to_end_stubbed(monkeypatch):
     class FakeCompletion:
         def __init__(self, text):
             self.text = text
+            self.output_tokens = 0
 
     def fake_complete(model, prompt, **kw):
         # pick the first concept_id present in the prompt (the top candidate)

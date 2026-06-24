@@ -64,6 +64,63 @@ def search_collections(
     return items
 
 
+def fetch_by_concept_ids(cids: list[str], *, use_cache: bool = True) -> list[dict]:
+    """Fetch collection UMM-JSON items by exact concept-id (cache-first).
+
+    Used to pull ground-truth target collections (e.g. from an external query
+    benchmark) into the corpus so retrieval has something to find. Cached
+    records are served from disk; only the misses hit the network, batched into
+    a single ``concept_id``-repeated CMR query.
+    """
+    found: dict[str, dict] = {}
+    misses: list[str] = []
+    for cid in dict.fromkeys(cids):  # dedup, preserve order
+        cached = load_cached(cid) if use_cache else None
+        if cached is not None:
+            found[cid] = cached
+        else:
+            misses.append(cid)
+
+    if misses:
+        url = f"{CMR_BASE}/collections.umm_json"
+        params = [("page_size", str(min(len(misses), 2000)))]
+        params += [("concept_id", cid) for cid in misses]
+        with httpx.Client(timeout=_TIMEOUT) as client:
+            resp = client.get(url, params=params)
+            resp.raise_for_status()
+            items = resp.json().get("items", [])
+        if use_cache:
+            CMR_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        for item in items:
+            cid = concept_id(item)
+            found[cid] = item
+            if use_cache:
+                _cache_path(cid).write_text(json.dumps(item))
+
+    return [found[cid] for cid in dict.fromkeys(cids) if cid in found]
+
+
+def extend_corpus(cids: list[str], *, path: Path = CORPUS_PATH) -> tuple[int, list[str]]:
+    """Append any of ``cids`` missing from the corpus JSONL, fetching from CMR.
+
+    Returns ``(n_added, still_missing)`` — concept-ids CMR could not return are
+    reported, never silently dropped (see CLAUDE.md coverage convention).
+    """
+    existing = {concept_id(r) for r in load_corpus(path)} if path.exists() else set()
+    wanted = [c for c in dict.fromkeys(cids) if c not in existing]
+    if not wanted:
+        return 0, []
+
+    fetched = fetch_by_concept_ids(wanted)
+    got = {concept_id(r) for r in fetched}
+    still_missing = [c for c in wanted if c not in got]
+
+    with path.open("a") as fh:
+        for rec in fetched:
+            fh.write(json.dumps(rec) + "\n")
+    return len(fetched), still_missing
+
+
 def get_granules(collection_concept_id: str, count: int = 5) -> list[dict]:
     """Return up to ``count`` granule UMM-JSON items for a collection."""
     params = {"collection_concept_id": collection_concept_id, "page_size": count}

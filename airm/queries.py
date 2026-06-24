@@ -22,9 +22,18 @@ class Query:
     question: str
     relevant: list[str] = field(default_factory=list)  # ground-truth concept-ids
     notes: str = ""
+    difficulty: str = ""  # "easy" | "medium" | "hard" (benchmark stratum)
+    fields: list[str] = field(default_factory=list)  # CMR fields needed to answer
+    paper: str = ""  # source paper the query was derived from
 
     def to_dict(self) -> dict:
         d = {"id": self.id, "question": self.question, "relevant": self.relevant}
+        if self.difficulty:
+            d["difficulty"] = self.difficulty
+        if self.fields:
+            d["fields"] = self.fields
+        if self.paper:
+            d["paper"] = self.paper
         if self.notes:
             d["notes"] = self.notes
         return d
@@ -40,6 +49,9 @@ def load_queries(path: Path = QUERIES_PATH) -> list[Query]:
             question=q["question"],
             relevant=q.get("relevant", []),
             notes=q.get("notes", ""),
+            difficulty=q.get("difficulty", ""),
+            fields=q.get("fields", []),
+            paper=q.get("paper", ""),
         )
         for q in raw
     ]
@@ -47,7 +59,11 @@ def load_queries(path: Path = QUERIES_PATH) -> list[Query]:
 
 def save_queries(queries: list[Query], path: Path = QUERIES_PATH) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(yaml.safe_dump([q.to_dict() for q in queries], sort_keys=False))
+    path.write_text(
+        yaml.safe_dump(
+            [q.to_dict() for q in queries], sort_keys=False, allow_unicode=True
+        )
+    )
 
 
 def seed_queries_from_corpus(records: list[dict]) -> list[Query]:

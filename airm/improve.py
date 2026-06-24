@@ -61,7 +61,17 @@ def paraphrase_queries(queries: list[Query], style: str = "shuffle_words") -> li
             text = " ".join([words[0], *mid, words[-1]])
         else:
             text = q.question
-        out.append(Query(id=q.id, question=text, relevant=q.relevant, notes=q.notes))
+        out.append(
+            Query(
+                id=q.id,
+                question=text,
+                relevant=q.relevant,
+                notes=q.notes,
+                difficulty=q.difficulty,
+                fields=q.fields,
+                paper=q.paper,
+            )
+        )
     return out
 
 

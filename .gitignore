@@ -219,6 +219,7 @@ __marimo__/
 
 # airm: cache + local env
 data/cmr_cache/*.json
+data/embed_cache/
 .env
 
 # experiment run outputs (timestamped)

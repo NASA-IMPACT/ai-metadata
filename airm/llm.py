@@ -20,7 +20,7 @@ from dataclasses import dataclass
 # Canonical model tiers referenced by the experiments. The open tier is
 # populated dynamically from whatever is pulled in Ollama.
 CLAUDE_MODELS = ["claude-opus-4-8", "claude-sonnet-4-6", "claude-haiku-4-5"]
-OPENAI_MODELS = ["gpt-4.1", "gpt-4.1-mini"]
+OPENAI_MODELS = ["gpt-5.4-nano", "gpt-4.1", "gpt-4.1-mini", "gpt-4.1-nano", "gpt-4o-mini"]
 
 
 class ProviderUnavailable(RuntimeError):
@@ -37,6 +37,11 @@ class Completion:
 
 def provider_for(model: str) -> str:
     m = model.lower()
+    # Ollama tags are "name:tag" (e.g. gpt-oss:20b, llama3.2:latest). A colon
+    # means a locally served model even when the name starts with "gpt" — cloud
+    # model ids never contain one, so check this before the prefix rules.
+    if ":" in m:
+        return "ollama"
     if m.startswith("claude"):
         return "anthropic"
     if m.startswith(("gpt", "o1", "o3", "o4")):
@@ -73,9 +78,20 @@ def _complete_openai(model, system, prompt, max_tokens, temperature) -> Completi
     if system:
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
-    resp = client.chat.completions.create(
-        model=model, messages=messages, max_tokens=max_tokens, temperature=temperature
-    )
+
+    # GPT-5 / o-series reasoning models renamed ``max_tokens`` to
+    # ``max_completion_tokens`` and accept only the default temperature; the
+    # older gpt-4.x chat models keep the classic params. Route accordingly so a
+    # single complete() works across both.
+    m = model.lower()
+    newer = m.startswith("gpt-5") or m.startswith(("o1", "o3", "o4"))
+    kwargs: dict = {"model": model, "messages": messages}
+    if newer:
+        kwargs["max_completion_tokens"] = max_tokens
+    else:
+        kwargs["max_tokens"] = max_tokens
+        kwargs["temperature"] = temperature
+    resp = client.chat.completions.create(**kwargs)
     usage = resp.usage
     return Completion(
         resp.choices[0].message.content or "",
