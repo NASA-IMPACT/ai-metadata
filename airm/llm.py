@@ -56,13 +56,18 @@ def _complete_anthropic(model, system, prompt, max_tokens, temperature) -> Compl
     import anthropic
 
     client = anthropic.Anthropic(api_key=key)
-    msg = client.messages.create(
-        model=model,
-        system=system or "",
-        max_tokens=max_tokens,
-        temperature=temperature,
-        messages=[{"role": "user", "content": prompt}],
-    )
+    try:
+        msg = client.messages.create(
+            model=model,
+            system=system or "",
+            max_tokens=max_tokens,
+            temperature=temperature,
+            messages=[{"role": "user", "content": prompt}],
+        )
+    except anthropic.APIError as exc:
+        # bad model id, 404, 429 rate-limit, transient 5xx, etc. — skip this
+        # tier rather than crash the whole sweep (parity with the Ollama path).
+        raise ProviderUnavailable(f"Anthropic error for {model}: {exc}") from exc
     text = "".join(b.text for b in msg.content if getattr(b, "type", None) == "text")
     return Completion(text, model, msg.usage.input_tokens, msg.usage.output_tokens)
 
@@ -71,7 +76,7 @@ def _complete_openai(model, system, prompt, max_tokens, temperature) -> Completi
     key = os.environ.get("OPENAI_API_KEY")
     if not key:
         raise ProviderUnavailable("OPENAI_API_KEY not set")
-    from openai import OpenAI
+    from openai import OpenAI, OpenAIError
 
     client = OpenAI(api_key=key)
     messages = []
@@ -87,11 +92,20 @@ def _complete_openai(model, system, prompt, max_tokens, temperature) -> Completi
     newer = m.startswith("gpt-5") or m.startswith(("o1", "o3", "o4"))
     kwargs: dict = {"model": model, "messages": messages}
     if newer:
+        # gpt-5 / o-series reject a non-default temperature, so we cannot pass
+        # temperature=0 here. Callers relying on determinism should note these
+        # models run at the provider default while gpt-4.x and Claude honor 0.0
+        # — a reproducibility asymmetry across tiers, not a bug.
         kwargs["max_completion_tokens"] = max_tokens
     else:
         kwargs["max_tokens"] = max_tokens
         kwargs["temperature"] = temperature
-    resp = client.chat.completions.create(**kwargs)
+    try:
+        resp = client.chat.completions.create(**kwargs)
+    except OpenAIError as exc:
+        # bad model id, 404, 429 rate-limit, transient 5xx, etc. — skip this
+        # tier rather than crash the whole sweep (parity with the Ollama path).
+        raise ProviderUnavailable(f"OpenAI error for {model}: {exc}") from exc
     usage = resp.usage
     return Completion(
         resp.choices[0].message.content or "",
@@ -173,11 +187,11 @@ def available_models(
     With no candidates, returns Claude + OpenAI tiers (if keyed) plus all
     locally pulled Ollama models.
     """
+    ollama_present = set(list_ollama_models())
     if candidates is None:
-        candidates = list(CLAUDE_MODELS) + list(OPENAI_MODELS) + list_ollama_models()
+        candidates = list(CLAUDE_MODELS) + list(OPENAI_MODELS) + list(ollama_present)
 
     ready: list[str] = []
-    ollama_present = set(list_ollama_models())
     for model in candidates:
         provider = provider_for(model)
         if provider == "anthropic" and os.environ.get("ANTHROPIC_API_KEY"):

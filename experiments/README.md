@@ -3,7 +3,7 @@
 Five experiments from `Report.md` §6, each isolating one claim about how the
 *representation* of NASA CMR metadata affects LLM use. All share the `airm/`
 harness (CMR data, renderers, embeddings, cross-provider LLM client, metrics,
-runner, improve loop) and the same corpus (`data/corpus.jsonl`, 437 real CMR
+runner, improve loop) and the same corpus (`data/corpus.jsonl`, 481 real CMR
 collections) and query set (`data/queries.yaml`).
 
 Each folder has:

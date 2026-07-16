@@ -14,7 +14,12 @@ it is kept deterministic and self-contained (no LLM call) for reproducibility.
 
 The small ``_extract_*`` helpers pull the common facets (instrument, variables,
 spatial/temporal coverage, quality) once; renderers compose them differently so
-the *content* is held roughly constant while the *format* varies.
+the *format* varies. Note that ``raw_umm_json`` and ``dot_breadcrumb`` in the
+default :data:`RENDERERS` registry render the *full* UMM tree, so they carry a
+superset of the content the two curated renderers see — a format/content
+confound. Use :data:`RENDERERS_FAIR` (all four driven from the same
+:func:`facets` payload via :func:`umm_facet_subset`) for a content-held
+comparison that isolates format.
 """
 
 from __future__ import annotations
@@ -125,6 +130,68 @@ def facets(record: dict) -> dict:
     }
 
 
+def umm_facet_subset(record: dict) -> dict:
+    """Rebuild a minimal UMM-shaped record carrying ONLY the shared facets.
+
+    ``raw_umm_json`` and ``dot_breadcrumb`` render the full UMM tree, so they see
+    a strict superset of the content the two curated renderers see — which
+    confounds *format* with *information content* in the Experiment 1 ablation.
+    Wrapping a record through this subset before those two renderers yields the
+    same facet content in the native UMM structure, so the "fair" registry
+    (:data:`RENDERERS_FAIR`) varies only format. The returned dict mirrors the
+    ``{"meta": ..., "umm": ...}`` shape the renderers expect.
+    """
+    f = facets(record)
+    umm: dict = {"EntryTitle": f["title"]}
+    if f["summary"]:
+        umm["Abstract"] = f["summary"]
+    if f["data_center"]:
+        umm["DataCenters"] = [{"ShortName": f["data_center"]}]
+    if f["platforms"]:
+        umm["Platforms"] = [
+            {
+                "ShortName": p["platform"],
+                "Instruments": [{"ShortName": i} for i in p["instruments"]],
+            }
+            for p in f["platforms"]
+        ]
+    if f["variables"]:
+        umm["ScienceKeywords"] = [{"VariableLevel1": v} for v in f["variables"]]
+    bbox = f["bbox"]
+    if bbox and None not in bbox.values():
+        umm["SpatialExtent"] = {
+            "HorizontalSpatialDomain": {
+                "Geometry": {
+                    "BoundingRectangles": [
+                        {
+                            "WestBoundingCoordinate": bbox["west"],
+                            "SouthBoundingCoordinate": bbox["south"],
+                            "EastBoundingCoordinate": bbox["east"],
+                            "NorthBoundingCoordinate": bbox["north"],
+                        }
+                    ]
+                }
+            }
+        }
+    t = f["temporal"]
+    if t and t.get("begin"):
+        rng: dict = {"BeginningDateTime": t["begin"]}
+        end = t.get("end")
+        if end and end != "present":
+            rng["EndingDateTime"] = end
+        umm["TemporalExtents"] = [
+            {"RangeDateTimes": [rng], "EndsAtPresentFlag": end == "present"}
+        ]
+    q = f["quality"]
+    if q["processing_level"]:
+        umm["ProcessingLevel"] = {"Id": q["processing_level"]}
+    if q["collection_progress"]:
+        umm["CollectionProgress"] = q["collection_progress"]
+    if q["version"]:
+        umm["Version"] = q["version"]
+    return {"meta": record.get("meta", {}), "umm": umm}
+
+
 # --------------------------------------------------------------------------- #
 # Renderers.
 # --------------------------------------------------------------------------- #
@@ -141,7 +208,7 @@ def flattened_jsonld(record: dict) -> str:
     bbox = f["bbox"]
     spatial = None
     if bbox and None not in bbox.values():
-        # GeoJSON-style bbox order: west south east north
+        # Schema.org GeoShape.box order: south west north east
         spatial = {
             "@type": "Place",
             "geo": {
@@ -256,6 +323,28 @@ RENDERERS: dict[str, Callable[[dict], str]] = {
     "raw_umm_json": raw_umm_json,
     "flattened_jsonld": flattened_jsonld,
     "dot_breadcrumb": dot_breadcrumb,
+    "metadata_as_text": metadata_as_text,
+}
+
+
+def _fair(render_fn: Callable[[dict], str]) -> Callable[[dict], str]:
+    """Wrap a full-tree renderer so it only ever sees the shared facet content."""
+
+    def render(record: dict) -> str:
+        return render_fn(umm_facet_subset(record))
+
+    return render
+
+
+# Content-held ("fair") registry: every renderer is driven from the same
+# ``facets()`` payload, so an Experiment 1 comparison over this registry varies
+# *format only*. ``flattened_jsonld`` and ``metadata_as_text`` are already built
+# from facets, so they are unchanged; the two full-tree renderers are restricted
+# to the facet subtree via :func:`umm_facet_subset`.
+RENDERERS_FAIR: dict[str, Callable[[dict], str]] = {
+    "raw_umm_json": _fair(raw_umm_json),
+    "flattened_jsonld": flattened_jsonld,
+    "dot_breadcrumb": _fair(dot_breadcrumb),
     "metadata_as_text": metadata_as_text,
 }
 

@@ -9,8 +9,8 @@
 from __future__ import annotations
 
 import math
-import re
 from dataclasses import dataclass
+from datetime import datetime
 
 # --------------------------------------------------------------------------- #
 # Retrieval metrics. ``ranked`` is a list of concept-ids best-first;
@@ -21,7 +21,10 @@ from dataclasses import dataclass
 def recall_at_k(ranked: list[str], relevant: set[str], k: int) -> float:
     if not relevant:
         return 0.0
-    hits = sum(1 for cid in ranked[:k] if cid in relevant)
+    # Count *distinct* relevant ids hit, so a ranked list with a repeated id
+    # (possible if the corpus has duplicate concept-ids; search does not dedup)
+    # can never score above 1.0.
+    hits = len(set(ranked[:k]) & relevant)
     return hits / len(relevant)
 
 
@@ -33,11 +36,14 @@ def mrr(ranked: list[str], relevant: set[str]) -> float:
 
 
 def ndcg_at_k(ranked: list[str], relevant: set[str], k: int) -> float:
-    dcg = sum(
-        1.0 / math.log2(i + 1)
-        for i, cid in enumerate(ranked[:k], start=1)
-        if cid in relevant
-    )
+    # Credit each relevant id at most once, at its first (best) rank, so a
+    # duplicated id in ``ranked`` cannot inflate DCG past the ideal.
+    seen: set[str] = set()
+    dcg = 0.0
+    for i, cid in enumerate(ranked[:k], start=1):
+        if cid in relevant and cid not in seen:
+            seen.add(cid)
+            dcg += 1.0 / math.log2(i + 1)
     ideal_hits = min(len(relevant), k)
     idcg = sum(1.0 / math.log2(i + 1) for i in range(1, ideal_hits + 1))
     return dcg / idcg if idcg else 0.0
@@ -59,17 +65,42 @@ def field_selection_f1(predicted: set[str], gold: set[str]) -> float:
     return 2 * prec * rec / (prec + rec) if (prec + rec) else 0.0
 
 
-_ISO_RANGE = re.compile(
-    r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?,\s*"
-    r"(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?)?$"
-)
+def _parse_iso8601(s: str) -> datetime | None:
+    """Parse an ISO-8601 UTC timestamp, tolerating the forms CMR actually emits.
+
+    Accepts a trailing ``Z``, fractional seconds, and numeric ``+HH:MM`` offsets;
+    range-checks month/day/hour/minute/second via ``datetime`` (so ``2020-13-40``
+    is rejected). Returns a ``datetime`` on success, ``None`` otherwise.
+    """
+    s = s.strip()
+    if not s:
+        return None
+    # datetime.fromisoformat accepts numeric offsets and fractional seconds; it
+    # only chokes on the literal ``Z``, so normalize that to ``+00:00`` first.
+    normalized = s[:-1] + "+00:00" if s.endswith("Z") else s
+    try:
+        return datetime.fromisoformat(normalized)
+    except ValueError:
+        return None
 
 
 def value_format_valid(field: str, value: str) -> bool:
     """Validate a few high-signal CMR value formats (temporal, bounding_box)."""
     value = value.strip()
     if field == "temporal":
-        return bool(_ISO_RANGE.match(value))
+        # "start[,end]" — start required, end optional (open-ended range). Each
+        # endpoint must be a valid ISO-8601 datetime and start must not follow end.
+        parts = [p.strip() for p in value.split(",")]
+        if len(parts) not in (1, 2):
+            return False
+        start = _parse_iso8601(parts[0])
+        if start is None:
+            return False
+        if len(parts) == 2 and parts[1]:
+            end = _parse_iso8601(parts[1])
+            if end is None or end < start:
+                return False
+        return True
     if field == "bounding_box":
         parts = value.split(",")
         if len(parts) != 4:
@@ -168,3 +199,47 @@ def bootstrap_ci(
     lo = float(np.percentile(means, 100 * alpha / 2))
     hi = float(np.percentile(means, 100 * (1 - alpha / 2)))
     return (float(arr.mean()), lo, hi)
+
+
+def bootstrap_ci_clustered(
+    values: list[float],
+    clusters: list,
+    n_resamples: int = 1000,
+    alpha: float = 0.05,
+    seed: int = 0,
+) -> tuple[float, float, float]:
+    """Cluster (block) bootstrap CI for correlated per-query scores.
+
+    When many queries are near-duplicate paraphrases of the same ground-truth
+    dataset, treating them as independent (:func:`bootstrap_ci`) understates the
+    CI width. This resamples whole *clusters* (e.g. one per gold dataset) with
+    replacement and pools their member scores, so correlated within-cluster
+    duplicates no longer inflate the effective sample size.
+
+    ``values`` and ``clusters`` are parallel lists; ``clusters[i]`` is the group
+    id (hashable) of ``values[i]``. Falls back to the per-observation bootstrap
+    when there is 0 or 1 distinct cluster.
+    """
+    import numpy as np
+
+    if not values:
+        return (0.0, 0.0, 0.0)
+    groups: dict = {}
+    for v, c in zip(values, clusters):
+        groups.setdefault(c, []).append(float(v))
+    keys = list(groups)
+    point = float(np.mean(values))
+    if len(keys) < 2:
+        return bootstrap_ci(values, n_resamples=n_resamples, alpha=alpha, seed=seed)
+
+    rng = np.random.default_rng(seed)
+    members = [np.asarray(groups[k], dtype=float) for k in keys]
+    means = np.empty(n_resamples, dtype=float)
+    n = len(keys)
+    for r in range(n_resamples):
+        picked = rng.integers(0, n, size=n)
+        pooled = np.concatenate([members[i] for i in picked])
+        means[r] = pooled.mean()
+    lo = float(np.percentile(means, 100 * alpha / 2))
+    hi = float(np.percentile(means, 100 * (1 - alpha / 2)))
+    return (point, lo, hi)

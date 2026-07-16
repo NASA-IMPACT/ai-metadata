@@ -64,11 +64,17 @@ otherwise we would be measuring content differences, not format differences.
   east"`, and `raw_umm_json` keeps the original nested
   `BoundingRectangles`. Same fact, four formats.
 
-> Note: `raw_umm_json` and `dot_breadcrumb` operate over the *full* UMM tree, so
-> they carry incidental extra fields that the two curated projections drop. This
-> is intentional — it is part of what "raw" vs "curated" formats means in
-> practice — but it is why those two are both larger and (as the results show)
-> weaker.
+> **Confound (identified in the 2026-07-16 audit, now controllable).** In the
+> default `RENDERERS` registry, `raw_umm_json` and `dot_breadcrumb` operate over
+> the *full* UMM tree, so they carry a **superset** of the content the two curated
+> projections see. That means the default comparison conflates *format* with
+> *information content* — the original run's large gap (raw/dot ≈ 0.55 vs curated
+> ≈ 0.88) is not a clean format effect. Run with `--fair` (the `RENDERERS_FAIR`
+> registry, all four driven from the same `facets()` payload via
+> `umm_facet_subset`) to isolate format. When content **is** held constant, the
+> four formats collapse to Recall@10 = 0.81–0.88 with heavily overlapping cluster
+> CIs, and the full tree is revealed to have *hurt* retrieval (dilution), not the
+> JSON format per se. See §7 "Audit corrections" below.
 
 **Renderers must be deterministic and must not call an LLM.** This is a hard
 rule: retrieval has to be reproducible, and `metadata_as_text` is the target of
@@ -381,6 +387,15 @@ the prose more reliably than raw JSON. `raw_umm_json` is worst (0.40): even when
 a correct candidate is present, the verbose nested JSON is harder for the model
 to adjudicate.
 
+> ⚠️ **Superseded by the 2026-07-16 audit — see §7.** The last sentence is
+> *contradicted by this run's own data*: `raw_umm_json` scored correctly on 8 of
+> the 8 sampled queries where the gold candidate was actually present. The
+> accuracy ordering "mirrors retrieval exactly" precisely *because* this coupled
+> stage bounds answer accuracy by retrieval recall — it does **not** show a
+> format-on-reasoning effect. The audit added a *decoupled* stage (all formats
+> shown the same gold-containing candidate set) to measure reasoning over format
+> honestly; results in §7.3.
+
 ### 5.4 Model-dependence verdict
 
 - best format for **gpt-5.4-nano**: `metadata_as_text`
@@ -517,3 +532,113 @@ now answered **for the OpenAI family: yes**. `metadata_as_text` wins on all thre
 tiers, on both accuracy and cost. The remaining gap is cross-*family* coverage
 (Claude / local Ollama), which would stress whether the prose format's lead is a
 property of the representation itself or of OpenAI tokenization/training.
+
+---
+
+## 7. Audit corrections (run `20260716T190813Z`, cross-family)
+
+A 2026-07-16 audit found that §5–§6's headline claims were confounded, and that
+the harness had several faithfulness bugs. The fixes (all in `airm/` + this
+runner) and the corrected re-run are below. This section **supersedes the
+format-on-reasoning and model-dependence narratives in §5.3–§5.8 and §6.4.**
+
+Command (all five *distinct model families* pulled in Ollama):
+
+```
+uv run python -m experiments.exp1_format_ablation.run --fair \
+  --models "llama3.2:latest,gemma3:4b,qwen3:8b,gpt-oss:20b,deepseek-r1:latest" \
+  --max-queries 10 --answer-max-tokens 1024
+```
+
+### 7.1 Content was not held constant — the retrieval gap was mostly *content*
+
+`raw_umm_json`/`dot_breadcrumb` rendered the full UMM tree (a superset of the
+curated formats' content). Re-running with `--fair` (`RENDERERS_FAIR`, all four
+driven from the same `facets()` payload via `umm_facet_subset`) isolates format.
+Recall@10 (all 554 queries, cluster-bootstrapped CIs):
+
+| representation | default (full-tree) | **fair (content-held)** |
+|---|---|---|
+| metadata_as_text | 0.883 | 0.883 |
+| dot_breadcrumb | 0.592 | **0.877** |
+| raw_umm_json | 0.543 | **0.852** |
+| flattened_jsonld | 0.812 | 0.812 |
+
+Held constant, the four collapse to **0.81–0.88 with overlapping CIs**. The
+original 0.54–0.88 spread was **almost entirely information content**: the full
+tree *diluted* retrieval, it was not the JSON format that hurt. So §5.8's "raw
+dumps are the weakest format" is wrong — they are weak *renderings of more,
+noisier content*, not a weak format.
+
+### 7.2 Answer accuracy mirrored retrieval because it was *bounded* by it
+
+§5.3 read the coupled accuracy ordering as a format-on-reasoning effect. It is
+not — coupled accuracy is capped by whether each format retrieved the gold. The
+tell: **conditional on the gold candidate being present, every format is
+adjudicated well, and raw JSON is not worst** (coupled, gold-present only):
+
+| representation | acc \| gold present | n |
+|---|---|---|
+| raw_umm_json | 0.90 | 40 |
+| dot_breadcrumb | 0.90 | 40 |
+| flattened_jsonld | 0.85 | 40 |
+| metadata_as_text | 0.72 | 50 |
+
+This directly refutes §5.3's "verbose nested JSON is harder to adjudicate":
+`raw_umm_json` was picked correctly 90% of the time when present; prose was
+actually *lowest* here.
+
+### 7.3 Decoupled stage — reasoning over format, isolated
+
+New stage: every format is shown the **same** gold-containing candidate set,
+varying only rendering. Accuracy (rep × model):
+
+| representation | deepseek-r1 | gemma3:4b | gpt-oss:20b | llama3.2 | qwen3:8b |
+|---|---|---|---|---|---|
+| raw_umm_json | 0.90 | 0.60 | 0.90 | 0.30 | 0.60 |
+| flattened_jsonld | 0.70 | 0.70 | 0.90 | 0.80 | 0.70 |
+| dot_breadcrumb | 0.80 | 0.60 | 0.90 | 0.60 | 0.80 |
+| metadata_as_text | 0.80 | 0.70 | 0.90 | 0.70 | 0.80 |
+
+No format dominates; when the right answer is in front of the model, format has a
+modest, model-specific effect (and `gpt-oss:20b` is format-insensitive at 0.90).
+
+### 7.4 Model-dependence — now actually tested, and confirmed
+
+With a genuine cross-family sweep, the best format **differs by model** (the
+project's central thesis, untestable in §5–§6's single-family runs):
+
+- **decoupled** best format: deepseek→`raw_umm_json`, gemma3→`flattened_jsonld`,
+  gpt-oss→`raw_umm_json`, llama3.2→`flattened_jsonld`, qwen3→`dot_breadcrumb`
+  (**3 distinct winners / 5 models**).
+- **coupled** best format is also split 3 ways across the five families.
+
+So "`metadata_as_text` wins outright / on every model" (§5.8, §6.4) held only
+within the OpenAI family. Across families, **there is no single best format** —
+consistent with the report's thesis that the best representation is
+model-dependent and must be measured.
+
+### 7.5 Auto-tune, with a held-out split
+
+Auto-tune now trains on a cluster-disjoint train/val split and re-scores the
+winner on a held-out **test** split it never saw:
+
+- baseline Recall@10 (tuning split): **0.843**
+- tuned Recall@10 (tuning split): **0.906**
+- **tuned Recall@10 (held-out test): 0.950** ← the honest number
+
+Here the gain generalized (no overfitting evident), but the number that matters
+is now the held-out one, not the tuning-split score §5.6 reported.
+
+### 7.6 Other faithfulness fixes applied
+
+- Recall/nDCG dedup by set (can no longer exceed 1.0 on duplicate ids).
+- CIs are **cluster-bootstrapped by ground-truth dataset** — the 554 queries are
+  paraphrase clusters over 46 datasets, so a per-query bootstrap understated
+  widths. Robustness CIs use the same block bootstrap.
+- Ground-truth coverage is logged (dangling/empty `relevant` ids); queries with
+  unreachable ground truth are excluded from scoring instead of silently scoring 0.
+- ISO-8601 temporal validator rewritten (accepts fractional seconds / numeric
+  offsets, range-checks fields, enforces start ≤ end).
+- Cloud API runtime errors now raise `ProviderUnavailable` (skip a tier, don't
+  crash a sweep); atomic CMR cache writes; deterministic paraphrase seeding.

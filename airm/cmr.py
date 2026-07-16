@@ -33,6 +33,19 @@ def _cache_path(cid: str) -> Path:
     return CMR_CACHE_DIR / f"{cid}.json"
 
 
+def _write_cache(cid: str, item: dict) -> None:
+    """Persist one record to the disk cache atomically (tmp file + rename).
+
+    A plain ``write_text`` leaves a truncated file if the process dies mid-write,
+    which then crashes the next :func:`load_cached`. Writing to a temp file and
+    renaming makes the publish atomic so readers never see a partial record.
+    """
+    path = _cache_path(cid)
+    tmp = path.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(item))
+    tmp.replace(path)
+
+
 def search_collections(
     keyword: str | None = None,
     count: int = 20,
@@ -60,7 +73,7 @@ def search_collections(
     if use_cache:
         CMR_CACHE_DIR.mkdir(parents=True, exist_ok=True)
         for item in items:
-            _cache_path(concept_id(item)).write_text(json.dumps(item))
+            _write_cache(concept_id(item), item)
     return items
 
 
@@ -95,7 +108,7 @@ def fetch_by_concept_ids(cids: list[str], *, use_cache: bool = True) -> list[dic
             cid = concept_id(item)
             found[cid] = item
             if use_cache:
-                _cache_path(cid).write_text(json.dumps(item))
+                _write_cache(cid, item)
 
     return [found[cid] for cid in dict.fromkeys(cids) if cid in found]
 
@@ -132,11 +145,15 @@ def get_granules(collection_concept_id: str, count: int = 5) -> list[dict]:
 
 
 def load_cached(cid: str) -> dict | None:
-    """Load a single cached record by concept-id, or None if not cached."""
+    """Load a single cached record by concept-id, or None if absent/corrupt."""
     path = _cache_path(cid)
-    if path.exists():
+    if not path.exists():
+        return None
+    try:
         return json.loads(path.read_text())
-    return None
+    except (json.JSONDecodeError, OSError):
+        # truncated/corrupt cache file — treat as a miss so the caller re-fetches
+        return None
 
 
 def build_corpus(

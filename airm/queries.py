@@ -8,8 +8,10 @@ reshuffle) using these primitives.
 
 from __future__ import annotations
 
+import random
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Callable
 
 import yaml
 
@@ -64,6 +66,53 @@ def save_queries(queries: list[Query], path: Path = QUERIES_PATH) -> None:
             [q.to_dict() for q in queries], sort_keys=False, allow_unicode=True
         )
     )
+
+
+def _gold_cluster(q: Query) -> str:
+    """Group key for a query: its ground-truth dataset (fallback to its id).
+
+    Many queries are near-duplicate paraphrases that share one gold concept-id;
+    grouping by that id lets callers keep a whole paraphrase cluster on one side
+    of a split (no leakage) and cluster-bootstrap honest CIs.
+    """
+    return q.relevant[0] if q.relevant else q.id
+
+
+def split_by_cluster(
+    queries: list[Query],
+    *,
+    ratios: tuple[float, float, float] = (0.6, 0.2, 0.2),
+    seed: int = 0,
+    cluster_key: Callable[[Query], str] = _gold_cluster,
+) -> dict[str, list[Query]]:
+    """Partition queries into train/val/test by *cluster*, not by row.
+
+    Assigning whole clusters (paraphrases of the same gold dataset) to a single
+    split prevents train/test leakage — otherwise a paraphrase of a tuning query
+    can land in the test set and inflate the reported score. Returns
+    ``{"train": [...], "val": [...], "test": [...]}``. The split is deterministic
+    for a given ``seed``.
+    """
+    if not abs(sum(ratios) - 1.0) < 1e-9:
+        raise ValueError(f"ratios must sum to 1.0, got {ratios}")
+    clusters: dict[str, list[Query]] = {}
+    for q in queries:
+        clusters.setdefault(cluster_key(q), []).append(q)
+    keys = sorted(clusters)  # stable order before shuffling for reproducibility
+    random.Random(seed).shuffle(keys)
+
+    n = len(keys)
+    n_train = int(n * ratios[0])
+    n_val = int(n * ratios[1])
+    buckets = {
+        "train": keys[:n_train],
+        "val": keys[n_train : n_train + n_val],
+        "test": keys[n_train + n_val :],
+    }
+    return {
+        split: [q for key in key_list for q in clusters[key]]
+        for split, key_list in buckets.items()
+    }
 
 
 def seed_queries_from_corpus(records: list[dict]) -> list[Query]:

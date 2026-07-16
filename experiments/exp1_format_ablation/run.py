@@ -37,9 +37,10 @@ from airm.improve import (
     robustness_check,
 )
 from airm.llm import ProviderUnavailable, available_models, complete
-from airm.queries import Query, load_queries
-from airm.representations import RENDERERS, facets
+from airm.queries import Query, _gold_cluster, load_queries, split_by_cluster
+from airm.representations import RENDERERS, RENDERERS_FAIR, facets
 from airm.run import (
+    check_relevance_coverage,
     evaluate_retrieval,
     new_run_dir,
     set_seed,
@@ -206,6 +207,35 @@ ANSWER_SYSTEM = (
 )
 
 
+def build_shared_candidates(
+    q: Query,
+    ref_ranked: list[str],
+    corpus_by_id: dict[str, dict],
+    *,
+    answer_k: int,
+    seed: int = 0,
+) -> list[str]:
+    """A candidate id set that is identical across formats and contains the gold.
+
+    To measure *reasoning over format* (not retrieval), every format must be
+    shown the same candidates, differing only in how they are rendered. We take
+    the gold id(s) plus distractors from a fixed reference retrieval, cap at
+    ``answer_k``, and shuffle deterministically so gold position is not a
+    giveaway. Returns ``[]`` when the gold is not in the corpus (unanswerable).
+    """
+    gold = [c for c in q.relevant if c in corpus_by_id]
+    if not gold:
+        return []
+    cand = list(gold[:answer_k])
+    for cid in ref_ranked:
+        if len(cand) >= answer_k:
+            break
+        if cid not in set(q.relevant) and cid in corpus_by_id:
+            cand.append(cid)
+    random.Random(f"{q.id}:{seed}").shuffle(cand)
+    return cand
+
+
 def run_answer_stage(
     corpus_by_id: dict[str, dict],
     retrieved: dict[tuple[str, str], list[str]],
@@ -213,10 +243,19 @@ def run_answer_stage(
     models: list[str],
     *,
     answer_k: int,
+    renderers: dict = RENDERERS,
+    shared_candidates: dict[str, list[str]] | None = None,
     max_tokens: int = 512,
     verbose: bool = True,
 ) -> list[dict]:
     """For each (model, representation, sampled query), grade the LLM's pick.
+
+    Two modes:
+      * coupled (default): candidates are that representation's own retrieved
+        top-k — the end-to-end RAG measurement, bounded by retrieval recall.
+      * decoupled (``shared_candidates`` given): every representation is shown the
+        *same* candidate id set (gold + fixed distractors), rendered in its own
+        format, so accuracy isolates reasoning-over-format from retrieval.
 
     ``max_tokens`` is generous so reasoning models can finish a <think> block and
     still emit the concept-id (which ``extract_concept_id`` parses post-think).
@@ -224,9 +263,12 @@ def run_answer_stage(
     run log (full text) and previewed on the console.
     """
     rows: list[dict] = []
-    for rep, render_fn in RENDERERS.items():
+    for rep, render_fn in renderers.items():
         for q in sampled:
-            top_ids = retrieved.get((rep, q.id), [])[:answer_k]
+            if shared_candidates is not None:
+                top_ids = shared_candidates.get(q.id, [])
+            else:
+                top_ids = retrieved.get((rep, q.id), [])[:answer_k]
             candidates = [
                 (cid, render_fn(corpus_by_id[cid])) for cid in top_ids if cid in corpus_by_id
             ]
@@ -264,6 +306,7 @@ def run_answer_stage(
                         "prompt_tokens": n_tokens,
                         "output_tokens": out.output_tokens,
                         "output": out.text,
+                        "stage": "decoupled" if shared_candidates is not None else "coupled",
                         "retrieved_in_candidates": any(
                             cid in set(q.relevant) for cid in top_ids
                         ),
@@ -284,15 +327,15 @@ def run_answer_stage(
 # --------------------------------------------------------------------------- #
 
 
-def run_robustness(corpus, sampled, k):
+def run_robustness(corpus, sampled, k, renderers=RENDERERS):
     """Per-representation robustness across seeds with paraphrased queries."""
     reports = {}
-    for rep, render_fn in RENDERERS.items():
+    for rep, render_fn in renderers.items():
         index = Index.build(corpus, render_fn)
 
         def scorer(seed, index=index):
             set_seed(seed)
-            pqs = paraphrase_queries(sampled)
+            pqs = paraphrase_queries(sampled, seed=seed)
             return [
                 metrics.recall_at_k(
                     [cid for cid, _ in index.search(q.question, k=k)], set(q.relevant), k
@@ -308,21 +351,33 @@ def run_robustness(corpus, sampled, k):
     return reports
 
 
-def run_auto_tune(corpus, sampled, k, model, rounds):
-    """Hill-climb the templated metadata_as_text renderer on Recall@k."""
+def score_template(corpus, queries, k, template: str) -> float:
+    """Mean Recall@k of a templated renderer over ``queries`` (−inf if invalid)."""
+    try:
+        render_fn = templated_renderer(template)
+        index = Index.build(corpus, render_fn)
+    except Exception:  # invalid placeholder / format error -> reject
+        return float("-inf")
+    if not queries:
+        return 0.0
+    return statistics.mean(
+        metrics.recall_at_k(
+            [cid for cid, _ in index.search(q.question, k=k)], set(q.relevant), k
+        )
+        for q in queries
+    )
+
+
+def run_auto_tune(corpus, tune_queries, k, model, rounds):
+    """Hill-climb the templated metadata_as_text renderer on Recall@k.
+
+    ``tune_queries`` should be a tuning split *disjoint* from the held-out queries
+    used to report the final number, so the optimizer cannot train on the test
+    set. The caller re-scores the winner on the held-out split afterward.
+    """
 
     def score_fn(template: str) -> float:
-        try:
-            render_fn = templated_renderer(template)
-            index = Index.build(corpus, render_fn)
-        except Exception:  # invalid placeholder / format error -> reject
-            return float("-inf")
-        return statistics.mean(
-            metrics.recall_at_k(
-                [cid for cid, _ in index.search(q.question, k=k)], set(q.relevant), k
-            )
-            for q in sampled
-        )
+        return score_template(corpus, tune_queries, k, template)
 
     context = (
         "The template renders one CMR dataset record as a natural-language summary "
@@ -341,6 +396,23 @@ def run_auto_tune(corpus, sampled, k, model, rounds):
 # --------------------------------------------------------------------------- #
 
 
+def _answer_table(lines: list[str], rows: list[dict], cost: dict, renderers: dict) -> dict:
+    """Render one format×model accuracy table; return {rep: [acc per model]}."""
+    models = sorted({r["model"] for r in rows})
+    lines.append("| representation | " + " | ".join(models) + " |")
+    lines.append("|---|" + "---|" * len(models))
+    acc: dict = {}
+    for rep in renderers:
+        cells = []
+        for m in models:
+            sel = [r for r in rows if r["representation"] == rep and r["model"] == m]
+            a = statistics.mean(r["correct"] for r in sel) if sel else 0.0
+            acc.setdefault(rep, []).append(a)
+            cells.append(f"{a:.2f}" if sel else "—")
+        lines.append(f"| {rep} | " + " | ".join(cells) + " |")
+    return acc
+
+
 def write_summary(
     retrieval_summary,
     robustness,
@@ -349,12 +421,52 @@ def write_summary(
     tune_result,
     tune_baseline,
     path: Path,
+    *,
+    renderers: dict = RENDERERS,
+    fair: bool = False,
+    tune_heldout: float | None = None,
+    coverage=None,
 ):
     lines = ["# Experiment 1 — Format ablation results\n"]
+    lines.append(
+        "**Content-hold mode:** "
+        + (
+            "`fair` — all four renderers driven from the same `facets()` payload, "
+            "so differences reflect *format only*."
+            if fair
+            else "`default` — `raw_umm_json`/`dot_breadcrumb` render the full UMM "
+            "tree (a superset of the curated formats' content), so retrieval "
+            "differences confound format with information content. Re-run with "
+            "`--fair` to isolate format."
+        )
+        + "\n"
+    )
+
+    # Coverage of ground truth vs corpus (silent-failure guard).
+    if coverage is not None:
+        lines.append("## Ground-truth coverage\n")
+        lines.append(
+            f"- {coverage.n_ok}/{coverage.n_queries} queries have an in-corpus "
+            f"relevant id (max achievable recall)."
+        )
+        if coverage.missing_relevant:
+            lines.append(
+                f"- {len(coverage.missing_relevant)} query(ies) reference relevant "
+                "ids **absent from the corpus** (these can never be retrieved and "
+                "score a hard 0)."
+            )
+        if coverage.empty_relevant:
+            lines.append(
+                f"- {len(coverage.empty_relevant)} query(ies) have **no** ground "
+                "truth and were excluded from scoring."
+            )
+        if not coverage.missing_relevant and not coverage.empty_relevant:
+            lines.append("- No dangling or empty ground truth. ✓")
+        lines.append("")
 
     # Retrieval table.
     lines.append("## Retrieval (all queries)\n")
-    lines.append("| representation | Recall@k | 95% CI | MRR | nDCG | tokens/rec |")
+    lines.append("| representation | Recall@k | 95% CI (cluster) | MRR | nDCG | tokens/rec |")
     lines.append("|---|---|---|---|---|---|")
     for rep, s in sorted(
         retrieval_summary.items(), key=lambda kv: -kv[1]["recall_at_k_mean"]
@@ -364,6 +476,11 @@ def write_summary(
             f"[{s['recall_at_k_lo']:.3f}, {s['recall_at_k_hi']:.3f}] | "
             f"{s['mrr_mean']:.3f} | {s['ndcg_mean']:.3f} | {cost.get(rep, 0):.0f} |"
         )
+    lines.append(
+        "\n_CIs are cluster-bootstrapped by ground-truth dataset (not per query), "
+        "since the query set is paraphrase-clustered — a per-query bootstrap would "
+        "understate their width._"
+    )
 
     # Robustness distinguishability.
     lines.append("\n## Robustness — are format differences distinguishable?\n")
@@ -377,47 +494,51 @@ def write_summary(
                 overlaps.append(f"- {reps[i]} ≈ {reps[j]} (CIs overlap)")
     lines.extend(overlaps or ["- (none — all pairwise differences are distinguishable)"])
 
-    # Answer / format x model table.
-    lines.append("\n## End-to-end answer accuracy (format × model)\n")
-    if not answer_rows:
+    # Answer stages: coupled (end-to-end RAG) and decoupled (reasoning-only).
+    coupled = [r for r in answer_rows if r.get("stage") != "decoupled"]
+    decoupled = [r for r in answer_rows if r.get("stage") == "decoupled"]
+
+    lines.append("\n## End-to-end answer accuracy — coupled (RAG)\n")
+    if not coupled:
         lines.append(
-            "_No models configured (OpenAI key + pulled Ollama models). Answer "
-            "stage skipped; retrieval + robustness above stand on their own._"
+            "_No models configured (keyed cloud tiers + pulled Ollama models). "
+            "Answer stage skipped; retrieval + robustness above stand on their own._"
         )
     else:
-        models = sorted({r["model"] for r in answer_rows})
-        lines.append("| representation | " + " | ".join(models) + " |")
-        lines.append("|---|" + "---|" * len(models))
-        acc = {}
-        for rep in RENDERERS:
-            cells = []
-            for m in models:
-                sel = [r for r in answer_rows if r["representation"] == rep and r["model"] == m]
-                a = statistics.mean(r["correct"] for r in sel) if sel else 0.0
-                acc.setdefault(rep, []).append(a)
-                cells.append(f"{a:.2f}" if sel else "—")
-            lines.append(f"| {rep} | " + " | ".join(cells) + " |")
+        lines.append(
+            "Candidates are each format's *own* retrieved top-k, so accuracy here "
+            "is bounded by retrieval recall — this measures the full pipeline, not "
+            "format's effect on reasoning (see the decoupled table below).\n"
+        )
+        _answer_table(lines, coupled, cost, renderers)
 
-        # Model-dependence verdict: does the best representation differ by model?
-        lines.append("\n### Model-dependence verdict\n")
+    if decoupled:
+        lines.append("\n## Answer accuracy — decoupled (reasoning over format)\n")
+        lines.append(
+            "Every format is shown the **same** candidate set (gold + fixed "
+            "distractors), rendered in its own format. Gold is always present, so "
+            "this isolates how format affects the model's *selection/reasoning*, "
+            "independent of retrieval.\n"
+        )
+        acc = _answer_table(lines, decoupled, cost, renderers)
+
+        lines.append("\n### Model-dependence verdict (decoupled)\n")
+        models = sorted({r["model"] for r in decoupled})
         best_by_model = {}
         for mi, m in enumerate(models):
-            best_rep = max(RENDERERS, key=lambda rep: acc[rep][mi])
+            best_rep = max(renderers, key=lambda rep: acc[rep][mi])
             best_by_model[m] = best_rep
         for m, rep in best_by_model.items():
             lines.append(f"- best format for **{m}**: `{rep}`")
         distinct = len(set(best_by_model.values()))
         lines.append(
             f"\n**{'Model-dependent' if distinct > 1 else 'Consistent'}**: "
-            f"{distinct} distinct best-formats across {len(models)} models."
+            f"{distinct} distinct best-format(s) across {len(models)} models."
         )
 
-        # Pareto.
-        pts = [
-            (rep, statistics.mean(acc[rep]), cost.get(rep, 0.0)) for rep in RENDERERS
-        ]
+        pts = [(rep, statistics.mean(acc[rep]), cost.get(rep, 0.0)) for rep in renderers]
         front = metrics.pareto_frontier(pts)
-        lines.append("\n### Pareto frontier (accuracy vs token cost)\n")
+        lines.append("\n### Pareto frontier (decoupled accuracy vs token cost)\n")
         for rep, a, c in pts:
             mark = " ⬅ frontier" if rep in front else ""
             lines.append(f"- {rep}: acc={a:.2f}, tokens/rec={c:.0f}{mark}")
@@ -427,13 +548,16 @@ def write_summary(
     if tune_result is None:
         lines.append("_Skipped (no model available for the optimizer)._")
     else:
+        heldout = (
+            f"{tune_heldout:.3f}" if tune_heldout is not None else "n/a"
+        )
         lines.append(
-            f"- baseline templated Recall@k: {tune_baseline:.3f}\n"
-            f"- tuned Recall@k: {tune_result.best.score:.3f} "
+            f"- baseline templated Recall@k (tuning split): {tune_baseline:.3f}\n"
+            f"- tuned Recall@k (tuning split): {tune_result.best.score:.3f} "
             f"(round {tune_result.best.round}, plateaued={tune_result.plateaued})\n"
-            f"- winning template saved to `results/tuned_metadata_as_text.txt`\n"
-            "- Note: cross-model answer re-evaluation with the tuned template is a "
-            "documented follow-up, not run here."
+            f"- **tuned Recall@k on held-out test split: {heldout}** ← the honest "
+            "number; the tuning-split gain is optimistic (selection over rounds).\n"
+            f"- winning template saved to `results/tuned_metadata_as_text.txt`"
         )
 
     path.write_text("\n".join(lines) + "\n")
@@ -462,12 +586,26 @@ def main() -> None:
     parser.add_argument("--no-answer", action="store_true")
     parser.add_argument("--no-tune", action="store_true")
     parser.add_argument(
+        "--fair",
+        action="store_true",
+        help="use the content-held renderer registry (RENDERERS_FAIR) so all four "
+        "formats see the same facet content — isolates format from information "
+        "content in the retrieval comparison.",
+    )
+    parser.add_argument(
+        "--no-decoupled",
+        action="store_true",
+        help="skip the decoupled answer stage (shared candidate set); run only the "
+        "coupled end-to-end RAG answer stage.",
+    )
+    parser.add_argument(
         "--no-verbose",
         action="store_true",
         help="disable per-query/per-model output logging (still writes answers.jsonl)",
     )
     args = parser.parse_args()
     verbose = not args.no_verbose
+    renderers = RENDERERS_FAIR if args.fair else RENDERERS
 
     run_dir = new_run_dir(RESULTS_DIR)
     log_path = run_dir / f"run-{run_dir.name}.log"
@@ -477,24 +615,51 @@ def main() -> None:
     corpus = load_corpus()
     queries = load_queries()
     corpus_by_id = {r["meta"]["concept-id"]: r for r in corpus}
-    sampled = sample_queries(queries, args.max_queries, args.seed)
-    log(f"corpus={len(corpus)} queries={len(queries)} sample={len(sampled)}")
+    log(f"content-hold mode: {'fair (facet-only)' if args.fair else 'default (full-tree)'}")
 
-    # --- Retrieval stage (all queries, all representations) ---
+    # --- Ground-truth coverage (silent-failure guard) ---
+    coverage = check_relevance_coverage(corpus, queries)
+    log(
+        f"coverage: {coverage.n_ok}/{coverage.n_queries} queries have an in-corpus "
+        f"relevant id; {len(coverage.missing_relevant)} with dangling ids, "
+        f"{len(coverage.empty_relevant)} with empty ground truth"
+    )
+    if coverage.missing_relevant:
+        log(f"  dangling relevant ids (sample): {dict(list(coverage.missing_relevant.items())[:5])}")
+
+    # Score only queries whose ground truth is actually reachable, so empty /
+    # dangling ground truth does not silently depress every representation.
+    scored_queries = [
+        q for q in queries
+        if q.relevant and any(c in corpus_by_id for c in q.relevant)
+    ]
+    if len(scored_queries) != len(queries):
+        log(f"scoring {len(scored_queries)}/{len(queries)} queries with reachable ground truth")
+
+    # Cluster-aware train/val/test split (paraphrases of one gold stay together).
+    splits = split_by_cluster(scored_queries, seed=args.seed)
+    log(f"splits: train={len(splits['train'])} val={len(splits['val'])} test={len(splits['test'])}")
+
+    # Cluster map (query_id -> gold dataset) for honest, cluster-bootstrapped CIs.
+    clusters = {q.id: _gold_cluster(q) for q in scored_queries}
+    sampled = sample_queries(scored_queries, args.max_queries, args.seed)
+    log(f"corpus={len(corpus)} queries={len(queries)} scored={len(scored_queries)} sample={len(sampled)}")
+
+    # --- Retrieval stage (all scored queries, all representations) ---
     all_retrieval = []
     retrieved: dict[tuple[str, str], list[str]] = {}
-    for rep, fn in RENDERERS.items():
-        results = evaluate_retrieval(corpus, queries, fn, rep, k=args.k)
+    for rep, fn in renderers.items():
+        results = evaluate_retrieval(corpus, scored_queries, fn, rep, k=args.k)
         all_retrieval += results
         for r in results:
             retrieved[(rep, r.query_id)] = r.top_ids
         log(f"retrieval {rep}: built + scored {len(results)} queries")
     write_jsonl(all_retrieval, run_dir / "retrieval.jsonl")
-    retrieval_summary = summarize(all_retrieval)
-    cost = {rep: tokens_per_record(corpus, fn) for rep, fn in RENDERERS.items()}
+    retrieval_summary = summarize(all_retrieval, clusters=clusters)
+    cost = {rep: tokens_per_record(corpus, fn) for rep, fn in renderers.items()}
 
     # --- Robustness ---
-    robustness = run_robustness(corpus, sampled, args.k)
+    robustness = run_robustness(corpus, sampled, args.k, renderers)
 
     # --- Answer stage ---
     if args.models.strip():
@@ -516,39 +681,71 @@ def main() -> None:
             log(f"WARNING: only {len(models)} model(s) available; report design wants ≥3: {models}")
         else:
             log(f"models: {models}")
+
+        # Coupled (end-to-end RAG): each format answers over its own top-k.
         answer_rows = run_answer_stage(
             corpus_by_id,
             retrieved,
             sampled,
             models,
             answer_k=args.answer_k,
+            renderers=renderers,
             max_tokens=args.answer_max_tokens,
             verbose=verbose,
         )
+
+        # Decoupled (reasoning over format): every format sees the SAME candidate
+        # set (gold + fixed distractors from the reference retriever), so accuracy
+        # is not bounded by that format's own recall.
+        if not args.no_decoupled:
+            ref = "metadata_as_text" if "metadata_as_text" in renderers else next(iter(renderers))
+            shared = {
+                q.id: build_shared_candidates(
+                    q, retrieved.get((ref, q.id), []), corpus_by_id,
+                    answer_k=args.answer_k, seed=args.seed,
+                )
+                for q in sampled
+            }
+            n_answerable = sum(1 for v in shared.values() if v)
+            log(f"decoupled stage: {n_answerable}/{len(sampled)} queries have gold in corpus; ref={ref}")
+            answer_rows += run_answer_stage(
+                corpus_by_id,
+                retrieved,
+                sampled,
+                models,
+                answer_k=args.answer_k,
+                renderers=renderers,
+                shared_candidates=shared,
+                max_tokens=args.answer_max_tokens,
+                verbose=verbose,
+            )
         write_jsonl(answer_rows, run_dir / "answers.jsonl")
 
-    # --- Auto-tune ---
+    # --- Auto-tune (train on the tuning split, report on held-out test) ---
     tune_result = None
     tune_baseline = 0.0
+    tune_heldout = None
     if args.no_tune:
         log("auto-tune disabled (--no-tune)")
     elif not models:
         log("auto-tune skipped: no optimizer model available")
     else:
-        baseline_fn = templated_renderer(DEFAULT_TEMPLATE)
-        base_index = Index.build(corpus, baseline_fn)
-        tune_baseline = statistics.mean(
-            metrics.recall_at_k(
-                [cid for cid, _ in base_index.search(q.question, k=args.k)],
-                set(q.relevant),
-                args.k,
-            )
-            for q in sampled
+        tune_split = splits["train"] + splits["val"]
+        test_split = splits["test"]
+        tune_baseline = score_template(corpus, tune_split, args.k, DEFAULT_TEMPLATE)
+        log(
+            f"auto-tune baseline Recall@{args.k}={tune_baseline:.3f} on "
+            f"{len(tune_split)} tuning queries; optimizing with {models[0]}"
         )
-        log(f"auto-tune baseline Recall@{args.k}={tune_baseline:.3f}; optimizing with {models[0]}")
-        tune_result = run_auto_tune(corpus, sampled, args.k, models[0], args.tune_rounds)
+        tune_result = run_auto_tune(corpus, tune_split, args.k, models[0], args.tune_rounds)
+        # The honest number: re-score the winning template on the held-out test
+        # split it was never optimized against.
+        tune_heldout = score_template(corpus, test_split, args.k, tune_result.best.text)
         (run_dir / "tuned_metadata_as_text.txt").write_text(tune_result.best.text + "\n")
-        log(f"auto-tune best Recall@{args.k}={tune_result.best.score:.3f}")
+        log(
+            f"auto-tune tuning-split Recall@{args.k}={tune_result.best.score:.3f}; "
+            f"held-out test Recall@{args.k}={tune_heldout:.3f}"
+        )
 
     # --- Summary ---
     write_summary(
@@ -559,6 +756,10 @@ def main() -> None:
         tune_result,
         tune_baseline,
         run_dir / "summary.md",
+        renderers=renderers,
+        fair=args.fair,
+        tune_heldout=tune_heldout,
+        coverage=coverage,
     )
     log(f"wrote {run_dir / 'summary.md'}")
     log(f"verbose run log saved to {log_path}")

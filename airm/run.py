@@ -71,6 +71,43 @@ class RetrievalResult:
     top_ids: list[str]
 
 
+@dataclass
+class RelevanceCoverage:
+    """Ground-truth vs. corpus coverage — the retrieval eval's silent-failure map."""
+
+    missing_relevant: dict[str, list[str]]  # query_id -> relevant ids absent from corpus
+    empty_relevant: list[str]  # query_ids with no ground truth at all
+    n_queries: int
+    n_ok: int  # queries with at least one in-corpus relevant id
+
+
+def check_relevance_coverage(
+    records: list[dict], queries: list[Query]
+) -> RelevanceCoverage:
+    """Flag queries whose ground truth can never be retrieved from ``records``.
+
+    A relevant concept-id that is not in the corpus (stale/typo'd id, or a
+    filtered corpus) makes that query score a hard 0 across *every* representation
+    with no error — quiet, systematic score depression. Likewise a query with an
+    empty ``relevant`` list. Callers should ``log`` the result rather than let it
+    pass silently (see CLAUDE.md coverage convention).
+    """
+    corpus_ids = {r["meta"]["concept-id"] for r in records}
+    missing: dict[str, list[str]] = {}
+    empty: list[str] = []
+    n_ok = 0
+    for q in queries:
+        if not q.relevant:
+            empty.append(q.id)
+            continue
+        absent = [c for c in q.relevant if c not in corpus_ids]
+        if absent:
+            missing[q.id] = absent
+        if any(c in corpus_ids for c in q.relevant):
+            n_ok += 1
+    return RelevanceCoverage(missing, empty, len(queries), n_ok)
+
+
 def evaluate_retrieval(
     records: list[dict],
     queries: list[Query],
@@ -99,8 +136,18 @@ def evaluate_retrieval(
     return results
 
 
-def summarize(results: list[RetrievalResult]) -> dict[str, dict[str, float]]:
-    """Aggregate per-representation means with bootstrap CIs on recall."""
+def summarize(
+    results: list[RetrievalResult],
+    *,
+    clusters: dict[str, str] | None = None,
+) -> dict[str, dict[str, float]]:
+    """Aggregate per-representation means with bootstrap CIs on recall.
+
+    When ``clusters`` (query_id -> group id, e.g. the query's ground-truth
+    dataset) is given, the recall CI is computed with a cluster bootstrap so
+    correlated paraphrase clusters don't shrink the interval artificially. Falls
+    back to the per-query bootstrap when ``clusters`` is omitted.
+    """
     by_rep: dict[str, list[RetrievalResult]] = {}
     for r in results:
         by_rep.setdefault(r.representation, []).append(r)
@@ -108,7 +155,11 @@ def summarize(results: list[RetrievalResult]) -> dict[str, dict[str, float]]:
     summary: dict[str, dict[str, float]] = {}
     for rep, rows in by_rep.items():
         recalls = [r.recall_at_k for r in rows]
-        mean, lo, hi = metrics.bootstrap_ci(recalls)
+        if clusters is not None:
+            cluster_ids = [clusters.get(r.query_id, r.query_id) for r in rows]
+            mean, lo, hi = metrics.bootstrap_ci_clustered(recalls, cluster_ids)
+        else:
+            mean, lo, hi = metrics.bootstrap_ci(recalls)
         summary[rep] = {
             "recall_at_k_mean": mean,
             "recall_at_k_lo": lo,
