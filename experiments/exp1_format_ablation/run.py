@@ -171,10 +171,40 @@ def extract_concept_id(text: str) -> str | None:
 
 
 def sample_queries(queries: list[Query], n: int, seed: int) -> list[Query]:
+    """Sample ``n`` queries spread across ground-truth clusters.
+
+    The query set is paraphrase-clustered by gold dataset, so a uniform sample
+    can draw several paraphrases of the same dataset and leave answer accuracy
+    resting on very few *distinct* datasets. Drawing round-robin over shuffled
+    clusters maximises the distinct datasets covered, which is also what makes a
+    cluster bootstrap on this axis meaningful.
+    """
     set_seed(seed)
     if n >= len(queries):
         return list(queries)
-    return random.sample(queries, n)
+    rng = random.Random(seed)
+    by_cluster: dict[str, list[Query]] = {}
+    for q in queries:
+        by_cluster.setdefault(q.relevant[0] if q.relevant else q.id, []).append(q)
+    for group in by_cluster.values():
+        rng.shuffle(group)
+    order = sorted(by_cluster)
+    rng.shuffle(order)
+    picked: list[Query] = []
+    depth = 0
+    while len(picked) < n:
+        added = False
+        for key in order:
+            group = by_cluster[key]
+            if depth < len(group):
+                picked.append(group[depth])
+                added = True
+                if len(picked) == n:
+                    break
+        if not added:
+            break
+        depth += 1
+    return picked
 
 
 def tokens_per_record(records: list[dict], render_fn, cap: int = 100) -> float:
@@ -413,6 +443,38 @@ def _answer_table(lines: list[str], rows: list[dict], cost: dict, renderers: dic
     return acc
 
 
+def _answer_ci(rows: list[dict], renderers: dict) -> dict[str, tuple[float, float, float, int, int]]:
+    """{representation: (mean, lo, hi, n_rows, n_clusters)} pooled over models.
+
+    Clusters are the gold dataset, matching the retrieval axis, so correlated
+    paraphrases don't shrink the interval.
+    """
+    out: dict[str, tuple[float, float, float, int, int]] = {}
+    for rep in renderers:
+        sel = [r for r in rows if r["representation"] == rep]
+        if not sel:
+            continue
+        values = [float(r["correct"]) for r in sel]
+        clusters = [
+            r["relevant"][0] if r.get("relevant") else r.get("query_id", i)
+            for i, r in enumerate(sel)
+        ]
+        mean, lo, hi = metrics.bootstrap_ci_clustered(values, clusters)
+        out[rep] = (mean, lo, hi, len(sel), len(set(clusters)))
+    return out
+
+
+def _ci_overlap_pairs(ci: dict[str, tuple[float, float, float, int, int]]) -> list[str]:
+    keys = list(ci)
+    pairs = []
+    for i in range(len(keys)):
+        for j in range(i + 1, len(keys)):
+            a, b = ci[keys[i]], ci[keys[j]]
+            if not (a[2] < b[1] or b[2] < a[1]):
+                pairs.append(f"- {keys[i]} ≈ {keys[j]} (CIs overlap)")
+    return pairs
+
+
 def write_summary(
     retrieval_summary,
     robustness,
@@ -521,6 +583,33 @@ def write_summary(
             "independent of retrieval.\n"
         )
         acc = _answer_table(lines, decoupled, cost, renderers)
+
+        # Uncertainty on this axis, matching how retrieval is already reported.
+        # Without it a 0.78-vs-0.74 gap reads as a winner when it can be one query.
+        rep_ci = _answer_ci(decoupled, renderers)
+        if rep_ci:
+            n_rows = next(iter(rep_ci.values()))[3]
+            n_clusters = next(iter(rep_ci.values()))[4]
+            lines.append("\n### Decoupled accuracy with CIs (pooled over models)\n")
+            lines.append("| representation | accuracy | 95% CI (cluster) | n | distinct datasets |")
+            lines.append("|---|---|---|---|---|")
+            for rep, (mean, lo, hi, n, nc) in sorted(rep_ci.items(), key=lambda kv: -kv[1][0]):
+                lines.append(f"| {rep} | {mean:.3f} | [{lo:.3f}, {hi:.3f}] | {n} | {nc} |")
+            overlaps = _ci_overlap_pairs(rep_ci)
+            lines.append("\nFormat pairs whose CIs **overlap** (not distinguishable):\n")
+            lines.extend(overlaps or ["- (none — all formats are distinguishable)"])
+            if len(overlaps) == len(rep_ci) * (len(rep_ci) - 1) // 2:
+                lines.append(
+                    "\n**No format is statistically distinguishable on this axis.** Any "
+                    "'winner' named below is a point estimate only."
+                )
+            if n_clusters < 20:
+                lines.append(
+                    f"\n⚠️ Only **{n_clusters} distinct gold datasets** in the answer sample "
+                    f"({n_rows} rows/format). The cluster bootstrap resamples those "
+                    f"{n_clusters} units, so these intervals are wide and the per-model "
+                    "cells above are coarse. Raise `--max-queries` before quoting them."
+                )
 
         lines.append("\n### Model-dependence verdict (decoupled)\n")
         models = sorted({r["model"] for r in decoupled})
