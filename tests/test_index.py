@@ -8,8 +8,9 @@ from __future__ import annotations
 
 import pytest
 
-from airm import index
+from airm import index, unfaceted
 from airm.config import FORMATS, MAX_EMBED_TRUNCATIONS, collection_name
+from airm.facets import facets
 
 
 def _record(cid: str, title: str, topic: str = "OCEANS", abstract: str = "") -> dict:
@@ -214,3 +215,97 @@ def test_live_expert_queries_retrieve_their_targets():
         if hits & set(q.expected_concept_ids):
             found += 1
     assert found >= len(queries) - 2, f"only {found}/{len(queries)} queries hit a target"
+
+
+# --------------------------------------------------------------------------- #
+# Two payloads, two databases.
+# --------------------------------------------------------------------------- #
+
+
+def test_the_two_payloads_get_separate_databases():
+    """Separate paths, identical collection names.
+
+    Naming the wrong collection cannot reach the other payload's vectors — you
+    would have to open the wrong database, which is explicit.
+    """
+    assert index.chroma_dir("faceted") != index.chroma_dir("unfaceted")
+    assert index.chroma_dir("faceted").name == "faceted"
+    assert {collection_name(f) for f in FORMATS} == {collection_name(f) for f in FORMATS}
+
+
+def test_unknown_payload_is_rejected():
+    with pytest.raises(ValueError, match="unknown payload"):
+        index.chroma_dir("nonsense")
+
+
+def test_the_payloads_index_different_documents(tmp_path):
+    """Same records, same model, different renderings — the whole design."""
+    faceted = index._documents("faceted", "json", [(r["meta"]["concept-id"], facets(r)) for r in RECORDS])
+    unfaceted_docs = index._documents(
+        "unfaceted", "json", [(r["meta"]["concept-id"], unfaceted.payload(r)) for r in RECORDS]
+    )
+    assert faceted != unfaceted_docs
+    # Size is deliberately not asserted here: these are hand-built stubs whose
+    # raw UMM is smaller than their facet payload (the facets add a constructed
+    # cmr_link). Only on real records does the control carry strictly more —
+    # `test_the_unfaceted_payload_dwarfs_the_faceted_one` checks that on ATL08.
+    assert all(unfaceted.payload(r) is not facets(r) for r in RECORDS)
+
+
+def test_truncation_is_fatal_for_faceted_and_graded_for_the_control():
+    """The asymmetry that lets the control exist at all.
+
+    Experiment 2 measures a format effect on the faceted index, so uneven
+    clipping there would be an artefact. The control exists partly *to show*
+    that a raw UMM record does not fit an 8k window.
+    """
+    clipped = index.IndexReport(
+        payload="faceted", max_sequence_tokens=8192,
+        counts={f: 2 for f in FORMATS}, truncated={f: 3 for f in FORMATS},
+        ground_truth_missing={f: [] for f in FORMATS},
+    )
+    assert any("exceed the" in p for p in index.verify(clipped, 2))
+
+    clipped.payload = "unfaceted"
+    assert index.verify(clipped, 2) == []
+    assert "not for a format comparison" in index.truncation_note(clipped)
+
+
+def test_truncation_note_is_empty_when_nothing_was_clipped():
+    clean = index.IndexReport(
+        payload="unfaceted", max_sequence_tokens=8192,
+        counts={f: 2 for f in FORMATS}, truncated={f: 0 for f in FORMATS},
+        ground_truth_missing={f: [] for f in FORMATS},
+    )
+    assert index.truncation_note(clean) == ""
+    assert index.verify(clean, 2) == []
+
+
+def test_the_report_records_which_payload_it_describes():
+    assert index.IndexReport(payload="unfaceted").to_dict()["payload"] == "unfaceted"
+
+
+def test_over_length_documents_are_truncated_not_turned_into_nan():
+    """The bug that killed the first unfaceted build.
+
+    ``gte-modernbert-base`` returns NaN for input past its window rather than
+    truncating, and Chroma rejects NaN outright. The build counted truncations
+    without performing any, so the counter meant "would have been clipped" while
+    nothing was. Only the faceted zero-truncation gate kept it hidden.
+    """
+    import math
+
+    limit = index.max_sequence_tokens()
+    long_doc = "sea ice concentration measurements " * 4000
+    assert index.count_wordpieces([long_doc])[0] > limit
+
+    cut = index.truncate_to_window([long_doc])
+    assert index.count_wordpieces(cut)[0] <= limit
+
+    vector = index.embed(cut)[0]
+    assert all(math.isfinite(v) for v in vector)
+
+
+def test_documents_within_the_window_are_returned_untouched():
+    short = ["a short record", "another short one"]
+    assert index.truncate_to_window(short) == short

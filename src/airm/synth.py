@@ -73,11 +73,19 @@ class SynthReport:
         }
 
 
-def _retrievable(text: str, concept_id: str, *, k: int = TOP_K) -> list[str]:
-    """Formats whose top-``k`` contains ``concept_id``."""
+def _retrievable(
+    text: str, concept_id: str, *, k: int = TOP_K, index_path: str | None = None
+) -> list[str]:
+    """Formats whose top-``k`` contains ``concept_id``.
+
+    ``index_path`` must name the database holding the *same* records the queries
+    are being generated from. Checking a full-cache candidate against the 500
+    corpus index would ask whether a record that is not in that haystack can be
+    found in it, and drop every query as unretrievable.
+    """
     found = []
     for fmt in FORMATS:
-        hits = {h["concept_id"] for h in index.query(fmt, text, k=k)}
+        hits = {h["concept_id"] for h in index.query(fmt, text, k=k, path=index_path)}
         if concept_id in hits:
             found.append(fmt)
     return found
@@ -92,6 +100,8 @@ def generate(
     seed: int = RANDOM_SEED,
     k: int = TOP_K,
     check_retrievable: bool = True,
+    index_path: str | None = None,
+    temperature: float | None = 0.7,
 ) -> tuple[list[Query], SynthReport]:
     """Generate one query per sampled record until each topic quota is met."""
     records = records if records is not None else cmr.load_corpus()
@@ -139,7 +149,7 @@ def generate(
                         purpose=PURPOSE_QUERY_GEN,
                         logger=logger,
                         json_mode=True,
-                        temperature=0.7,
+                        temperature=temperature,
                         topic=topic,
                         concept_id=cid,
                         attempt=attempt,
@@ -168,7 +178,11 @@ def generate(
                         )
                     continue
 
-                formats_hit = _retrievable(text, cid, k=k) if check_retrievable else list(FORMATS)
+                formats_hit = (
+                    _retrievable(text, cid, k=k, index_path=index_path)
+                    if check_retrievable
+                    else list(FORMATS)
+                )
                 if not formats_hit:
                     if attempt == MAX_QUERY_REGEN_ATTEMPTS:
                         report.dropped.append(
@@ -205,15 +219,26 @@ def build(
     *,
     logger: CallLogger | None = None,
     out_path: Path = QUERIES_PATH,
+    report_path: Path | None = None,
     **kwargs,
 ) -> tuple[list[Query], SynthReport]:
-    """Generate synthetic queries and write the combined SME + synthetic set."""
+    """Generate synthetic queries and write the combined SME + synthetic set.
+
+    ``report_path`` defaults to ``synthetic_report.json`` beside ``out_path``,
+    which is right for the canonical set and wrong for any other: a second run
+    writing to a different ``out_path`` would otherwise overwrite the first run's
+    report and leave a query set whose provenance describes a different one.
+    """
     synthetic, report = generate(spec, logger=logger, **kwargs)
     combined = load_queries() + synthetic
     write_queries(combined, out_path)
-    out_path.with_name("synthetic_report.json").write_text(
-        json.dumps(report.to_dict(), indent=2, ensure_ascii=False) + "\n"
-    )
+    if report_path is None:
+        report_path = (
+            out_path.with_name("synthetic_report.json")
+            if out_path == QUERIES_PATH
+            else out_path.with_name(f"{out_path.stem}_report.json")
+        )
+    report_path.write_text(json.dumps(report.to_dict(), indent=2, ensure_ascii=False) + "\n")
     return combined, report
 
 
@@ -236,15 +261,76 @@ if __name__ == "__main__":  # pragma: no cover - CLI
     parser.add_argument("--provider", default="ollama")
     parser.add_argument("--model", default="qwen3.6:latest")
     parser.add_argument("--limit", type=int, help="cap per-topic quota (smoke run)")
+    parser.add_argument(
+        "--total",
+        type=int,
+        default=None,
+        help="synthetic queries to generate; the per-topic shape is scaled, not reshaped",
+    )
+    parser.add_argument(
+        "--records",
+        choices=("corpus", "full"),
+        default="corpus",
+        help="draw from the 500 stratified corpus or from every gate-passing cached record",
+    )
+    parser.add_argument(
+        "--index-path",
+        default=None,
+        help="Chroma database for the retrievability check; must hold the same records as --records",
+    )
+    parser.add_argument("--out", type=Path, default=QUERIES_PATH)
+    parser.add_argument("--report", type=Path, default=None)
+    parser.add_argument("--seed", type=int, default=RANDOM_SEED)
+    parser.add_argument(
+        "--temperature",
+        type=float,
+        default=0.7,
+        help="pass -1 to omit the parameter for models that reject it",
+    )
     args = parser.parse_args()
 
-    quota = synthetic_quota()
+    quota = synthetic_quota(args.total) if args.total else synthetic_quota()
     if args.limit:
         quota = {t: min(n, args.limit) for t, n in quota.items()}
 
-    log = CallLogger()
     spec = Spec(args.provider, args.model)
-    qs, rep = build(spec, logger=log, quota=quota)
+    # Checked before anything expensive: a retired model name is a 404 on every
+    # one of several hundred calls, and the run would burn the whole record pool
+    # discovering it.
+    from .llm import resolve_models
+
+    usable, issues = resolve_models([spec])
+    for issue in issues:
+        print(f"! {issue}")
+    if not usable:
+        raise SystemExit(f"{spec.key} is not available; nothing generated.")
+
+    records = None
+    if args.records == "full":
+        records, selection = index.all_cached_records()
+        print(
+            f"records       : {selection['kept']} of {selection['examined']} cached "
+            f"({len(selection['parity_failures'])} parity, {len(selection['over_window'])} over window)"
+        )
+        if args.index_path is None:
+            raise SystemExit(
+                "--records full needs --index-path pointing at the index built over those "
+                "records (e.g. data/chroma/faceted_full); the default 500-record index would "
+                "mark every candidate unretrievable."
+            )
+
+    log = CallLogger()
+    qs, rep = build(
+        spec,
+        logger=log,
+        quota=quota,
+        records=records,
+        out_path=args.out,
+        report_path=args.report,
+        index_path=args.index_path,
+        seed=args.seed,
+        temperature=None if args.temperature < 0 else args.temperature,
+    )
 
     print(f"generator     : {rep.generator}")
     print(f"queries total : {len(qs)} ({rep.total} synthetic + {len(qs) - rep.total} SME)")
@@ -262,5 +348,5 @@ if __name__ == "__main__":  # pragma: no cover - CLI
         print("\nQUOTA SHORTFALLS:")
         for issue in issues:
             print(f"  - {issue}")
-    print(f"\nwrote {QUERIES_PATH}")
+    print(f"\nwrote {args.out}")
     print(f"log records: {log.counts()}")

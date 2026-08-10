@@ -85,15 +85,18 @@ def test_a_tighter_sample_gives_a_tighter_interval():
 # --------------------------------------------------------------------------- #
 
 
-def test_every_record_yields_one_row_per_format_plus_the_reference():
+def test_every_record_yields_one_row_per_payload_and_format():
     rows = exp1.measure_records([_record("C1-A"), _record("C2-A")], hf=False)
-    assert len(rows) == 2 * (len(FORMATS) + 1)
-    kinds = {r["format"] for r in rows}
-    assert kinds == set(FORMATS) | {exp1.REFERENCE_KEY}
+    assert len(rows) == 2 * len(exp1.PAYLOADS) * len(FORMATS)
+    assert {r["format"] for r in rows} == set(FORMATS)
+    assert {r["payload"] for r in rows} == set(exp1.PAYLOADS)
+    # Every (payload, format) cell is filled exactly once per record.
+    cells = [(r["concept_id"], r["payload"], r["format"]) for r in rows]
+    assert len(cells) == len(set(cells))
 
 
-def test_the_raw_umm_reference_dwarfs_every_rendered_format():
-    """It carries the whole tree; that is why it is excluded from the comparison.
+def test_the_unfaceted_payload_dwarfs_the_faceted_one():
+    """The projection is what makes the study's payload small.
 
     Measured on the real ATL08 record -- a hand-built stub has so few fields that
     its raw UMM is *smaller* than the facet renderings, which says nothing about
@@ -108,9 +111,30 @@ def test_the_raw_umm_reference_dwarfs_every_rendered_format():
         "umm": json.loads((SAMPLE_DATA_DIR / "umm_json.json").read_text()),
     }
     rows = exp1.measure_records([record], hf=False)
-    ref = next(r for r in rows if r["format"] == exp1.REFERENCE_KEY)
-    others = [r for r in rows if r["format"] != exp1.REFERENCE_KEY]
-    assert ref["tiktoken"] > 2 * max(r["tiktoken"] for r in others)
+    by = {(r["payload"], r["format"]): r["tiktoken"] for r in rows}
+    # Compared per format, not cheapest-against-dearest: prose over the raw
+    # record is cheaper than JSON-LD over the projection, so a global min/max
+    # comparison says nothing about content. Like for like is the invariant.
+    for fmt in FORMATS:
+        assert by[(exp1.UNFACETED, fmt)] > by[(exp1.FACETED, fmt)], fmt
+
+
+def test_the_reference_is_the_unfaceted_json_row_not_a_second_measurement():
+    """``json_umm`` was measuring the same string as unfaceted JSON.
+
+    If these ever diverge, the reference has stopped describing the raw record.
+    """
+    import json
+
+    record = _record("C1-A")
+    rows = exp1.measure_records([record], hf=False)
+    unfaceted_json = next(
+        r for r in rows if r["payload"] == exp1.UNFACETED and r["format"] == "json"
+    )
+    raw = json.dumps(record["umm"], ensure_ascii=False, separators=(",", ":"))
+    from airm import tokens
+
+    assert unfaceted_json["tiktoken"] == tokens.measure(raw, hf=False)["tiktoken"]
 
 
 def test_topic_is_carried_onto_every_row():
@@ -131,14 +155,13 @@ def rows():
     )
 
 
-def test_summary_covers_every_format_but_not_the_reference(rows):
-    comparable = [r for r in rows if r["format"] != exp1.REFERENCE_KEY]
-    summaries = exp1.summarise(comparable)
+def test_summary_covers_every_format(rows):
+    summaries = exp1.summarise(rows, payload=exp1.FACETED)
     assert {s.fmt for s in summaries} == set(FORMATS)
 
 
 def test_the_baseline_is_exactly_one_relative_to_itself(rows):
-    summaries = {s.fmt: s for s in exp1.summarise(rows)}
+    summaries = {s.fmt: s for s in exp1.summarise(rows, payload=exp1.FACETED)}
     base = summaries["json"]
     assert base.ratio_mean == pytest.approx(1.0)
     assert base.pct_vs_baseline == pytest.approx(0.0)
@@ -146,25 +169,29 @@ def test_the_baseline_is_exactly_one_relative_to_itself(rows):
 
 def test_ratios_are_paired_per_record_not_a_ratio_of_means(rows):
     """Records vary hugely in size; unpaired means bury a real format effect."""
-    summaries = {s.fmt: s for s in exp1.summarise(rows)}
+    summaries = {s.fmt: s for s in exp1.summarise(rows, payload=exp1.FACETED)}
     per_record = {}
     for r in rows:
+        # Filtering by payload is load-bearing: without it the unfaceted rows
+        # overwrite the faceted ones and the expectation silently changes.
+        if r["payload"] != exp1.FACETED:
+            continue
         per_record.setdefault(r["concept_id"], {})[r["format"]] = r["tiktoken"]
     expected = sum(v["jsonld"] / v["json"] for v in per_record.values()) / len(per_record)
     assert summaries["jsonld"].ratio_mean == pytest.approx(expected)
 
 
 def test_summary_counts_every_record(rows):
-    for s in exp1.summarise(rows):
+    for s in exp1.summarise(rows, payload=exp1.FACETED):
         assert s.n == 12
 
 
 def test_a_measure_with_no_data_is_skipped_rather_than_zeroed(rows):
-    assert exp1.summarise(rows, measure="hf_tokens") == []
+    assert exp1.summarise(rows, measure="hf_tokens", payload=exp1.FACETED) == []
 
 
 def test_per_topic_means_split_by_domain(rows):
-    means = exp1.per_topic_means([r for r in rows if r["format"] != exp1.REFERENCE_KEY])
+    means = exp1.per_topic_means(rows, payload=exp1.FACETED)
     assert set(means) == {"OCEANS", "ATMOSPHERE"}
     assert set(means["OCEANS"]) == set(FORMATS)
 
@@ -178,7 +205,7 @@ def test_rows_write_to_csv_with_a_stable_schema(tmp_path, rows):
     path = exp1.write_rows(rows, tmp_path / "exp1_tokens.csv")
     read = list(csv.DictReader(path.open()))
     assert len(read) == len(rows)
-    assert list(read[0]) == ["concept_id", "topic", "format", *exp1.MEASURES]
+    assert list(read[0]) == ["concept_id", "topic", "payload", "format", *exp1.MEASURES]
 
 
 def test_run_writes_every_artefact(tmp_path, monkeypatch):
@@ -186,7 +213,7 @@ def test_run_writes_every_artefact(tmp_path, monkeypatch):
     result = exp1.run(hf=False, run_id="testrun", out_dir=tmp_path)
 
     assert result["records"] == 6
-    assert result["rows"] == 6 * (len(FORMATS) + 1)
+    assert result["rows"] == 6 * len(exp1.PAYLOADS) * len(FORMATS)
     assert result["reference_raw_umm"]["n"] == 6
     assert result["tokenizers"]["hf"] is None
     for name in ("exp1_tokens.csv", "exp1_summary.json", "exp1_tokens.png"):

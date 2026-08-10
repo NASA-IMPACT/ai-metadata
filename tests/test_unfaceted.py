@@ -124,11 +124,59 @@ def test_jsonld_models_five_fields_and_dumps_the_rest_into_property_values():
     assert "ContactPersons[0].LastName" in names
 
 
-def test_prose_is_path_clauses_not_sentences():
-    """Documents the degradation rather than pretending it reads as prose."""
-    text = unfaceted.render_mat(unfaceted.payload(RECORD))
-    assert "SpatialExtent > HorizontalSpatialDomain" in text
-    assert text.count(" is ") > 10
+def test_mat_is_prose_not_a_breadcrumb_dump():
+    """The check that was missing when ``mat`` was silently a path dump.
+
+    A renderer is not verified by its name. Prose carries several values per
+    sentence, so its clause count must be far below its leaf count; a breadcrumb
+    dump emits exactly one clause per leaf and spells a path in every one.
+    """
+    p = unfaceted.payload(RECORD)
+    prose = unfaceted.render_mat(p)
+    crumbs = unfaceted.render_breadcrumb(p)
+    leaves = len(flatten(p))
+
+    assert crumbs.count(" is ") == leaves          # breadcrumb: one clause per leaf
+    assert prose.count(" is ") < leaves / 3        # prose: several values per sentence
+    assert unfaceted.PATH_SEPARATOR not in prose.split("Additional metadata:")[0]
+    assert prose.startswith("A Test Collection")   # a sentence, not a path
+
+
+def test_prose_is_substantially_cheaper_than_the_breadcrumb_dump():
+    """The mislabel cost Experiment 1 roughly a factor of two."""
+    p = unfaceted.payload(RECORD)
+    assert len(unfaceted.render_mat(p)) < len(unfaceted.render_breadcrumb(p))
+
+
+def test_prose_carries_almost_everything_before_the_tail():
+    """The tail is a backstop, not the renderer.
+
+    Without this a renderer that routed every leaf through the tail would pass
+    parity while being a breadcrumb dump again — exactly the failure this module
+    already made once.
+    """
+    coverage = unfaceted.prose_coverage(unfaceted.payload(RECORD))
+    assert coverage["prose_share"] > 0.9
+
+
+def test_values_appear_verbatim_not_prettified():
+    """``full_mat.txt`` prettifies (``ACTIVE`` -> ``active``) and so covers 78%.
+
+    Parity is defined on the canonical string, so prettifying drops the value.
+    """
+    record = {"umm": {"EntryTitle": "T", "CollectionProgress": "ACTIVE"}}
+    assert "ACTIVE" in unfaceted.render_mat(unfaceted.payload(record))
+
+
+def test_data_centres_are_merged_by_name():
+    """CMR lists one entry per role; repeating the name states no extra fact."""
+    record = {"umm": {"EntryTitle": "T", "DataCenters": [
+        {"ShortName": "NSIDC", "Roles": ["ARCHIVER"]},
+        {"ShortName": "NSIDC", "Roles": ["DISTRIBUTOR"]},
+    ]}}
+    text = unfaceted.render_mat(unfaceted.payload(record))
+    assert "NSIDC (ARCHIVER, DISTRIBUTOR)" in text
+    assert text.count("NSIDC") == 1
 
 
 def test_json_rendering_matches_exp1_raw_umm_reference():

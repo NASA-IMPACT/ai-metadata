@@ -137,7 +137,7 @@ def stub_llm(monkeypatch):
         )
 
     monkeypatch.setattr(synth, "ask", fake_ask)
-    monkeypatch.setattr(synth, "_retrievable", lambda text, cid, k=10: ["json"])
+    monkeypatch.setattr(synth, "_retrievable", lambda text, cid, k=10, index_path=None: ["json"])
 
 
 def test_generation_meets_the_quota_per_topic(stub_llm):
@@ -189,7 +189,7 @@ def test_a_leaking_query_is_retried_then_dropped_with_a_reason(monkeypatch):
             text=json.dumps({"query": "Give me SEA1 data"}), provider="ollama", model="m"
         ),
     )
-    monkeypatch.setattr(synth, "_retrievable", lambda text, cid, k=10: ["json"])
+    monkeypatch.setattr(synth, "_retrievable", lambda text, cid, k=10, index_path=None: ["json"])
 
     qs, report = synth.generate(SPEC, records=RECORDS[:1], quota={"OCEANS": 1})
     assert qs == []
@@ -209,7 +209,7 @@ def test_an_unretrievable_query_is_dropped_with_a_reason(monkeypatch):
             model="m",
         ),
     )
-    monkeypatch.setattr(synth, "_retrievable", lambda text, cid, k=10: [])
+    monkeypatch.setattr(synth, "_retrievable", lambda text, cid, k=10, index_path=None: [])
 
     qs, report = synth.generate(SPEC, records=RECORDS[:1], quota={"OCEANS": 1})
     assert qs == []
@@ -252,7 +252,7 @@ def test_generation_calls_are_logged(monkeypatch, tmp_path):
             completion_tokens=8,
         ),
     )
-    monkeypatch.setattr(synth, "_retrievable", lambda text, cid, k=10: ["json"])
+    monkeypatch.setattr(synth, "_retrievable", lambda text, cid, k=10, index_path=None: ["json"])
 
     synth.generate(SPEC, records=RECORDS[:1], quota={"OCEANS": 1}, logger=logger)
     records = logger.read(llm.PURPOSE_QUERY_GEN)

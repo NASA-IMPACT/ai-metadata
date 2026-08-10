@@ -19,25 +19,27 @@ the corpus, the index and both experiments go through
 comparable to each other record-for-record, because they carry different content
 — which is the whole reason the faceted payload exists.
 
-What breaks without a schema
-----------------------------
+What a schema buys, and what it does not
+----------------------------------------
 Four of the six formats are schema-agnostic: JSON, YAML, TOON and CSV serialise
-an arbitrary tree and read it back. The other two cannot, and their degradation
-is the most informative thing this module produces:
+an arbitrary tree and read it back. The other two need to know what a field
+*means*, and UMM-C 1.18.5 tells them — so both are written against the schema
+rather than against the tree:
 
-* **JSON-LD** has schema.org properties for five UMM fields and nothing for the
-  other forty. The rest can only be carried as ``PropertyValue`` entries keyed by
-  path, which is legal JSON-LD and semantically inert — the ``@context`` buys
-  nothing when every term is a literal path string.
-* **Metadata-as-Text** cannot be prose. Prose requires knowing what a field
-  *means* in order to write a sentence about it; over an arbitrary tree the best
-  available rendering is one ``path is value`` clause per leaf. It satisfies the
-  value-coverage parity check and reads like a database dump, because that is
-  what it is.
-
-Both are rendered anyway, and honestly labelled, because "this format needs a
-schema and that schema is exactly what faceting provides" is a finding rather
-than an obstacle.
+* **Metadata-as-Text is real prose** (:func:`render_mat`). An earlier version of
+  this module emitted one ``path is value`` clause per leaf and called it ``mat``,
+  which was simply wrong: that is the old study's ``dot_breadcrumb``
+  representation, preserved here as :func:`render_breadcrumb`. The mislabel made
+  Experiment 1 report a mechanical path dump as prose and cost it a factor of
+  two — 4,911 tokens against 2,101 on the same record. UMM is a *published*
+  schema, so prose over the whole record is a matter of writing one template per
+  field, not an impossibility.
+* **JSON-LD genuinely cannot.** schema.org has properties for five UMM fields and
+  nothing for the other forty. The rest can only travel as ``PropertyValue``
+  entries keyed by path — legal JSON-LD, semantically inert, and the ``@context``
+  buys nothing when every term is a literal path string. That is a limit of the
+  *vocabulary*, not of the tree, which is why prose escapes it and JSON-LD does
+  not.
 """
 
 from __future__ import annotations
@@ -52,7 +54,7 @@ import yaml
 
 from . import cmr, formats
 from .config import CMR_CACHE_DIR, DATA_DIR, FORMATS
-from .facets import fact_set, fact_values, flatten, scalar_str
+from .facets import GCMD_SEPARATOR, fact_set, fact_values, flatten, scalar_str
 
 #: Sibling of ``data/format_cache``, same layout, different payload.
 UNFACETED_CACHE_DIR = DATA_DIR / "format_cache_unfaceted"
@@ -149,7 +151,7 @@ def parse_jsonld(text: str) -> dict:
 
 #: How a flattened path is spoken. ``SpatialExtent.HorizontalSpatialDomain`` ->
 #: ``SpatialExtent > HorizontalSpatialDomain``, matching GCMD's own notation for
-#: hierarchy so the prose at least reads consistently with the keyword paths.
+#: hierarchy so the breadcrumb reads consistently with the keyword paths.
 PATH_SEPARATOR = " > "
 
 
@@ -157,18 +159,571 @@ def _speak_path(path: str) -> str:
     return path.replace(".", PATH_SEPARATOR)
 
 
-def render_mat(p: dict) -> str:
+def render_breadcrumb(p: dict) -> str:
     """One ``path is value`` clause per leaf.
 
-    Not prose, and labelled as such. Writing a sentence about a field requires
-    knowing what the field means; over 398 arbitrary paths there is no such
-    knowledge, so the only faithful rendering is mechanical. Every leaf value
-    appears verbatim, so the value-coverage parity check still applies.
+    **This is not prose.** It is the old study's ``dot_breadcrumb``
+    representation (``git show 92553ba:airm/representations.py:245``) with
+    different separators, and it is kept under its real name because it was
+    briefly mislabelled ``mat`` -- which made Experiment 1 report a mechanical
+    path dump as Metadata-as-Text. It is not one of the six formats; it exists so
+    that correction stays auditable and so the two can be compared directly.
     """
-    lines = []
-    for path, value in flatten(p):
-        lines.append(f"{_speak_path(path)} is {scalar_str(value)}.")
-    return " ".join(lines)
+    return " ".join(
+        f"{_speak_path(path)} is {scalar_str(value)}." for path, value in flatten(p)
+    )
+
+
+# --------------------------------------------------------------------------- #
+# Prose. One writer per UMM field that is worth a sentence.
+# --------------------------------------------------------------------------- #
+
+
+def _s(value: Any) -> str:
+    return scalar_str(value)
+
+
+def _list(node: Any, key: str) -> list:
+    """The list at ``key``, or empty. UMM omits keys freely and varies types."""
+    value = node.get(key) if isinstance(node, dict) else None
+    return value if isinstance(value, list) else []
+
+
+def _vals(node: Any, *keys: str) -> list[str]:
+    """Non-empty scalar values at ``keys``, in order, canonicalised."""
+    if not isinstance(node, dict):
+        return []
+    return [_s(node[k]) for k in keys if node.get(k) not in (None, "", [], {})]
+
+
+def _label(node: Any, *keys: str) -> str:
+    """A name built from ``keys``, without repeating an identical value.
+
+    Many records set ``LongName`` equal to ``ShortName``, which would otherwise
+    read "Sentinel-1A Sentinel-1A". Deduplication loses no fact: parity compares
+    the *set* of values, and the value is still present once.
+    """
+    seen: list[str] = []
+    for value in _vals(node, *keys):
+        if value not in seen:
+            seen.append(value)
+    return " ".join(seen)
+
+
+def _person(person: dict) -> str:
+    name = " ".join(_vals(person, "FirstName", "MiddleName", "LastName"))
+    roles = ", ".join(_s(r) for r in _list(person, "Roles"))
+    detail = _contact_detail(person.get("ContactInformation"))
+    out = name or roles or "unnamed contact"
+    if roles and name:
+        out += f" ({roles})"
+    if detail:
+        out += f" -- {detail}"
+    return out
+
+
+def _contact_detail(info: Any) -> str:
+    """Mechanisms, addresses and URLs of one ``ContactInformation`` block."""
+    if not isinstance(info, dict):
+        return ""
+    bits: list[str] = []
+    for m in _list(info, "ContactMechanisms"):
+        if isinstance(m, dict):
+            pair = _vals(m, "Type", "Value")
+            if pair:
+                bits.append(" ".join(pair))
+    for a in _list(info, "Addresses"):
+        if isinstance(a, dict):
+            street = [_s(x) for x in _list(a, "StreetAddresses")]
+            rest = _vals(a, "City", "StateProvince", "PostalCode", "Country")
+            if street or rest:
+                bits.append(", ".join(street + rest))
+    for u in _list(info, "RelatedUrls"):
+        if isinstance(u, dict):
+            bits.append(" ".join(
+                _vals(u, "URLContentType", "Type", "Subtype", "URL", "Description")
+            ).strip())
+    for key in ("ServiceHours", "ContactInstruction"):
+        if info.get(key):
+            bits.append(_s(info[key]))
+    return "; ".join(bits)
+
+
+def _identity(u: dict, parts: list[str]) -> None:
+    title = _s(u.get("EntryTitle") or u.get("ShortName") or "(untitled)")
+    opening = title
+    tags = _vals(u, "ShortName", "Version")
+    if tags:
+        opening += f" (short name {tags[0]}"
+        opening += f", version {tags[1]})" if len(tags) > 1 else ")"
+    opening += " is a NASA Earth-science dataset"
+
+    # Merge centres by name and union their roles. CMR lists the same centre
+    # once per role, so ATL08 would otherwise read "NASA NSIDC DAAC (ARCHIVER);
+    # NASA NSIDC DAAC (DISTRIBUTOR)" -- the name repeated for no added fact.
+    centres: dict[str, list[str]] = {}
+    for dc in _list(u, "DataCenters"):
+        if not isinstance(dc, dict):
+            continue
+        name = _label(dc, "ShortName", "LongName")
+        if not name:
+            continue
+        roles = centres.setdefault(name, [])
+        for role in _list(dc, "Roles"):
+            if (text := _s(role)) not in roles:
+                roles.append(text)
+    if centres:
+        opening += " managed by " + "; ".join(
+            f"{name} ({', '.join(roles)})" if roles else name
+            for name, roles in centres.items()
+        )
+    parts.append(opening + ".")
+
+    doi = u.get("DOI")
+    if isinstance(doi, dict):
+        if doi.get("DOI"):
+            authority = _s(doi["Authority"]) if doi.get("Authority") else ""
+            parts.append(
+                f"Its DOI is {_s(doi['DOI'])}"
+                + (f", issued by {authority}" if authority else "")
+                + "."
+            )
+        elif doi.get("MissingReason"):
+            reason = ", ".join(_vals(doi, "MissingReason", "Explanation"))
+            parts.append(f"It has no DOI ({reason.rstrip('.')}).")
+
+    for cit in _list(u, "CollectionCitations"):
+        if not isinstance(cit, dict):
+            continue
+        bits = []
+        for key, label in (
+            ("Title", ""), ("Creator", "by {}"), ("SeriesName", "series {}"),
+            ("Version", "version {}"), ("ReleaseDate", "released {}"),
+            ("Publisher", "published by {}"), ("DataPresentationForm", "as {}"),
+            ("OtherCitationDetails", "{}"),
+        ):
+            if cit.get(key) not in (None, "", [], {}):
+                value = _s(cit[key])
+                bits.append(label.format(value) if label else value)
+        link = cit.get("OnlineResource")
+        if isinstance(link, dict):
+            bits += [_s(v) for _, v in flatten(link)]
+        if bits:
+            parts.append("Cite it as " + ", ".join(bits) + ".")
+
+    for key, template in (
+        ("DataLanguage", "The data language is {}."),
+        ("MetadataLanguage", "The metadata language is {}."),
+        ("Purpose", "Purpose: {}."),
+        ("CollectionDataType", "Collection data type: {}."),
+        ("DataMaturity", "Data maturity: {}."),
+        ("Quality", "Quality notes: {}."),
+        ("StandardProduct", "NASA standard product: {}."),
+    ):
+        if u.get(key) not in (None, "", [], {}):
+            parts.append(template.format(_s(u[key])))
+
+
+def _instrumentation(u: dict, parts: list[str]) -> None:
+    described = []
+    for plat in _list(u, "Platforms"):
+        if not isinstance(plat, dict):
+            continue
+        name = _label(plat, "ShortName", "LongName")
+        if not name:
+            continue
+        entry = name
+        if plat.get("Type"):
+            kind = _s(plat["Type"])
+            article = "an" if kind[:1].upper() in "AEIOU" else "a"
+            entry += f", {article} {kind} class platform"
+        instruments = []
+        for inst in _list(plat, "Instruments"):
+            if not isinstance(inst, dict):
+                continue
+            label = _label(inst, "ShortName", "LongName")
+            extra = _vals(inst, "Technique", "NumberOfInstruments")
+            for part in _list(inst, "ComposedOf"):
+                if isinstance(part, dict):
+                    extra += _vals(part, "ShortName", "LongName", "Technique")
+            for mode in _list(inst, "OperationalModes"):
+                extra.append(_s(mode))
+            for ch in _list(inst, "Characteristics"):
+                if isinstance(ch, dict):
+                    extra.append(" ".join(_vals(ch, "Name", "Value", "Unit", "Description")))
+            if label:
+                instruments.append(label + (f" [{', '.join(x for x in extra if x)}]" if extra else ""))
+        if instruments:
+            entry += ", carrying " + ", ".join(instruments)
+        for ch in _list(plat, "Characteristics"):
+            if isinstance(ch, dict):
+                entry += " (" + " ".join(_vals(ch, "Name", "Value", "Unit", "Description")) + ")"
+        described.append(entry)
+    if described:
+        parts.append("Data were acquired by " + "; ".join(described) + ".")
+
+    projects = []
+    for pr in _list(u, "Projects"):
+        if isinstance(pr, dict):
+            bits = _vals(pr, "ShortName", "LongName", "StartDate", "EndDate")
+            bits += [_s(c) for c in _list(pr, "Campaigns")]
+            if bits:
+                projects.append(" ".join(bits))
+    if projects:
+        parts.append("Collected under " + "; ".join(projects) + ".")
+
+
+def _keywords(u: dict, parts: list[str]) -> None:
+    paths = []
+    for sk in _list(u, "ScienceKeywords"):
+        if isinstance(sk, dict):
+            levels = _vals(sk, "Category", "Topic", "Term",
+                           "VariableLevel1", "VariableLevel2", "VariableLevel3",
+                           "DetailedVariable")
+            if levels:
+                paths.append(GCMD_SEPARATOR.join(levels))
+    if paths:
+        parts.append("Science keywords: " + "; ".join(paths) + ".")
+
+    for key, label in (("ISOTopicCategories", "ISO topic categories"),
+                       ("AncillaryKeywords", "Ancillary keywords"),
+                       ("TemporalKeywords", "Temporal keywords")):
+        values = [_s(v) for v in _list(u, key)]
+        if values:
+            parts.append(f"{label}: " + "; ".join(values) + ".")
+
+    places = []
+    for lk in _list(u, "LocationKeywords"):
+        if isinstance(lk, dict):
+            levels = _vals(lk, "Category", "Type", "Subregion1", "Subregion2",
+                           "Subregion3", "DetailedLocation")
+            if levels:
+                places.append(GCMD_SEPARATOR.join(levels))
+    if places:
+        parts.append("Location keywords: " + "; ".join(places) + ".")
+
+    names = []
+    for dn in _list(u, "DirectoryNames"):
+        if isinstance(dn, dict):
+            if (name := _label(dn, "ShortName", "LongName")):
+                names.append(name)
+    if names:
+        parts.append("Directory names: " + "; ".join(names) + ".")
+
+
+def _space(u: dict, parts: list[str]) -> None:
+    spatial = u.get("SpatialExtent")
+    if not isinstance(spatial, dict):
+        return
+    hsd = spatial.get("HorizontalSpatialDomain")
+    geom = hsd.get("Geometry") if isinstance(hsd, dict) else None
+
+    if isinstance(geom, dict):
+        for rect in _list(geom, "BoundingRectangles"):
+            if isinstance(rect, dict):
+                w, s, e, north = (
+                    rect.get("WestBoundingCoordinate"), rect.get("SouthBoundingCoordinate"),
+                    rect.get("EastBoundingCoordinate"), rect.get("NorthBoundingCoordinate"),
+                )
+                if None not in (w, s, e, north):
+                    parts.append(
+                        f"Spatial coverage spans {_s(w)}° to {_s(e)}° longitude and "
+                        f"{_s(s)}° to {_s(north)}° latitude."
+                    )
+        for key, label in (("GPolygons", "Bounding polygon"), ("Points", "Point location"),
+                           ("Lines", "Bounding line")):
+            for shape in _list(geom, key):
+                coords = [_s(v) for _, v in flatten(shape)]
+                if coords:
+                    parts.append(f"{label}: " + ", ".join(coords) + ".")
+        if geom.get("CoordinateSystem"):
+            parts.append(f"Coordinates are {_s(geom['CoordinateSystem'])}.")
+
+    framing = []
+    if isinstance(hsd, dict) and hsd.get("ZoneIdentifier"):
+        framing.append(f"zone {_s(hsd['ZoneIdentifier'])}")
+    for key in ("SpatialCoverageType", "GranuleSpatialRepresentation"):
+        if spatial.get(key):
+            framing.append(f"{key} {_s(spatial[key])}")
+    if framing:
+        parts.append("Spatial framing: " + ", ".join(framing) + ".")
+
+    rcs = hsd.get("ResolutionAndCoordinateSystem") if isinstance(hsd, dict) else None
+    if isinstance(rcs, dict):
+        res = rcs.get("HorizontalDataResolution")
+        if isinstance(res, dict):
+            for key in ("GriddedResolutions", "NonGriddedResolutions", "GenericResolutions",
+                        "GriddedRangeResolutions", "NonGriddedRangeResolutions"):
+                for entry in _list(res, key):
+                    bits = [_s(v) for _, v in flatten(entry)]
+                    if bits:
+                        parts.append("Horizontal resolution: " + " ".join(bits) + ".")
+            if res.get("VariesResolution"):
+                parts.append(f"Horizontal resolution {_s(res['VariesResolution'])}.")
+            if res.get("PointResolution"):
+                parts.append(f"Point resolution {_s(res['PointResolution'])}.")
+        for key in ("Description", "GeodeticModel", "LocalCoordinateSystem"):
+            node = rcs.get(key)
+            if node:
+                bits = [_s(v) for _, v in flatten(node)]
+                parts.append(f"Coordinate system {key}: " + " ".join(bits) + ".")
+
+    for vsd in _list(spatial, "VerticalSpatialDomains"):
+        bits = [_s(v) for _, v in flatten(vsd)]
+        if bits:
+            parts.append("Vertical extent: " + " ".join(bits) + ".")
+
+    for tile in _list(u, "TilingIdentificationSystems"):
+        bits = [_s(v) for _, v in flatten(tile)]
+        if bits:
+            parts.append("Tiling system: " + " ".join(bits) + ".")
+
+
+def _time(u: dict, parts: list[str]) -> None:
+    for te in _list(u, "TemporalExtents"):
+        if not isinstance(te, dict):
+            continue
+        for rng in _list(te, "RangeDateTimes"):
+            if isinstance(rng, dict) and rng.get("BeginningDateTime"):
+                end = _s(rng["EndingDateTime"]) if rng.get("EndingDateTime") else "present"
+                parts.append(
+                    f"Temporal coverage runs from {_s(rng['BeginningDateTime'])} to {end}."
+                )
+        singles = [_s(d) for d in _list(te, "SingleDateTimes")]
+        if singles:
+            parts.append("Observed on " + ", ".join(singles) + ".")
+        for per in _list(te, "PeriodicDateTimes"):
+            bits = [_s(v) for _, v in flatten(per)]
+            if bits:
+                parts.append("Periodic coverage: " + " ".join(bits) + ".")
+        res = te.get("TemporalResolution")
+        if isinstance(res, dict):
+            bits = _vals(res, "Value", "Unit")
+            if bits:
+                parts.append("Temporal resolution is " + " ".join(bits) + ".")
+        extras = _vals(te, "EndsAtPresentFlag", "TemporalRangeType", "PrecisionOfSeconds")
+        if extras:
+            parts.append("Temporal flags: " + ", ".join(extras) + ".")
+
+    for pt in _list(u, "PaleoTemporalCoverages"):
+        bits = [_s(v) for _, v in flatten(pt)]
+        if bits:
+            parts.append("Paleo temporal coverage: " + " ".join(bits) + ".")
+
+
+def _quality_and_content(u: dict, parts: list[str]) -> None:
+    level = u.get("ProcessingLevel")
+    bits = []
+    if isinstance(level, dict):
+        if level.get("Id"):
+            bits.append(f"processing level {_s(level['Id'])}")
+        if level.get("ProcessingLevelDescription"):
+            bits.append(_s(level["ProcessingLevelDescription"]))
+    if u.get("Version"):
+        bits.append(f"version {_s(u['Version'])}")
+    if u.get("CollectionProgress"):
+        bits.append(f"status {_s(u['CollectionProgress'])}")
+    if bits:
+        parts.append("Quality: " + ", ".join(bits) + ".")
+
+    if u.get("VersionDescription"):
+        parts.append(f"Changes in this version: {_s(u['VersionDescription'])}")
+    if u.get("Abstract"):
+        parts.append(_s(u["Abstract"]))
+
+    for attr in _list(u, "AdditionalAttributes"):
+        if isinstance(attr, dict):
+            bits = _vals(attr, "Name", "DataType", "Value", "Description",
+                         "Measurement Resolution", "ParameterUnitsOfMeasure")
+            if bits:
+                parts.append("Additional attribute " + ", ".join(bits) + ".")
+
+
+def _distribution(u: dict, parts: list[str]) -> None:
+    adi = u.get("ArchiveAndDistributionInformation")
+    if isinstance(adi, dict):
+        for key, label in (("FileDistributionInformation", "Distributed as"),
+                           ("FileArchiveInformation", "Archived as")):
+            for entry in _list(adi, key):
+                bits = [_s(v) for _, v in flatten(entry)]
+                if bits:
+                    parts.append(f"{label} " + ", ".join(bits) + ".")
+
+    ddi = u.get("DirectDistributionInformation")
+    if isinstance(ddi, dict):
+        bits = [_s(v) for _, v in flatten(ddi)]
+        if bits:
+            parts.append("Direct S3 access: " + ", ".join(bits) + ".")
+
+    if u.get("FileNamingConvention"):
+        bits = [_s(v) for _, v in flatten(u["FileNamingConvention"])]
+        parts.append("File naming convention: " + " ".join(bits) + ".")
+
+    for key, label in (("AccessConstraints", "Access constraints"),
+                       ("UseConstraints", "Use constraints")):
+        node = u.get(key)
+        if node:
+            bits = [_s(v) for _, v in flatten(node)]
+            parts.append(f"{label}: " + " ".join(bits))
+
+    for url in _list(u, "RelatedUrls"):
+        if not isinstance(url, dict):
+            continue
+        label = " ".join(_vals(url, "URLContentType", "Type", "Subtype"))
+        target = _s(url["URL"]) if url.get("URL") else ""
+        detail = _s(url["Description"]) if url.get("Description") else ""
+        extra: list[str] = []
+        for k in ("GetData", "GetService"):
+            if isinstance(url.get(k), dict):
+                extra += [_s(v) for _, v in flatten(url[k])]
+        if target or label:
+            sentence = f"{label} URL: {target}".strip()
+            if detail:
+                sentence += f" -- {detail}"
+            if extra:
+                sentence += " (" + ", ".join(extra) + ")"
+            parts.append(sentence.rstrip(".") + ".")
+
+
+def _people(u: dict, parts: list[str]) -> None:
+    people = [_person(p) for p in _list(u, "ContactPersons") if isinstance(p, dict)]
+    if people:
+        parts.append("Contacts: " + "; ".join(people) + ".")
+
+    groups = []
+    for g in _list(u, "ContactGroups"):
+        if isinstance(g, dict):
+            name = _s(g["GroupName"]) if g.get("GroupName") else ""
+            roles = ", ".join(_s(r) for r in _list(g, "Roles"))
+            detail = _contact_detail(g.get("ContactInformation"))
+            groups.append("; ".join(x for x in (name, roles, detail) if x))
+    if groups:
+        parts.append("Contact groups: " + " | ".join(groups) + ".")
+
+    for dc in _list(u, "DataCenters"):
+        if not isinstance(dc, dict):
+            continue
+        name = _s(dc["ShortName"]) if dc.get("ShortName") else "the data centre"
+        detail = _contact_detail(dc.get("ContactInformation"))
+        nested = [_person(p) for p in _list(dc, "ContactPersons") if isinstance(p, dict)]
+        for g in _list(dc, "ContactGroups"):
+            if isinstance(g, dict):
+                nested.append("; ".join(
+                    x for x in (
+                        _s(g["GroupName"]) if g.get("GroupName") else "",
+                        ", ".join(_s(r) for r in _list(g, "Roles")),
+                        _contact_detail(g.get("ContactInformation")),
+                    ) if x
+                ))
+        if detail or nested:
+            parts.append(
+                f"Reach {name} via " + "; ".join(x for x in [detail, *nested] if x) + "."
+            )
+
+
+def _provenance(u: dict, parts: list[str]) -> None:
+    for key, label in (("DataDates", "Data record"), ("MetadataDates", "Metadata")):
+        for d in _list(u, key):
+            if isinstance(d, dict):
+                bits = _vals(d, "Type", "Date")
+                if bits:
+                    parts.append(f"{label} {bits[0]}" + (f" on {bits[1]}." if len(bits) > 1 else "."))
+
+    for ref in _list(u, "PublicationReferences"):
+        bits = [_s(v) for _, v in flatten(ref)]
+        if bits:
+            parts.append("Publication reference: " + ", ".join(bits) + ".")
+
+    for assoc in _list(u, "MetadataAssociations"):
+        bits = [_s(v) for _, v in flatten(assoc)]
+        if bits:
+            parts.append("Associated metadata: " + ", ".join(bits) + ".")
+
+    for doi in _list(u, "AssociatedDOIs"):
+        bits = [_s(v) for _, v in flatten(doi)]
+        if bits:
+            parts.append("Associated DOI: " + ", ".join(bits) + ".")
+
+    spec = u.get("MetadataSpecification")
+    if isinstance(spec, dict):
+        bits = _vals(spec, "Name", "Version", "URL")
+        if bits:
+            parts.append("Metadata follows " + " ".join(bits) + ".")
+
+
+#: Section writers, in reading order. Each appends sentences to ``parts``.
+_SECTIONS = (
+    _identity,
+    _instrumentation,
+    _keywords,
+    _space,
+    _time,
+    _quality_and_content,
+    _distribution,
+    _people,
+    _provenance,
+)
+
+
+def render_mat(p: dict) -> str:
+    """Natural-language prose over a full UMM record.
+
+    UMM-C is a *published schema*, not an arbitrary tree, so prose over the whole
+    record is a matter of writing one template per field. :data:`_SECTIONS`
+    covers the fields worth a sentence; whatever they do not carry is appended by
+    :func:`_remainder` in breadcrumb form.
+
+    That tail is what makes parity achievable without hand-writing a template for
+    all 45 top-level fields *and* their long tail of sub-fields -- and it is
+    self-correcting: a value is appended only if the prose does not already
+    contain it, which is the same predicate :func:`parity_report` checks. Prose
+    therefore satisfies value coverage by construction rather than by inspection.
+
+    Values appear **verbatim**, which is why this reads ``status ACTIVE`` rather
+    than ``status active``: parity is defined on the canonical string, and
+    prettifying a value would drop it. ``sample_data/full_mat.txt`` -- the
+    hand-authored target this follows -- prettifies, which is exactly why it
+    covers only 78% of the record's values.
+    """
+    parts: list[str] = []
+    for section in _SECTIONS:
+        section(p, parts)
+    body = " ".join(parts)
+
+    tail = _remainder(p, body)
+    return f"{body} {tail}".strip() if tail else body
+
+
+def _remainder(p: dict, body: str) -> str:
+    """Breadcrumb clauses for values the prose did not already carry."""
+    missing = [
+        (path, value) for path, value in flatten(p) if scalar_str(value) not in body
+    ]
+    if not missing:
+        return ""
+    return "Additional metadata: " + " ".join(
+        f"{_speak_path(path)} is {scalar_str(value)}." for path, value in missing
+    )
+
+
+def prose_coverage(p: dict) -> dict:
+    """How much of the record the prose carries before the tail takes over.
+
+    Reported rather than assumed: a renderer that silently routed everything
+    through the tail would pass parity while being a breadcrumb dump again.
+    """
+    parts: list[str] = []
+    for section in _SECTIONS:
+        section(p, parts)
+    body = " ".join(parts)
+    leaves = flatten(p)
+    tailed = [1 for path, value in leaves if scalar_str(value) not in body]
+    return {
+        "leaves": len(leaves),
+        "in_prose": len(leaves) - len(tailed),
+        "in_tail": len(tailed),
+        "prose_share": (len(leaves) - len(tailed)) / len(leaves) if leaves else 1.0,
+    }
 
 
 # --------------------------------------------------------------------------- #
@@ -445,6 +1000,26 @@ def load(fmt: str, cid: str, *, root: Path | None = None, strict: bool = True) -
             f"`uv run python -m airm.unfaceted --build`."
         )
     return path_for(fmt, cid, root=root).read_text(encoding="utf-8")
+
+
+def render_all_cached(cid: str | None, p: dict, *, root: Path | None = None) -> dict[str, str]:
+    """Every format's unfaceted rendering of one record — cache first, live otherwise.
+
+    The mirror of :func:`airm.format_cache.render_all_cached`, and for the same
+    reason: a caller gets the speed of the cache without depending on it. A
+    missing, stale or partial cache costs time, never correctness, because the
+    fallback renders the same payload through the same code that filled it.
+    """
+    usable = is_current(root)
+    out: dict[str, str] = {}
+    for fmt in FORMATS:
+        if usable and cid is not None:
+            path = path_for(fmt, cid, root=root)
+            if path.exists():
+                out[fmt] = path.read_text(encoding="utf-8")
+                continue
+        out[fmt] = render(fmt, p)
+    return out
 
 
 def load_all(fmt: str, *, root: Path | None = None, strict: bool = True) -> dict[str, str]:

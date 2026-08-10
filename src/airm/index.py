@@ -21,7 +21,7 @@ import functools
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from . import cmr, format_cache
+from . import cmr, format_cache, unfaceted
 from .config import (
     CHROMA_DIR,
     EMBED_MODEL,
@@ -34,11 +34,37 @@ from .config import (
 from .corpus import topic_of
 from .facets import facets
 
+#: The two payloads, each in its own Chroma database. ``faceted`` is what the
+#: study runs on; ``unfaceted`` is the control (see :mod:`airm.unfaceted`).
+PAYLOADS: tuple[str, ...] = ("faceted", "unfaceted")
+
+FACETED, UNFACETED = PAYLOADS
+
+
+def chroma_dir(payload: str = FACETED) -> Path:
+    """Separate databases rather than separate collection names.
+
+    Collection names stay ``cmr_<fmt>`` in both, so a caller that has one
+    database open cannot accidentally read the other's vectors by naming the
+    wrong collection -- it would have to open the wrong path, which is explicit.
+    """
+    if payload not in PAYLOADS:
+        raise ValueError(f"unknown payload {payload!r}; known: {', '.join(PAYLOADS)}")
+    return CHROMA_DIR / payload
+
+
+def _documents(payload: str, fmt: str, items: list[tuple[str, dict]]) -> list[str]:
+    """Renderings for ``items`` from whichever cache the payload belongs to."""
+    if payload == FACETED:
+        return format_cache.render_many(fmt, items)
+    return [unfaceted.render_all_cached(cid, p)[fmt] for cid, p in items]
+
 
 @dataclass
 class IndexReport:
     """What was indexed, and what was clipped doing it."""
 
+    payload: str = FACETED
     embed_model: str = EMBED_MODEL
     max_sequence_tokens: int | None = None
     counts: dict[str, int] = field(default_factory=dict)
@@ -48,6 +74,7 @@ class IndexReport:
 
     def to_dict(self) -> dict:
         return {
+            "payload": self.payload,
             "embed_model": self.embed_model,
             "max_sequence_tokens": self.max_sequence_tokens,
             "counts": self.counts,
@@ -117,31 +144,156 @@ def count_wordpieces(texts: list[str], name: str = EMBED_MODEL) -> list[int]:
     return [len(tok.encode(t, add_special_tokens=True)) for t in texts]
 
 
+def truncate_to_window(texts: list[str], name: str = EMBED_MODEL) -> list[str]:
+    """Cut each text to the embedding model's context window.
+
+    Necessary, not defensive. ``gte-modernbert-base`` does **not** silently
+    truncate an over-length input -- it runs it through position embeddings it
+    does not have and returns ``NaN``, which Chroma then rejects outright
+    ("Embeddings must not contain NaN or Infinity values"). Before this, the
+    build counted truncations without ever performing one, so the counter meant
+    "would have been clipped" while the actual clipping never happened. The
+    faceted index never hit it because its gate forbids over-length documents;
+    the unfaceted control hits it on the first collection.
+
+    Truncating here makes ``IndexReport.truncated`` mean what it says: this many
+    documents reached the model with their tail removed.
+    """
+    tok = embedder(name).tokenizer
+    limit = max_sequence_tokens(name)
+    out: list[str] = []
+    for text in texts:
+        ids = tok.encode(text, add_special_tokens=True)
+        if len(ids) <= limit:
+            out.append(text)
+            continue
+        kept = tok(text, truncation=True, max_length=limit, add_special_tokens=True)
+        out.append(tok.decode(kept["input_ids"], skip_special_tokens=True))
+    return out
+
+
 # --------------------------------------------------------------------------- #
 # Chroma.
 # --------------------------------------------------------------------------- #
 
 
-@functools.lru_cache(maxsize=2)
+@functools.lru_cache(maxsize=4)
 def client(path: str | None = None):
     import chromadb
 
     ensure_dirs()
-    return chromadb.PersistentClient(path=str(path or CHROMA_DIR))
+    target = Path(path) if path else chroma_dir()
+    target.mkdir(parents=True, exist_ok=True)
+    return chromadb.PersistentClient(path=str(target))
 
 
-def get_collection(fmt: str, *, path: str | None = None):
-    return client(path).get_collection(collection_name(fmt))
+def get_collection(fmt: str, *, path: str | None = None, payload: str = FACETED):
+    return client(path or str(chroma_dir(payload))).get_collection(collection_name(fmt))
+
+
+def all_cached_records(
+    *, window: int | None = None, check_parity: bool = True
+) -> tuple[list[dict], dict]:
+    """Every record in ``cmr_cache``, minus those that would break a hard gate.
+
+    The study's corpus is 500 stratified, parity-gated records. This is the other
+    population: everything the pipeline ever *examined*, including sampling
+    candidates that were never selected. Indexing it answers a different question
+    -- how the format ranking behaves in a 5x larger haystack -- so it gets its
+    own database rather than replacing the corpus index.
+
+    Two exclusions, both of which the existing gates would otherwise fail on, and
+    both **reported rather than silently applied**:
+
+    ``over_window``
+        A record whose rendering in *any* format exceeds the embedding window.
+        ``MAX_EMBED_TRUNCATIONS = 0`` forbids these, and rightly: the clipping
+        falls unevenly across the formats under test (CSV and JSON-LD overflow
+        where prose does not), so including them would put a truncation effect
+        inside the format comparison. A record is dropped for *every* format if
+        it overflows in one, because dropping it per-format would leave the six
+        collections searching different haystacks.
+
+    ``parity``
+        A record whose six renderings do not carry an identical fact set. Same
+        rule the corpus builder applies (``corpus.build``), for the same reason.
+
+    Returns ``(records, report)``.
+    """
+    from . import formats
+
+    window = window or max_sequence_tokens()
+    ids = format_cache.cached_concept_ids()
+    # Reading cached bytes directly would bypass the staleness guard and measure
+    # renderings produced by older code. Check once, then fall back to live
+    # rendering for the whole pass rather than per record.
+    cache_usable = format_cache.is_current()
+
+    records: list[dict] = []
+    report: dict = {"examined": len(ids), "over_window": [], "parity_failures": [], "unreadable": []}
+
+    for cid in ids:
+        record = cmr.load_cached(cid)
+        if record is None:
+            report["unreadable"].append(cid)
+            continue
+
+        if check_parity:
+            ok, detail = formats.check_record(record)
+            if not ok:
+                report["parity_failures"].append(
+                    {"concept_id": cid, "formats": {k: v for k, v in detail.items() if not v["ok"]}}
+                )
+                continue
+
+        # A token can never be shorter than one byte, so a rendering smaller than
+        # the window in *bytes* cannot exceed it in tokens. That bound turns a
+        # 15,540-document tokenisation into a few dozen.
+        oversized: dict[str, int] = {}
+        rendered: dict[str, str] | None = None
+        for fmt in FORMATS:
+            text: str | None = None
+            if cache_usable:
+                path = format_cache.path_for(fmt, cid)
+                try:
+                    if path.stat().st_size <= window:
+                        continue  # cannot exceed the window in tokens
+                    text = path.read_text()
+                except OSError:
+                    text = None
+            if text is None:
+                if rendered is None:
+                    rendered = format_cache.render_all_cached(cid, facets(record))
+                text = rendered[fmt]
+                if len(text.encode()) <= window:
+                    continue
+            n = count_wordpieces([text])[0]
+            if n > window:
+                oversized[fmt] = n
+        if oversized:
+            report["over_window"].append({"concept_id": cid, "tokens": oversized})
+            continue
+
+        records.append(record)
+
+    report["kept"] = len(records)
+    return records, report
 
 
 def build(
     records: list[dict] | None = None,
     *,
+    payload: str = FACETED,
     ground_truth: list[str] | None = None,
     path: str | None = None,
     batch_size: int = 128,
 ) -> IndexReport:
-    """(Re)build all six collections from the corpus."""
+    """(Re)build all six collections from the corpus, for one payload.
+
+    Both payloads index the *same* 500 corpus records with the same model and
+    chunking; only the rendering differs. They land in separate databases under
+    ``data/chroma/<payload>/`` so neither can be read by accident.
+    """
     if records is None:
         records = cmr.load_corpus()
     if ground_truth is None:
@@ -149,10 +301,11 @@ def build(
 
         ground_truth = ground_truth_ids(load_queries())
 
-    chroma = client(path)
-    report = IndexReport(max_sequence_tokens=max_sequence_tokens())
+    chroma = client(path or str(chroma_dir(payload)))
+    report = IndexReport(payload=payload, max_sequence_tokens=max_sequence_tokens())
 
-    payloads = [(cmr.concept_id(r), topic_of(r), facets(r)) for r in records]
+    project = facets if payload == FACETED else unfaceted.payload
+    payloads = [(cmr.concept_id(r), topic_of(r), project(r)) for r in records]
 
     for fmt in FORMATS:
         name = collection_name(fmt)
@@ -165,7 +318,7 @@ def build(
         collection = chroma.create_collection(name, metadata={"hnsw:space": "cosine"})
 
         ids = [cid for cid, _, _ in payloads]
-        docs = format_cache.render_many(fmt, [(cid, p) for cid, _, p in payloads])
+        docs = _documents(payload, fmt, [(cid, p) for cid, _, p in payloads])
         metas = [
             {"concept_id": cid, "topic": topic, "format": fmt}
             for cid, topic, _ in payloads
@@ -177,14 +330,18 @@ def build(
         report.truncated[fmt] = len(clipped)
         report.truncated_examples[fmt] = clipped[:5]
 
+        # The document stored in Chroma stays whole; only the text handed to the
+        # embedder is cut, so `--probe` and any inspection still show the real
+        # rendering rather than a silently shortened one.
+        embeddable = truncate_to_window(docs)
+
         for start in range(0, len(ids), batch_size):
             end = start + batch_size
-            chunk = docs[start:end]
             collection.add(
                 ids=ids[start:end],
-                documents=chunk,
+                documents=docs[start:end],
                 metadatas=metas[start:end],
-                embeddings=embed(chunk),
+                embeddings=embed(embeddable[start:end]),
             )
             _release_accelerator_memory()
 
@@ -201,9 +358,10 @@ def query(
     *,
     k: int = TOP_K,
     path: str | None = None,
+    payload: str = FACETED,
 ) -> list[dict]:
     """Top-``k`` records for ``text`` from the ``fmt`` collection."""
-    collection = get_collection(fmt, path=path)
+    collection = get_collection(fmt, path=path, payload=payload)
     result = collection.query(
         query_embeddings=embed([text]),
         n_results=k,
@@ -222,7 +380,15 @@ def query(
 
 
 def verify(report: IndexReport, expected_size: int) -> list[str]:
-    """Hard-gate violations; empty when the indexes are sound."""
+    """Hard-gate violations; empty when the indexes are sound.
+
+    Truncation is fatal for the **faceted** index and merely reported for the
+    control, for the same reason parity is: the faceted index is what
+    Experiment 2 measures a format effect on, and uneven clipping there would
+    turn that effect into a truncation artefact. The control exists to show what
+    the raw record costs, and the fact that it *cannot* be embedded whole at 8k
+    is one of the things it is there to show -- see :func:`truncation_note`.
+    """
     problems: list[str] = []
     for fmt in FORMATS:
         n = report.counts.get(fmt)
@@ -234,7 +400,7 @@ def verify(report: IndexReport, expected_size: int) -> list[str]:
                 f"{fmt}: {len(missing)} ground-truth record(s) not indexed: {missing[:5]}"
             )
         clipped = report.truncated.get(fmt, 0)
-        if clipped > MAX_EMBED_TRUNCATIONS:
+        if clipped > MAX_EMBED_TRUNCATIONS and report.payload == FACETED:
             # Uneven clipping across formats turns the format axis into a
             # truncation axis, which would invalidate Experiment 2 outright.
             problems.append(
@@ -242,6 +408,24 @@ def verify(report: IndexReport, expected_size: int) -> list[str]:
                 f"{report.max_sequence_tokens}-token embedding window"
             )
     return problems
+
+
+def truncation_note(report: IndexReport) -> str:
+    """Why the control's index must not be used for a format comparison.
+
+    Returns an empty string when nothing was clipped.
+    """
+    clipped = {f: n for f, n in report.truncated.items() if n}
+    if not clipped:
+        return ""
+    worst = max(clipped.values())
+    return (
+        f"{sum(clipped.values())} document(s) over the {report.max_sequence_tokens}-token "
+        f"window, unevenly: " + ", ".join(f"{f} {n}" for f, n in sorted(clipped.items(), key=lambda kv: -kv[1]))
+        + f". The verbose formats are clipped up to {worst}x more than the terse ones, so "
+        "retrieval scores from this index measure truncation as much as format. It is built "
+        "for inspection and completeness, not for a format comparison."
+    )
 
 
 if __name__ == "__main__":  # pragma: no cover - CLI
@@ -252,37 +436,97 @@ if __name__ == "__main__":  # pragma: no cover - CLI
 
     parser = argparse.ArgumentParser(description="Build the six ChromaDB collections.")
     parser.add_argument("--build", action="store_true")
+    parser.add_argument(
+        "--payload",
+        choices=[*PAYLOADS, "both"],
+        default=FACETED,
+        help="which rendering to index (default: faceted, what the study runs on)",
+    )
     parser.add_argument("--probe", help="run a query against every collection")
+    parser.add_argument(
+        "--records",
+        choices=["corpus", "all"],
+        default="corpus",
+        help="corpus (500, the study's stratified sample) or all cached records "
+        "minus those failing the parity or embedding-window gates",
+    )
+    parser.add_argument(
+        "--path",
+        default=None,
+        help="database directory; defaults to data/chroma/<payload>. Give an "
+        "explicit path with --records all so the corpus index survives.",
+    )
     args = parser.parse_args()
 
     if args.probe:
-        for fmt in FORMATS:
-            hits = query(fmt, args.probe, k=3)
-            print(f"\n{fmt}:")
-            for h in hits:
-                print(f"  {h['rank']}. {h['concept_id']:<24} d={h['distance']:.4f}")
+        for name in (PAYLOADS if args.payload == "both" else [args.payload]):
+            print(f"\n=== {name} ===")
+            for fmt in FORMATS:
+                hits = query(fmt, args.probe, k=3, payload=name)
+                print(f"  {fmt}:")
+                for h in hits:
+                    print(f"    {h['rank']}. {h['concept_id']:<24} d={h['distance']:.4f}")
         raise SystemExit(0)
 
     if not args.build:
         parser.error("pass --build or --probe")
 
-    corpus_records = cmr.load_corpus()
-    rep = build(corpus_records)
+    selection_report: dict | None = None
+    if args.records == "all":
+        print("selecting from the full record cache ...")
+        corpus_records, selection_report = all_cached_records()
+        print(f"  examined         : {selection_report['examined']}")
+        print(f"  parity failures  : {len(selection_report['parity_failures'])}")
+        for f in selection_report["parity_failures"][:5]:
+            print(f"      {f['concept_id']}  ({', '.join(f['formats'])})")
+        print(f"  over the window  : {len(selection_report['over_window'])}")
+        for f in selection_report["over_window"][:5]:
+            detail = ", ".join(f"{k} {v:,}" for k, v in f["tokens"].items())
+            print(f"      {f['concept_id']}  ({detail})")
+        if selection_report["unreadable"]:
+            print(f"  unreadable       : {len(selection_report['unreadable'])}")
+        print(f"  kept             : {selection_report['kept']}")
+    else:
+        corpus_records = cmr.load_corpus()
 
-    print(f"embedding model  : {rep.embed_model}")
-    print(f"max seq (tokens) : {rep.max_sequence_tokens}")
-    print("documents per collection:")
-    for fmt in FORMATS:
-        note = f"  ({rep.truncated[fmt]} over the window)" if rep.truncated.get(fmt) else ""
-        print(f"  {collection_name(fmt):<12} {rep.counts.get(fmt):>4}{note}")
+    # The evaluation set, not just the SME half -- a ground-truth id absent from
+    # a collection makes Recall@k unmeasurable for every query naming it.
+    from .queries import ground_truth_ids, load_eval_queries
 
-    Path(CHROMA_DIR).mkdir(parents=True, exist_ok=True)
-    (CHROMA_DIR / "index_report.json").write_text(json.dumps(rep.to_dict(), indent=2) + "\n")
+    ground_truth = ground_truth_ids(load_eval_queries())
+    failed = False
 
-    issues = verify(rep, len(corpus_records))
-    if issues:
-        print("\nHARD GATE FAILURES:")
-        for issue in issues:
-            print(f"  - {issue}")
-        raise SystemExit(1)
-    print(f"\nall hard gates passed ({len(corpus_records)} records, expected {CORPUS_SIZE})")
+    for name in (PAYLOADS if args.payload == "both" else [args.payload]):
+        out = Path(args.path) if args.path else chroma_dir(name)
+        rep = build(
+            corpus_records, payload=name, ground_truth=ground_truth, path=str(out)
+        )
+        out.mkdir(parents=True, exist_ok=True)
+        if selection_report is not None:
+            (out / "selection_report.json").write_text(
+                json.dumps(selection_report, indent=2) + "\n"
+            )
+        (out / "index_report.json").write_text(json.dumps(rep.to_dict(), indent=2) + "\n")
+
+        print(f"\n=== {name} ===")
+        print(f"embedding model  : {rep.embed_model}")
+        print(f"max seq (tokens) : {rep.max_sequence_tokens}")
+        print("documents per collection:")
+        for fmt in FORMATS:
+            note = f"  ({rep.truncated[fmt]} over the window)" if rep.truncated.get(fmt) else ""
+            print(f"  {collection_name(fmt):<12} {rep.counts.get(fmt):>4}{note}")
+        if (note := truncation_note(rep)):
+            print(f"\n  NOTE: {note}")
+
+        issues = verify(rep, len(corpus_records))
+        if issues:
+            failed = True
+            print(f"\nHARD GATE FAILURES ({name}):")
+            for issue in issues:
+                print(f"  - {issue}")
+        else:
+            print(f"\nall hard gates passed ({len(corpus_records)} records, "
+                  f"expected {CORPUS_SIZE})")
+        print(f"wrote {out}/index_report.json")
+
+    raise SystemExit(1 if failed else 0)

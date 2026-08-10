@@ -66,15 +66,89 @@ def exp1_section(summary: dict) -> str:
             f"[{r['ci_low']:,.0f}, {r['ci_high']:,.0f}] | {pct} | {paired} | {hf_mean} |"
         )
 
+    unfaceted = sorted(
+        summary.get("summary_tiktoken_unfaceted", []), key=lambda r: r["mean_tokens"]
+    )
+    if unfaceted:
+        lines += [
+            "",
+            "### The same six formats over the full raw UMM record",
+            "",
+            "The control. Content is held constant *within* each panel, so `vs JSON` is "
+            "again a paired ratio against the JSON rendering of the same payload — the two "
+            "payloads are never compared format-to-format, because they carry different "
+            "content by construction.",
+            "",
+            "| Format | Mean tokens | Median | vs JSON | Paired 95% CI |",
+            "|---|---:|---:|---:|---:|",
+        ]
+        for r in unfaceted:
+            label = FORMAT_LABELS.get(r["format"], r["format"])
+            if r["format"] == BASELINE_FORMAT:
+                label += " *(baseline)*"
+            paired = (
+                f"[{(r['ratio_ci_low'] - 1) * 100:+.1f}%, {(r['ratio_ci_high'] - 1) * 100:+.1f}%]"
+                if r["format"] != BASELINE_FORMAT
+                else MISSING
+            )
+            pct = f"{r['pct_vs_json']:+.1f}%" if r["format"] != BASELINE_FORMAT else MISSING
+            lines.append(
+                f"| {label} | {r['mean_tokens']:,.0f} | {r['median_tokens']:,.0f} | "
+                f"{pct} | {paired} |"
+            )
+
+        order = summary.get("rank_order", {})
+        faceted_order, unfaceted_order = order.get("faceted"), order.get("unfaceted")
+        if faceted_order and unfaceted_order:
+            if faceted_order == unfaceted_order:
+                lines += [
+                    "",
+                    f"**The ranking is stable across payloads** — `{' < '.join(faceted_order)}` "
+                    "at both levels of content. The cost ordering is a property of the formats "
+                    "themselves, not an artefact of the projection.",
+                ]
+            else:
+                moved = [
+                    FORMAT_LABELS.get(f, f)
+                    for f in faceted_order
+                    if faceted_order.index(f) != unfaceted_order.index(f)
+                ]
+                lines += [
+                    "",
+                    f"**The ranking is not stable across payloads.** Faceted: "
+                    f"`{' < '.join(faceted_order)}`. Unfaceted: `{' < '.join(unfaceted_order)}`. "
+                    f"Moved: {', '.join(moved)}. A format's cost advantage is a property of the "
+                    "format *and* the content it is asked to carry, not of the format alone.",
+                ]
+
+    savings = summary.get("faceting_savings", [])
+    if savings:
+        lines += [
+            "",
+            "### What the projection removes",
+            "",
+            "A **content** comparison, not a format one: the paired per-record ratio of the "
+            "faceted rendering to the unfaceted one, in the same format.",
+            "",
+            "| Format | Faceted | Unfaceted | Saved by faceting |",
+            "|---|---:|---:|---:|",
+        ]
+        for r in sorted(savings, key=lambda x: -x["pct_saved_by_faceting"]):
+            lines.append(
+                f"| {FORMAT_LABELS.get(r['format'], r['format'])} | "
+                f"{r['faceted_mean']:,.0f} | {r['unfaceted_mean']:,.0f} | "
+                f"{r['pct_saved_by_faceting']:.1f}% |"
+            )
+
     ref = summary.get("reference_raw_umm")
     if ref:
         lines += [
             "",
             f"**Reference:** the raw UMM record CMR serves today costs "
             f"**{ref['mean_tokens']:,.0f} tokens** (median {ref['median_tokens']:,.0f}) — "
-            f"{ref['mean_tokens'] / rows[0]['mean_tokens']:.1f}× the cheapest representation. "
-            "It is excluded from the comparison because it carries more *content*, not just "
-            "a different format.",
+            f"{ref['mean_tokens'] / rows[0]['mean_tokens']:.1f}× the cheapest faceted "
+            "representation. It is the unfaceted JSON row above, named separately because "
+            "\"what does the status quo cost?\" is the question that motivates the study.",
         ]
 
     tok = summary.get("tokenizers", {})

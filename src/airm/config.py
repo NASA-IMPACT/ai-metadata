@@ -124,16 +124,24 @@ SYNTHETIC_PER_PRIMARY_TOPIC = 30  # 3 x 30 = 90, the equal-representation requir
 MAX_QUERY_REGEN_ATTEMPTS = 3
 
 
-def synthetic_quota() -> dict[str, int]:
+def synthetic_quota(total: int = SYNTHETIC_QUERY_TOTAL) -> dict[str, int]:
     """How many synthetic queries to generate per topic.
 
     Land, Ocean and Atmosphere get an equal 30 each, as the study requires. The
     remaining 30 are spread as evenly as possible over the other topics so every
     domain is represented; with 11 secondary topics that is 2 each plus a
     remainder of 8 handed out one at a time.
+
+    ``total`` scales that shape without changing it: the primary share stays at
+    ``SYNTHETIC_PER_PRIMARY_TOPIC / SYNTHETIC_QUERY_TOTAL`` of the set each (a
+    quarter, so three quarters go to the equal-representation requirement) and
+    the rest is spread evenly as before. A larger query set therefore has the
+    *same* topical distribution as the 120, which is what makes the two
+    comparable; rebalancing on the way up would confound size with stratification.
     """
-    quota = {t: SYNTHETIC_PER_PRIMARY_TOPIC for t in PRIMARY_TOPICS}
-    remaining = SYNTHETIC_QUERY_TOTAL - SYNTHETIC_PER_PRIMARY_TOPIC * len(PRIMARY_TOPICS)
+    per_primary = round(total * SYNTHETIC_PER_PRIMARY_TOPIC / SYNTHETIC_QUERY_TOTAL)
+    quota = {t: per_primary for t in PRIMARY_TOPICS}
+    remaining = total - per_primary * len(PRIMARY_TOPICS)
     per, extra = divmod(remaining, len(SECONDARY_TOPICS))
     for i, topic in enumerate(SECONDARY_TOPICS):
         quota[topic] = per + (1 if i < extra else 0)

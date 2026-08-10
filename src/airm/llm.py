@@ -191,6 +191,14 @@ class CallLogger:
 # --------------------------------------------------------------------------- #
 
 
+#: Per-request ceiling. The SDK default is 600s, which is not a timeout so much
+#: as an afternoon: a single hung socket blocks the whole run for ten minutes
+#: before :func:`complete` is even told there is a problem. Generation and
+#: judging are both short prompts with short answers -- a call still running
+#: after a minute is not slow, it is stuck, and the retry is the cheaper move.
+OPENAI_TIMEOUT_SECONDS = 60.0
+
+
 def openai_client():
     from openai import OpenAI
 
@@ -200,7 +208,11 @@ def openai_client():
             "OPENAI_API_KEY is not set. Copy .env.example to .env and fill it in; "
             "Experiment 1 runs without it, Experiment 2 does not."
         )
-    return OpenAI(api_key=key)
+    # ``max_retries=0`` hands retry control to :func:`complete`, which logs every
+    # attempt. The SDK's own retries are invisible to the log, so leaving them on
+    # makes ``query_gen.jsonl`` undercount what was actually sent -- and the two
+    # layers multiply: 3 SDK attempts inside 4 of ours is 12 requests per call.
+    return OpenAI(api_key=key, timeout=OPENAI_TIMEOUT_SECONDS, max_retries=0)
 
 
 def ollama_client():
@@ -226,12 +238,26 @@ def _call_openai(spec: ModelSpec, messages: list[dict], **kwargs) -> LLMResponse
     )
 
 
+#: Models whose reasoning cannot be switched off, only *separated*. Ollama's
+#: ``think=False`` does not stop a harmony-format model (gpt-oss) from
+#: reasoning; it only stops the reasoning being split into its own field, so it
+#: lands in ``content`` and corrupts the answer -- under ``format="json"`` the
+#: result is unparseable prose followed by a mangled brace. Left as substrings
+#: so ``gpt-oss:20b``, ``gpt-oss:120b`` and future tags all match.
+ALWAYS_THINK = ("gpt-oss",)
+
+
+def _thinks_regardless(model: str) -> bool:
+    return any(name in model.lower() for name in ALWAYS_THINK)
+
+
 def _call_ollama(spec: ModelSpec, messages: list[dict], **kwargs) -> LLMResponse:
     client = ollama_client()
     options = kwargs.pop("options", {})
     if "temperature" in kwargs:
         options["temperature"] = kwargs.pop("temperature")
     fmt = "json" if kwargs.pop("json_mode", False) else None
+    think = True if _thinks_regardless(spec.model) else False
 
     started = time.time()
     try:
@@ -240,13 +266,13 @@ def _call_ollama(spec: ModelSpec, messages: list[dict], **kwargs) -> LLMResponse
             messages=messages,
             options=options or None,
             format=fmt,
-            think=False,
+            think=think,
         )
     except Exception as exc:  # noqa: BLE001 - narrow on the message below
-        # think=False keeps reasoning models (qwen3, gpt-oss) from spending
-        # tokens on hidden thought, but Ollama rejects the parameter outright
-        # for models without the capability. Retry once without it rather than
-        # ruling those models out of the matrix.
+        # think=False keeps reasoning models (qwen3) from spending tokens on
+        # hidden thought, but Ollama rejects the parameter outright for models
+        # without the capability. Retry once without it rather than ruling those
+        # models out of the matrix.
         if "think" not in str(exc).lower():
             raise
         resp = client.chat(
@@ -255,6 +281,9 @@ def _call_ollama(spec: ModelSpec, messages: list[dict], **kwargs) -> LLMResponse
             options=options or None,
             format=fmt,
         )
+    # Reasoning is returned separately and deliberately dropped from ``text``:
+    # it is not the answer. Its tokens still land in ``eval_count`` below, so
+    # the cost of thinking stays visible in the accounting.
     return LLMResponse(
         text=resp.get("message", {}).get("content", "") or "",
         provider="ollama",
