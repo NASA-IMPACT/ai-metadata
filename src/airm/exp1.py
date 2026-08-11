@@ -51,6 +51,7 @@ from pathlib import Path
 
 from . import cmr, format_cache, tokens, unfaceted
 from .config import BASELINE_FORMAT, FORMATS, FORMAT_LABELS, RUNS_DIR, ensure_dirs, new_run_id
+from .provenance import provenance
 from .corpus import topic_of
 from .facets import facets
 
@@ -502,7 +503,7 @@ def run(*, hf: bool = True, run_id: str | None = None, out_dir: Path | None = No
         hf_ok, hf_detail = tokens.hf_available()
 
     result = {
-        "run_id": run_id,
+        **provenance(run_id),
         "records": len(records),
         "rows": len(rows),
         "payloads": list(PAYLOADS),

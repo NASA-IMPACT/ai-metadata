@@ -74,6 +74,7 @@ from airm import cmr, index, unfaceted  # noqa: E402
 from airm.config import FORMATS, FORMAT_LABELS, RECALL_AT, RUNS_DIR, TOP_K, new_run_id  # noqa: E402
 from airm.evaluate import retrieval_metrics  # noqa: E402
 from airm.facets import facets  # noqa: E402
+from airm.provenance import provenance  # noqa: E402
 from airm.queries import ground_truth_ids, load_eval_queries, load_queries  # noqa: E402
 
 
@@ -267,6 +268,7 @@ def build(args) -> int:
         missing[fmt] = sorted(set(gt) - present)
 
     report = {
+        **provenance(),
         "payload": args.payload,
         "db": str(db),
         "embed_model": EMBED_MODEL,
@@ -487,6 +489,13 @@ def evaluate(args) -> int:
     # The report is the authority on what was indexed. Trusting --payload here
     # would let a mistyped flag label a faceted index as unfaceted in the summary.
     payload = built.get("payload", "unfaceted")
+    # Resolved before the summary is built, not after, so the id written into
+    # the artefact is the same one that names the directory holding it.
+    # A plain timestamp, like every other experiment in the study. What the run
+    # *was* -- payload, pooling rule, query set -- is recorded in the summary,
+    # not encoded in the directory name, so a run is identified by reading its
+    # artefact rather than by parsing its folder.
+    run_id = args.run_id or new_run_id()
 
     client = chromadb.PersistentClient(path=str(db))
     collections = {f: client.get_collection(f"{COLLECTION_PREFIX}{f}") for f in FORMATS}
@@ -522,6 +531,7 @@ def evaluate(args) -> int:
         return sum(real) / len(real) if real else None
 
     summary = {
+        **provenance(run_id),
         "payload": payload,
         "db": str(db),
         "embed_model": EMBED_MODEL,
@@ -533,6 +543,9 @@ def evaluate(args) -> int:
         "oversample": OVERSAMPLE,
         "query_instruction": prefix or None,
         "queries_path": args.queries or "data/queries.jsonl",
+        "index_run_id": built.get("run_id"),
+        "index_built": built.get("created"),
+        "index_seconds": built.get("total_seconds"),
         "records": built["records"],
         "chunk_counts": counts,
         "chunks_per_record": {f: built["by_format"][f]["chunks_per_record_mean"] for f in FORMATS},
@@ -557,7 +570,7 @@ def evaluate(args) -> int:
     ranking = sorted(FORMATS, key=lambda f: -(summary["by_source"]["all"][f]["recall@10"] or 0.0))
     summary["ranking"] = ranking
 
-    out = RUNS_DIR / (args.run_id or f"{payload}_chunked_{args.pool}_{new_run_id()}")
+    out = RUNS_DIR / run_id
     out.mkdir(parents=True, exist_ok=True)
     import csv as _csv
     fields = ["query_id", "source", "topic", "format", "n_expected", "retrieved", *metric_keys]

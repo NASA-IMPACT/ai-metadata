@@ -32,6 +32,7 @@ from .config import (
     model_matrix,
     new_run_id,
 )
+from .provenance import provenance
 from .evaluate import judge_description, retrieval_metrics, score_with_deepeval
 from .llm import PURPOSE_ANSWER, CallLogger, LLMError, ask, resolve_models
 from .queries import Query, load_eval_queries
@@ -254,7 +255,7 @@ def run(
 
     summary = summarise(cells)
     result = {
-        "run_id": run_id,
+        **provenance(run_id),
         "formats": list(formats),
         "models": [s.key for s in usable],
         "model_problems": problems,

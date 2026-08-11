@@ -53,9 +53,9 @@ from .config import (
     RECALL_AT,
     RUNS_DIR,
     TOP_K,
-    new_run_id,
 )
 from .evaluate import retrieval_metrics
+from .provenance import provenance
 from .queries import Query, ground_truth_ids, load_eval_queries
 
 # --------------------------------------------------------------------------- #
@@ -811,7 +811,7 @@ def run(
 
     summary = summarise(rows, embed_model=embed_model, formats=formats)
     summary = {
-        "run_id": run_id or new_run_id(),
+        **provenance(run_id),
         "endpoint": endpoint.url,
         "collections": {fmt: endpoint.collection(fmt) for fmt in formats},
         "collection_counts": counts,
