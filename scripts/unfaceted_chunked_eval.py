@@ -458,13 +458,18 @@ def plot_only(args) -> int:
 # --------------------------------------------------------------------------- #
 
 
-def pool(ids: list[str], distances: list[float], metas: list[dict], how: str) -> list[str]:
-    """Chunk hits -> ranked concept-ids.
+def pool(ids: list[str], distances: list[float], metas: list[dict], how: str) -> list[tuple[str, float]]:
+    """Chunk hits -> ranked ``(concept_id, pooled distance)`` pairs, best first.
 
     ``max`` takes each record's best chunk, which is the standard rule and the
     one most sensitive to chunk count. ``mean`` averages a record's retrieved
     chunks, which penalises a record whose other chunks are irrelevant -- a
     different bias, not a smaller one.
+
+    The pooled distance rides along so the retrieval log can record *how
+    strongly* each record matched, not just its rank -- a downstream answer
+    stage replaying this log can then be audited against the exact scores it
+    was built from.
     """
     by_record: dict[str, list[float]] = defaultdict(list)
     for meta, distance in zip(metas, distances):
@@ -473,7 +478,7 @@ def pool(ids: list[str], distances: list[float], metas: list[dict], how: str) ->
         scored = {cid: statistics.fmean(ds) for cid, ds in by_record.items()}
     else:
         scored = {cid: min(ds) for cid, ds in by_record.items()}
-    return [cid for cid, _ in sorted(scored.items(), key=lambda kv: kv[1])]
+    return sorted(scored.items(), key=lambda kv: kv[1])
 
 
 def evaluate(args) -> int:
@@ -507,6 +512,7 @@ def evaluate(args) -> int:
     vectors = embed(model, [prefix + q.text for q in queries])
 
     rows: list[dict] = []
+    detail_rows: list[dict] = []
     for fmt, collection in collections.items():
         for query, vector in zip(queries, vectors):
             got = collection.query(
@@ -514,13 +520,32 @@ def evaluate(args) -> int:
                 n_results=args.top_k * OVERSAMPLE,
                 include=["distances", "metadatas"],
             )
-            ranked = pool(got["ids"][0], got["distances"][0], got["metadatas"][0], args.pool)
+            pooled = pool(got["ids"][0], got["distances"][0], got["metadatas"][0], args.pool)
+            ranked = [cid for cid, _ in pooled]
             metrics = retrieval_metrics(ranked, query.expected_concept_ids, ndcg_k=NDCG_K)
             rows.append({
                 "query_id": query.query_id, "source": query.source,
                 "topic": query.topic or "", "format": fmt,
                 "n_expected": len(query.expected_concept_ids),
                 "retrieved": "|".join(ranked[:args.top_k]),
+                **metrics,
+            })
+            # The replayable record of this retrieval: everything an answer
+            # stage needs to reconstruct its inputs (query text, ranked ids)
+            # and everything an auditor needs to check it (pooled distances,
+            # expected ids, the metrics scored at retrieval time). Renderings
+            # are NOT inlined -- unfaceted documents run to 55k tokens -- the
+            # format cache holds the exact bytes and its fingerprint is in
+            # the summary.
+            detail_rows.append({
+                "query_id": query.query_id, "source": query.source,
+                "topic": query.topic or "", "query_text": query.text,
+                "payload": payload, "format": fmt, "pool": args.pool,
+                "expected": list(query.expected_concept_ids),
+                "retrieved": [
+                    {"concept_id": cid, "distance": round(d, 6)}
+                    for cid, d in pooled[: args.top_k]
+                ],
                 **metrics,
             })
 
@@ -530,10 +555,24 @@ def evaluate(args) -> int:
         real = [v for v in values if v is not None and v == v]
         return sum(real) / len(real) if real else None
 
+    # Pin the rendering bytes this log refers to. The answer stage loads
+    # documents from the render cache by concept-id; recording the cache's
+    # manifest fingerprint here means "the inputs to every later LLM call"
+    # is a checkable claim, not a hope that nobody rebuilt the cache in
+    # between.
+    if payload == index.FACETED:
+        from airm import format_cache as _rc
+        render_cache = {"dir": str(_rc.FORMAT_CACHE_DIR),
+                        "fingerprint": _rc._manifest_fingerprint()}
+    else:
+        render_cache = {"dir": str(unfaceted.UNFACETED_CACHE_DIR),
+                        "fingerprint": unfaceted._manifest_fingerprint()}
+
     summary = {
         **provenance(run_id),
         "payload": payload,
         "db": str(db),
+        "render_cache": render_cache,
         "embed_model": EMBED_MODEL,
         "window": WINDOW,
         "chunk_tokens": built["chunk_tokens"],
@@ -578,6 +617,9 @@ def evaluate(args) -> int:
         writer = _csv.DictWriter(fh, fieldnames=fields)
         writer.writeheader()
         writer.writerows(rows)
+    with (out / "chunked_retrieval.jsonl").open("w") as fh:
+        for row in detail_rows:
+            fh.write(json.dumps(row, ensure_ascii=False) + "\n")
     (out / "chunked_summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     chart = None
     if not args.no_chart:

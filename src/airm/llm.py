@@ -325,6 +325,16 @@ def complete(
         else:
             kwargs["json_mode"] = True
 
+    # Ollama serves every model with a small default context window (~4k)
+    # regardless of what the model supports, and silently truncates the prompt
+    # from the front when it overflows. For long-context work the caller must
+    # size the window explicitly via ``ollama_options={"num_ctx": ...}``. It is
+    # read from ``meta`` rather than popped so the setting lands in the call
+    # log -- a truncated context is exactly the kind of thing an audit needs to
+    # rule out.
+    if spec.provider == "ollama" and (opts := meta.get("ollama_options")):
+        kwargs["options"] = dict(opts)
+
     caller = _call_openai if spec.provider == "openai" else _call_ollama
     last: Exception | None = None
 

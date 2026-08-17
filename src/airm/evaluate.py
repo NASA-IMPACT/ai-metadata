@@ -169,7 +169,10 @@ def _deepeval_judge(spec: ModelSpec | None, logger: CallLogger | None):
     """
     from deepeval.models import DeepEvalBaseLLM
 
-    class _Judge(DeepEvalBaseLLM, LoggedJudge):
+    # LoggedJudge must precede the ABC in the MRO: with DeepEvalBaseLLM first,
+    # its *abstract* generate/a_generate resolve ahead of LoggedJudge's concrete
+    # ones and ABCMeta refuses to instantiate the class.
+    class _Judge(LoggedJudge, DeepEvalBaseLLM):
         def __init__(self, spec, logger):
             LoggedJudge.__init__(self, spec, logger)
 
@@ -275,7 +278,10 @@ def score_with_deepeval(
     result = JudgeResult()
     for name, metric in metrics.items():
         try:
-            metric.measure(case)
+            # _show_indicator=False: the rich Live spinner hangs in captured /
+            # non-TTY / worker-thread contexts (observed: measure() never
+            # reached the judge), and a headless pipeline has no use for it.
+            metric.measure(case, _show_indicator=False)
             result.scores[name] = metric.score
             result.reasons[name] = getattr(metric, "reason", None)
         except Exception as exc:  # noqa: BLE001 - judge failures are data
