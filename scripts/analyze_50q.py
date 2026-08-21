@@ -23,6 +23,7 @@ Cells with a judge error on a metric contribute nothing to that metric's mean
 
 from __future__ import annotations
 
+import argparse
 import json
 import math
 import statistics
@@ -43,8 +44,14 @@ JUDGE_METRICS = ("correctness", "faithfulness", "answer_relevancy", "contextual_
 #: records among 10 retrieved, it measures retrieval precision, which Stage R
 #: already measures exactly.
 
-#: gpt-5.4-nano, USD per M tokens, verified 2026-08-15 (pricepertoken.com).
-NANO_IN, NANO_OUT = 0.20, 1.25
+#: USD per M tokens (input, output). nano verified 2026-08-15 (pricepertoken.com);
+#: mini verified 2026-08-19 (developers.openai.com/api/docs/pricing, standard tier).
+PRICES = {"gpt-5.4-nano": (0.20, 1.25), "gpt-5.4-mini": (0.75, 4.50)}
+NANO_IN, NANO_OUT = PRICES["gpt-5.4-nano"]
+
+#: Baseline for the model axis: every other model is differenced against it.
+BASE_MODEL = "gpt-5.4-nano"
+SHORT = {"gpt-5.4-nano": "nano", "gpt-5.4-mini": "mini", "muse-glimmer:30b-mlx": "glimmer"}
 
 #: two-sided t critical values at 95%, by df; linear enough between entries.
 T95 = {29: 2.045, 39: 2.023, 49: 2.010, 59: 2.001, 99: 1.984, 149: 1.976, 199: 1.972}
@@ -127,9 +134,10 @@ def arm_table(rows, retrieval) -> dict:
         entry["prompt_tokens"] = mean(r["prompt_tokens"] for r in group)
         entry["completion_tokens"] = mean(r["completion_tokens"] for r in group)
         entry["latency_s"] = mean(r["latency_s"] for r in group)
-        if model == "gpt-5.4-nano":
+        if model in PRICES and entry["prompt_tokens"] is not None:
+            p_in, p_out = PRICES[model]
             entry["usd_per_1k_queries"] = round(
-                (entry["prompt_tokens"] * NANO_IN + entry["completion_tokens"] * NANO_OUT)
+                (entry["prompt_tokens"] * p_in + entry["completion_tokens"] * p_out)
                 / 1e6 * 1000, 2)
         rmetrics = [retrieval[(payload, fmt, r["query_id"])] for r in group
                     if r["model"] == model]
@@ -167,18 +175,28 @@ def paired(rows, metric: str, axis: str) -> dict:
         for model, ds in sorted(by_model.items()):
             out[f"faceted_minus_unfaceted__{model}"] = mean_ci(ds)
     elif axis == "model":
-        diffs_all, by_payload = [], defaultdict(list)
-        for (payload, fmt, qid, model), r in index.items():
-            if model != "muse-glimmer:30b-mlx":
+        # Every model against the baseline, plus every other pair, so a third
+        # model slots in without new code. Names read "<a>_minus_<b>".
+        models = sorted({m for (_, _, _, m) in index})
+        pairs = [(m, BASE_MODEL) for m in models if m != BASE_MODEL]
+        others = [m for m in models if m != BASE_MODEL]
+        pairs += [(a, b) for i, a in enumerate(others) for b in others[i + 1:]]
+        for a, b in pairs:
+            diffs_all, by_payload = [], defaultdict(list)
+            for (payload, fmt, qid, model), r in index.items():
+                if model != a:
+                    continue
+                other = index.get((payload, fmt, qid, b))
+                if other and val(r) is not None and val(other) is not None:
+                    d = val(r) - val(other)
+                    diffs_all.append(d)
+                    by_payload[payload].append(d)
+            if not diffs_all:
                 continue
-            other = index.get((payload, fmt, qid, "gpt-5.4-nano"))
-            if other and val(r) is not None and val(other) is not None:
-                d = val(r) - val(other)
-                diffs_all.append(d)
-                by_payload[payload].append(d)
-        out["glimmer_minus_nano"] = mean_ci(diffs_all)
-        for payload, ds in sorted(by_payload.items()):
-            out[f"glimmer_minus_nano__{payload}"] = mean_ci(ds)
+            name = f"{SHORT.get(a, a)}_minus_{SHORT.get(b, b)}"
+            out[name] = mean_ci(diffs_all)
+            for payload, ds in sorted(by_payload.items()):
+                out[f"{name}__{payload}"] = mean_ci(ds)
     elif axis == "format":
         for fmt in FORMATS:
             if fmt == "json":
@@ -214,6 +232,7 @@ C_UNFACETED = "#eb6834"  # slot 2 orange
 FMT_LABEL = {"json": "JSON", "csv": "CSV", "yaml": "YAML", "toon": "TOON",
              "jsonld": "JSON-LD", "mat": "MaT"}
 MODEL_LABEL = {"gpt-5.4-nano": "gpt-5.4-nano (cloud)",
+               "gpt-5.4-mini": "gpt-5.4-mini (cloud)",
                "muse-glimmer:30b-mlx": "muse-glimmer 30B (local)"}
 
 
@@ -225,12 +244,13 @@ def pareto_plot(arms: dict, path: Path, metric: str = "correctness",
     from matplotlib.lines import Line2D
 
     models = sorted({k.split("|")[2] for k in arms})
-    fig, axes = plt.subplots(1, len(models), figsize=(11.6, 4.8), dpi=200,
-                             sharey=True, sharex=True)
+    fig, axes = plt.subplots(1, len(models), figsize=(5.8 * len(models), 4.8), dpi=200,
+                             sharey=True, sharex=True, squeeze=False)
+    axes = axes[0]
     fig.patch.set_facecolor(SURFACE)
 
-    ymax = max(e[metric] for e in arms.values() if e[metric]) + 0.025
-    ymin = min(e[metric] for e in arms.values() if e[metric]) - 0.02
+    ymax = max(e[metric] for e in arms.values() if e[metric] is not None) + 0.025
+    ymin = min(e[metric] for e in arms.values() if e[metric] is not None) - 0.02
 
     for ax, model in zip(axes, models):
         ax.set_facecolor(SURFACE)
@@ -315,8 +335,14 @@ def pareto_plot(arms: dict, path: Path, metric: str = "correctness",
 # --------------------------------------------------------------------------- #
 
 
-def main() -> int:
-    answers, judgements, selected, retrieval = load()
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser.add_argument("--run", default=RID, metavar="RUN_ID",
+                        help=f"Stage A/J run id under runs/ to analyse (default {RID})")
+    args = parser.parse_args(argv)
+    rid = args.run
+
+    answers, judgements, selected, retrieval = load(rid)
     rows = cells_join(answers, judgements)
     arms = arm_table(rows, retrieval)
 
@@ -330,16 +356,16 @@ def main() -> int:
     }
     comparisons["prompt_tokens"] = {"payload": paired(rows, "prompt_tokens", "payload")}
 
-    out = RUNS_DIR / RID
+    out = RUNS_DIR / rid
     analysis = {
-        **provenance(RID),
+        **provenance(rid),
         "judge": JUDGE,
         "queries": len(selected),
         "cells": len(rows),
         "arms": arms,
         "paired_comparisons": comparisons,
-        "prices_usd_per_mtok": {"gpt-5.4-nano": [NANO_IN, NANO_OUT],
-                                "as_of": "2026-08-15"},
+        "prices_usd_per_mtok": {**{m: list(v) for m, v in PRICES.items()},
+                                "as_of": "2026-08-19"},
     }
     (out / "analysis.json").write_text(json.dumps(analysis, indent=2) + "\n")
     chart = pareto_plot(arms, out / "pareto.png")
@@ -352,6 +378,18 @@ def main() -> int:
         return f"{c['mean']:+.3f} [{c['ci'][0]:+.3f}, {c['ci'][1]:+.3f}] (n={c['n']})"
 
     print(f"cells analysed: {len(rows)}  queries: {len(selected)}\n")
+    print("== per-arm means (correctness / faithfulness / prompt tok / $ per 1k queries) ==")
+    print(f"  {'payload':<10}{'fmt':<8}{'model':<22}{'n':>4}{'corr':>8}{'faith':>8}"
+          f"{'ptok':>9}{'$/1k':>8}{'R@10':>7}")
+    for key, e in arms.items():
+        payload, fmt, model = key.split("|")
+        usd = e.get("usd_per_1k_queries")
+        print(f"  {payload:<10}{fmt:<8}{model:<22}{e['n']:>4}"
+              f"{(e['correctness'] if e['correctness'] is not None else float('nan')):>8.3f}"
+              f"{(e['faithfulness'] if e['faithfulness'] is not None else float('nan')):>8.3f}"
+              f"{e['prompt_tokens']:>9.0f}{(usd if usd is not None else float('nan')):>8.2f}"
+              f"{e['recall@10']:>7.3f}")
+    print()
     print("== paired: correctness ==")
     for name, c in comparisons["correctness"]["payload"].items():
         print(f"  {name:<46} {fmt_ci(c)}")

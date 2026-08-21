@@ -241,7 +241,7 @@ data/synthetic_report.json
 
 # experiment run outputs (timestamped)
 experiments/*/results/
-runs/
+/runs/
 logs/
 
 # Excel lock files
