@@ -51,7 +51,7 @@ NANO_IN, NANO_OUT = PRICES["gpt-5.4-nano"]
 
 #: Baseline for the model axis: every other model is differenced against it.
 BASE_MODEL = "gpt-5.4-nano"
-SHORT = {"gpt-5.4-nano": "nano", "gpt-5.4-mini": "mini", "muse-glimmer:30b-mlx": "glimmer"}
+SHORT = {"gpt-5.4-nano": "nano", "gpt-5.4-mini": "mini", "muse-glimmer:30b": "glimmer"}
 
 #: two-sided t critical values at 95%, by df; linear enough between entries.
 T95 = {29: 2.045, 39: 2.023, 49: 2.010, 59: 2.001, 99: 1.984, 149: 1.976, 199: 1.972}
@@ -233,11 +233,12 @@ FMT_LABEL = {"json": "JSON", "csv": "CSV", "yaml": "YAML", "toon": "TOON",
              "jsonld": "JSON-LD", "mat": "MaT"}
 MODEL_LABEL = {"gpt-5.4-nano": "gpt-5.4-nano (cloud)",
                "gpt-5.4-mini": "gpt-5.4-mini (cloud)",
-               "muse-glimmer:30b-mlx": "muse-glimmer 30B (local)"}
+               "muse-glimmer:30b": "muse-glimmer 30B (local)"}
 
 
 def pareto_plot(arms: dict, path: Path, metric: str = "correctness",
-                metric_label: str = "correctness") -> Path:
+                metric_label: str = "correctness", n_queries: int = 50,
+                n_sme: int = 11, n_syn: int = 39) -> Path:
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -251,6 +252,9 @@ def pareto_plot(arms: dict, path: Path, metric: str = "correctness",
 
     ymax = max(e[metric] for e in arms.values() if e[metric] is not None) + 0.025
     ymin = min(e[metric] for e in arms.values() if e[metric] is not None) - 0.02
+    xs = [e["prompt_tokens"] / 1000 for e in arms.values() if e[metric] is not None]
+    xpad = (max(xs) - min(xs)) * 0.05
+    xlo, xhi = min(xs) - xpad - 2.0, max(xs) + xpad  # extra left room for labels
 
     for ax, model in zip(axes, models):
         ax.set_facecolor(SURFACE)
@@ -278,27 +282,59 @@ def pareto_plot(arms: dict, path: Path, metric: str = "correctness",
                 if payload == "faceted":
                     labels.append((x, y, FMT_LABEL[fmt]))
         # Only the faceted point of each pair is labeled -- the connector
-        # carries the identity to its unfaceted partner. Labels sit left of
-        # the marker, greedily pushed down where they'd collide with an
-        # already-placed label OR with a data point in the text's footprint.
-        placed: list[float] = []
-        gap = (ymax - ymin) * 0.048  # ~one text-line in data units
-
-        def collides(x, ly):
-            if any(abs(ly - py) < gap for py in placed):
-                return True
-            # text ends at x-1.1 and extends ~2.5 data units left of that
-            return any(x - 3.6 < ox < x - 0.7 and abs(oy - ly) < gap * 0.7
-                       for ox, oy in points)
-
-        for x, y, text in sorted(labels, key=lambda p: -p[1]):
-            ly = y
-            while collides(x, ly):
-                ly -= gap
-            placed.append(ly)
-            ax.annotate(text, (x, y), xytext=(x - 1.1, ly), textcoords="data",
-                        ha="right", va="center", fontsize=7.5, color=INK_SECONDARY)
+        # carries the identity to its unfaceted partner. Each label walks a
+        # ring of candidate spots around its marker, nearest first, and takes
+        # the first one clear of every marker, every placed label, and the
+        # axes edge; a spot beyond the innermost ring gets a thin leader line
+        # back to its marker, so a displaced label is never ambiguous.
+        ax.set_xlim(xlo, xhi)
         ax.set_ylim(ymin, ymax)
+        # pt -> data-unit converters; axes ≈ 78% x 70% of a 5.8x4.8in panel
+        ux = (xhi - xlo) / (5.8 * 72 * 0.78)
+        uy = (ymax - ymin) / (4.8 * 72 * 0.70)
+        char_w, line_h = 4.4 * ux, 9 * uy  # ~7.5pt text
+        placed_boxes: list[tuple[float, float, float, float]] = []
+
+        def box_for(tx, ty, w, ha):
+            x0 = tx - w if ha == "right" else tx if ha == "left" else tx - w / 2
+            return (x0, ty - line_h / 2, x0 + w, ty + line_h / 2)
+
+        def clear(bb):
+            x0, y0, x1, y1 = bb
+            if x0 < xlo or x1 > xhi or y0 < ymin or y1 > ymax:
+                return False
+            mx, my = 7 * ux, 7 * uy  # marker footprint
+            if any(x0 - mx < ox < x1 + mx and y0 - my < oy < y1 + my
+                   for ox, oy in points):
+                return False
+            px, py = 3 * ux, 3 * uy  # padding between labels
+            return not any(x0 - px < a1 and x1 + px > a0 and
+                           y0 - py < b1 and y1 + py > b0
+                           for a0, b0, a1, b1 in placed_boxes)
+
+        offsets = [(-11, 0, "right"), (11, 0, "left"), (0, 12, "center"),
+                   (0, -12, "center"), (-10, 9, "right"), (10, 9, "left"),
+                   (-10, -9, "right"), (10, -9, "left")]
+        for x, y, text in sorted(labels, key=lambda p: -p[1]):
+            w = char_w * len(text)
+            spot = None
+            for ring in range(1, 7):
+                for ox_px, oy_px, ha in offsets:
+                    bb = box_for(x + ox_px * ring * ux, y + oy_px * ring * uy,
+                                 w, ha)
+                    if clear(bb):
+                        spot = (x + ox_px * ring * ux, y + oy_px * ring * uy,
+                                ha, ring)
+                        break
+                if spot:
+                    break
+            tx, ty, ha, ring = spot or (x - 11 * ux, y, "right", 1)
+            placed_boxes.append(box_for(tx, ty, w, ha))
+            leader = (dict(arrowstyle="-", color=BASELINE, lw=0.6,
+                           shrinkA=2, shrinkB=4) if ring > 1 else None)
+            ax.annotate(text, (x, y), xytext=(tx, ty), textcoords="data",
+                        ha=ha, va="center", fontsize=7.5, color=INK_SECONDARY,
+                        arrowprops=leader, zorder=4)
         ax.set_title(MODEL_LABEL.get(model, model), fontsize=10.5, color=INK, pad=8)
         ax.set_xlabel("mean prompt tokens per query (thousands)",
                       fontsize=8.5, color=INK_MUTED)
@@ -319,12 +355,13 @@ def pareto_plot(arms: dict, path: Path, metric: str = "correctness",
     ]
     axes[-1].legend(handles=handles, frameon=False, fontsize=8.5,
                     loc="lower right", labelcolor=INK_SECONDARY)
-    fig.suptitle(f"Answer {metric_label} vs context cost — 50 queries, top-10 records in context",
+    fig.suptitle(f"Answer {metric_label} vs context cost — {n_queries} queries, "
+                 "top-10 records in context",
                  fontsize=12, color=INK, x=0.008, ha="left", y=0.99)
     fig.text(0.008, 0.012,
              "Labels name the faceted point; the gray connector leads to the same format's "
-             "unfaceted point. Judge: gpt-5.4-nano; correctness pooled over 11 SME + 39 "
-             "synthetic queries.".replace("correctness", metric_label),
+             f"unfaceted point. Judge: gpt-5.4-nano; correctness pooled over {n_sme} SME + "
+             f"{n_syn} synthetic queries.".replace("correctness", metric_label),
              fontsize=6.8, color=INK_MUTED)
     fig.tight_layout(rect=(0, 0.05, 1, 0.94))
     fig.savefig(path, facecolor=SURFACE)
@@ -368,9 +405,12 @@ def main(argv=None) -> int:
                                 "as_of": "2026-08-19"},
     }
     (out / "analysis.json").write_text(json.dumps(analysis, indent=2) + "\n")
-    chart = pareto_plot(arms, out / "pareto.png")
+    n_sme = sum(1 for q in selected if q.startswith("sme"))
+    counts = {"n_queries": len(selected), "n_sme": n_sme,
+              "n_syn": len(selected) - n_sme}
+    chart = pareto_plot(arms, out / "pareto.png", **counts)
     chart2 = pareto_plot(arms, out / "faithfulness.png", metric="faithfulness",
-                         metric_label="faithfulness")
+                         metric_label="faithfulness", **counts)
 
     def fmt_ci(c):
         if c["ci"] is None:

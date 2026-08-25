@@ -246,3 +246,11 @@ logs/
 
 # Excel lock files
 ~$*.xlsx
+
+# LLM-summary caches + summary-appended renderings (regenerable via
+# scripts/summary_retrieval.py generate + scripts/summary_append_eval.py cache;
+# new chroma dbs live under data/chroma/, already ignored above)
+data/format_cache_summary/
+data/format_cache_unfaceted_summary/
+data/format_cache_plus_summary/
+data/format_cache_unfaceted_plus_summary/
