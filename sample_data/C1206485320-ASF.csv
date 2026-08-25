@@ -1,0 +1,690 @@
+path,value
+AdditionalAttributes[0].Name,FLIGHT_LINE
+AdditionalAttributes[0].Description,Flight line identifies where the aircraft/instrument has flown to acquire data.
+AdditionalAttributes[0].DataType,STRING
+AdditionalAttributes[1].Name,GROUP_ID
+AdditionalAttributes[1].Description,ID that helps ASF group products
+AdditionalAttributes[1].DataType,STRING
+AdditionalAttributes[2].Name,OFF_NADIR_ANGLE
+AdditionalAttributes[2].Description,The angle the sensor points away from the satellite's nadir (off to the side). Larger angles correspond to imaging farther away from the satellite.
+AdditionalAttributes[2].DataType,FLOAT
+AdditionalAttributes[3].Name,MD5SUM
+AdditionalAttributes[3].Description,Checksum
+AdditionalAttributes[3].DataType,STRING
+AdditionalAttributes[4].Name,GRANULE_TYPE
+AdditionalAttributes[4].Description,"Identifies the type of data by combining platform, beam mode type, and coverage (frame/swath)"
+AdditionalAttributes[4].DataType,STRING
+AdditionalAttributes[5].Name,ASCENDING_DESCENDING
+AdditionalAttributes[5].Description,"Describes whether the satellite travel direction was ascending towards the north pole, or descending towards the south pole."
+AdditionalAttributes[5].DataType,STRING
+AdditionalAttributes[6].Name,FAR_END_LAT
+AdditionalAttributes[6].Description,"Latitude of the granule where imaging ended farthest from the satellite. For an ascending satellite, it locates the upper right corner of a north-oriented image."
+AdditionalAttributes[6].DataType,FLOAT
+AdditionalAttributes[7].Name,INSAR_STACK_SIZE
+AdditionalAttributes[7].Description,The number of SAR images over the same location in the entire ASF archive. Used for data that may be used for interferometry.
+AdditionalAttributes[7].DataType,INT
+AdditionalAttributes[8].Name,BEAM_MODE_TYPE
+AdditionalAttributes[8].Description,"In most cases, the BEAM_MODE_TYPE value is the same as the BEAM_MODE attribute. Each platform has its own scheme for defining acquisition sensor beam modes. Beam modes often reflect a set configuration of polarization, resolution, and off-nadir pointing angle."
+AdditionalAttributes[8].DataType,STRING
+AdditionalAttributes[9].Name,INSAR_BASELINE
+AdditionalAttributes[9].Description,The perpendicular distance between two satellites when they took the related two images. Useful for identifying image pairs to use for interferometry.
+AdditionalAttributes[9].DataType,FLOAT
+AdditionalAttributes[10].Name,CENTER_FRAME_ID
+AdditionalAttributes[10].Description,ID of the center frame
+AdditionalAttributes[10].DataType,STRING
+AdditionalAttributes[11].Name,CENTER_ESA_FRAME
+AdditionalAttributes[11].Description,The European Space Agency equivalent to the value in the FRAME_NUMBER field
+AdditionalAttributes[11].DataType,INT
+AdditionalAttributes[12].Name,ACQUISITION_DATE
+AdditionalAttributes[12].Description,Date the data was acquired by the satellite or aircraft and instrument.
+AdditionalAttributes[12].DataType,STRING
+AdditionalAttributes[13].Name,MISSION_NAME
+AdditionalAttributes[13].Description,"The sitenames where AIRSAR, AIRMOSS, and UAVSAR acquisitions were taken."
+AdditionalAttributes[13].DataType,STRING
+AdditionalAttributes[14].Name,CENTER_LON
+AdditionalAttributes[14].Description,Longitude of the center of the scene or frame.
+AdditionalAttributes[14].DataType,FLOAT
+AdditionalAttributes[15].Name,NEAR_START_LAT
+AdditionalAttributes[15].Description,"Latitude of the granule where imaging began nearest to the satellite. For an ascending satellite, it locates the lower left corner of a north-oriented image."
+AdditionalAttributes[15].DataType,FLOAT
+AdditionalAttributes[16].Name,BEAM_MODE
+AdditionalAttributes[16].Description,"The general type of active sensor used. Values indicate image resolution: such as standard, fine, wide, scansar wide, SM (strip mode), EW (extra wide). Or indicate resolution + polarization: FBS (fine beam single polarization), FBD (fine beam dual pol). Or atypically the type of product: TOPSAR (high resolution DEM), RPI (repeat pass interferometry), XTI (across track interferometry). Or resolution and product type IW (interferometric wide)."
+AdditionalAttributes[16].DataType,STRING
+AdditionalAttributes[17].Name,BEAM_MODE_DESC
+AdditionalAttributes[17].Description,Text that describes the beam mode
+AdditionalAttributes[17].DataType,STRING
+AdditionalAttributes[18].Name,PROCESSING_TYPE
+AdditionalAttributes[18].Description,"Indicates the type of product, such as browse, metadata, L1, complex, amplitude, projected, terrain corrected."
+AdditionalAttributes[18].DataType,STRING
+AdditionalAttributes[19].Name,PROCESSING_DESCRIPTION
+AdditionalAttributes[19].Description,Describes what the data was processed to. For example: low resolution terrain corrected ALOS data.
+AdditionalAttributes[19].DataType,STRING
+AdditionalAttributes[20].Name,FRAME_NUMBER
+AdditionalAttributes[20].Description,"The designated frame or scene as defined by various space agencies (ESA, JAXA, CSA) each of which have their own scheme. The frame describes a box over the Earth at a fixed latitude. Combined with a path number (for longitude it identifies a specific piece of ground)."
+AdditionalAttributes[20].DataType,INT
+AdditionalAttributes[21].Name,PROCESSING_LEVEL
+AdditionalAttributes[21].Description,"Indicates how much processing has been done to the data: L1, L1.0 unprocessed; L1.1 single look complex; L1, L1.5 amplitude image; L2, L2.2 terrain corrected image."
+AdditionalAttributes[21].DataType,STRING
+AdditionalAttributes[22].Name,PROCESSING_DATE
+AdditionalAttributes[22].Description,The date the data was processed
+AdditionalAttributes[22].DataType,STRING
+AdditionalAttributes[23].Name,NEAR_START_LON
+AdditionalAttributes[23].Description,"Longitude of the granule where imaging began nearest the satellite. For an ascending satellite, it locates the lower left corner of a north-oriented image."
+AdditionalAttributes[23].DataType,FLOAT
+AdditionalAttributes[24].Name,DOPPLER
+AdditionalAttributes[24].Description,The doppler centroid frequency - Useful for SAR processing and interferometry. Related to the squint of the satellite.
+AdditionalAttributes[24].DataType,FLOAT
+AdditionalAttributes[25].Name,FAR_START_LAT
+AdditionalAttributes[25].Description,"Latitude of the granule where imaging began farthest from the satellite. For an ascending satellite, it locates the lower right corner of a north-oriented image."
+AdditionalAttributes[25].DataType,FLOAT
+AdditionalAttributes[26].Name,NEAR_END_LON
+AdditionalAttributes[26].Description,"Longitude of the granule where imaging ended nearest to the satellite. For an ascending satellite, it locates the upper left corner of a north-oriented image."
+AdditionalAttributes[26].DataType,FLOAT
+AdditionalAttributes[27].Name,PROCESSING_TYPE_DISPLAY
+AdditionalAttributes[27].Description,Label that will be displayed in ASF's Vertex interface
+AdditionalAttributes[27].DataType,STRING
+AdditionalAttributes[28].Name,POLARIZATION
+AdditionalAttributes[28].Description,"Radar transmissions are polarized, with components normally termed vertical (V) and horizontal (H). Vertical means that the electric vector is in the plane of incidence; horizontal means the electric vector is perpendicular to the plane of incidence."
+AdditionalAttributes[28].DataType,STRING
+AdditionalAttributes[29].Name,FAR_START_LON
+AdditionalAttributes[29].Description,"Latitude of the granule where imaging began farthest from the satellite. For an ascending satellite, it locates the lower right corner of a north-oriented image."
+AdditionalAttributes[29].DataType,FLOAT
+AdditionalAttributes[30].Name,THUMBNAIL_URL
+AdditionalAttributes[30].Description,URL that points to this granule's thumbnail image
+AdditionalAttributes[30].DataType,STRING
+AdditionalAttributes[31].Name,ASF_PLATFORM
+AdditionalAttributes[31].Description,Internal ASF platform name
+AdditionalAttributes[31].DataType,STRING
+AdditionalAttributes[32].Name,INSAR_STACK_ID
+AdditionalAttributes[32].Description,An ASF-assigned unique number used internally to unify SAR images over the same location. Used for data that might be used for interferometry.
+AdditionalAttributes[32].DataType,INT
+AdditionalAttributes[33].Name,LOOK_DIRECTION
+AdditionalAttributes[33].Description,SAR imagery is taken with the sensor pointing either left or right of the satellite. Most data is right-looking.
+AdditionalAttributes[33].DataType,STRING
+AdditionalAttributes[34].Name,PATH_NUMBER
+AdditionalAttributes[34].Description,The path describes a path the satellite will follow over the earth similar to longitude; each path has an assigned number. Combined with a frame number it identifies a specific piece of ground.
+AdditionalAttributes[34].DataType,INT
+AdditionalAttributes[35].Name,NEAR_END_LAT
+AdditionalAttributes[35].Description,"Latitude of the granule where imaging ended nearest to the satellite. For an ascending satellite, it locates the upper left corner of a north-oriented image."
+AdditionalAttributes[35].DataType,FLOAT
+AdditionalAttributes[36].Name,FARADAY_ROTATION
+AdditionalAttributes[36].Description,An effect of the ionosphere that rotates polarizations from HH or VV or HV or VH. Significant for L or P band. Rotation over 5 degrees reduces usefulness for applications such as forest biomass. Effect is reduced at solar minimum.
+AdditionalAttributes[36].DataType,STRING
+AdditionalAttributes[37].Name,FAR_END_LON
+AdditionalAttributes[37].Description,"Longitude of the granule where imaging ended farthest from the satellite. For an ascending satellite, it locates the upper right corner of a north-oriented image."
+AdditionalAttributes[37].DataType,FLOAT
+AdditionalAttributes[38].Name,BYTES
+AdditionalAttributes[38].Description,Product size in bytes.
+AdditionalAttributes[38].DataType,FLOAT
+AdditionalAttributes[39].Name,CENTER_LAT
+AdditionalAttributes[39].Description,Latitude of the center of the scene or frame.
+AdditionalAttributes[39].DataType,FLOAT
+AdditionalAttributes[40].Name,ARCHIVE_DATATAKE_ID
+AdditionalAttributes[40].Description,The ARCHIVE_DATATAKE_ID for this collection
+AdditionalAttributes[40].DataType,STRING
+AdditionalAttributes[41].Name,DEM_REGION
+AdditionalAttributes[41].Description,The DEM_REGION for this collection
+AdditionalAttributes[41].DataType,STRING
+SpatialExtent.HorizontalSpatialDomain.Geometry.CoordinateSystem,CARTESIAN
+SpatialExtent.HorizontalSpatialDomain.Geometry.BoundingRectangles[0].WestBoundingCoordinate,-180
+SpatialExtent.HorizontalSpatialDomain.Geometry.BoundingRectangles[0].NorthBoundingCoordinate,90
+SpatialExtent.HorizontalSpatialDomain.Geometry.BoundingRectangles[0].EastBoundingCoordinate,180
+SpatialExtent.HorizontalSpatialDomain.Geometry.BoundingRectangles[0].SouthBoundingCoordinate,-90
+SpatialExtent.GranuleSpatialRepresentation,GEODETIC
+CollectionProgress,COMPLETE
+StandardProduct,false
+ScienceKeywords[0].Category,EARTH SCIENCE
+ScienceKeywords[0].Topic,AGRICULTURE
+ScienceKeywords[0].Term,FOREST SCIENCE
+ScienceKeywords[0].VariableLevel1,REFORESTATION
+ScienceKeywords[1].Category,EARTH SCIENCE
+ScienceKeywords[1].Topic,BIOSPHERE
+ScienceKeywords[1].Term,ECOSYSTEMS
+ScienceKeywords[1].VariableLevel1,TERRESTRIAL ECOSYSTEMS
+ScienceKeywords[2].Category,EARTH SCIENCE
+ScienceKeywords[2].Topic,CRYOSPHERE
+ScienceKeywords[2].Term,FROZEN GROUND
+ScienceKeywords[2].VariableLevel1,PERMAFROST
+ScienceKeywords[3].Category,EARTH SCIENCE
+ScienceKeywords[3].Topic,CRYOSPHERE
+ScienceKeywords[3].Term,FROZEN GROUND
+ScienceKeywords[3].VariableLevel1,ROCK GLACIERS
+ScienceKeywords[4].Category,EARTH SCIENCE
+ScienceKeywords[4].Topic,CRYOSPHERE
+ScienceKeywords[4].Term,GLACIERS/ICE SHEETS
+ScienceKeywords[4].VariableLevel1,GLACIER ELEVATION/ICE SHEET ELEVATION
+ScienceKeywords[5].Category,EARTH SCIENCE
+ScienceKeywords[5].Topic,CRYOSPHERE
+ScienceKeywords[5].Term,GLACIERS/ICE SHEETS
+ScienceKeywords[5].VariableLevel1,GLACIER MOTION/ICE SHEET MOTION
+ScienceKeywords[6].Category,EARTH SCIENCE
+ScienceKeywords[6].Topic,CRYOSPHERE
+ScienceKeywords[6].Term,GLACIERS/ICE SHEETS
+ScienceKeywords[6].VariableLevel1,GLACIER THICKNESS/ICE SHEET THICKNESS
+ScienceKeywords[7].Category,EARTH SCIENCE
+ScienceKeywords[7].Topic,CRYOSPHERE
+ScienceKeywords[7].Term,GLACIERS/ICE SHEETS
+ScienceKeywords[7].VariableLevel1,GLACIER TOPOGRAPHY/ICE SHEET TOPOGRAPHY
+ScienceKeywords[8].Category,EARTH SCIENCE
+ScienceKeywords[8].Topic,CRYOSPHERE
+ScienceKeywords[8].Term,GLACIERS/ICE SHEETS
+ScienceKeywords[8].VariableLevel1,GLACIERS
+ScienceKeywords[9].Category,EARTH SCIENCE
+ScienceKeywords[9].Topic,CRYOSPHERE
+ScienceKeywords[9].Term,GLACIERS/ICE SHEETS
+ScienceKeywords[9].VariableLevel1,ICE SHEETS
+ScienceKeywords[10].Category,EARTH SCIENCE
+ScienceKeywords[10].Topic,CRYOSPHERE
+ScienceKeywords[10].Term,GLACIERS/ICE SHEETS
+ScienceKeywords[10].VariableLevel1,ICEBERGS
+ScienceKeywords[11].Category,EARTH SCIENCE
+ScienceKeywords[11].Topic,CRYOSPHERE
+ScienceKeywords[11].Term,SEA ICE
+ScienceKeywords[11].VariableLevel1,ICE DEFORMATION
+ScienceKeywords[12].Category,EARTH SCIENCE
+ScienceKeywords[12].Topic,CRYOSPHERE
+ScienceKeywords[12].Term,SEA ICE
+ScienceKeywords[12].VariableLevel1,ICE DEPTH/THICKNESS
+ScienceKeywords[13].Category,EARTH SCIENCE
+ScienceKeywords[13].Topic,CRYOSPHERE
+ScienceKeywords[13].Term,SEA ICE
+ScienceKeywords[13].VariableLevel1,ICE EDGES
+ScienceKeywords[14].Category,EARTH SCIENCE
+ScienceKeywords[14].Topic,CRYOSPHERE
+ScienceKeywords[14].Term,SEA ICE
+ScienceKeywords[14].VariableLevel1,ICE EXTENT
+ScienceKeywords[15].Category,EARTH SCIENCE
+ScienceKeywords[15].Topic,CRYOSPHERE
+ScienceKeywords[15].Term,SEA ICE
+ScienceKeywords[15].VariableLevel1,ICE FLOES
+ScienceKeywords[16].Category,EARTH SCIENCE
+ScienceKeywords[16].Topic,CRYOSPHERE
+ScienceKeywords[16].Term,SEA ICE
+ScienceKeywords[16].VariableLevel1,ICE GROWTH/MELT
+ScienceKeywords[17].Category,EARTH SCIENCE
+ScienceKeywords[17].Topic,CRYOSPHERE
+ScienceKeywords[17].Term,SEA ICE
+ScienceKeywords[17].VariableLevel1,ICE ROUGHNESS
+ScienceKeywords[18].Category,EARTH SCIENCE
+ScienceKeywords[18].Topic,CRYOSPHERE
+ScienceKeywords[18].Term,SEA ICE
+ScienceKeywords[18].VariableLevel1,ICE TEMPERATURE
+ScienceKeywords[19].Category,EARTH SCIENCE
+ScienceKeywords[19].Topic,CRYOSPHERE
+ScienceKeywords[19].Term,SEA ICE
+ScienceKeywords[19].VariableLevel1,ICE TYPES
+ScienceKeywords[20].Category,EARTH SCIENCE
+ScienceKeywords[20].Topic,CRYOSPHERE
+ScienceKeywords[20].Term,SEA ICE
+ScienceKeywords[20].VariableLevel1,ICEBERGS
+ScienceKeywords[21].Category,EARTH SCIENCE
+ScienceKeywords[21].Topic,CRYOSPHERE
+ScienceKeywords[21].Term,SEA ICE
+ScienceKeywords[21].VariableLevel1,LEADS
+ScienceKeywords[22].Category,EARTH SCIENCE
+ScienceKeywords[22].Topic,CRYOSPHERE
+ScienceKeywords[22].Term,SEA ICE
+ScienceKeywords[22].VariableLevel1,PACK ICE
+ScienceKeywords[23].Category,EARTH SCIENCE
+ScienceKeywords[23].Topic,CRYOSPHERE
+ScienceKeywords[23].Term,SEA ICE
+ScienceKeywords[23].VariableLevel1,POLYNYAS
+ScienceKeywords[24].Category,EARTH SCIENCE
+ScienceKeywords[24].Topic,CRYOSPHERE
+ScienceKeywords[24].Term,SEA ICE
+ScienceKeywords[24].VariableLevel1,REFLECTANCE
+ScienceKeywords[25].Category,EARTH SCIENCE
+ScienceKeywords[25].Topic,CRYOSPHERE
+ScienceKeywords[25].Term,SEA ICE
+ScienceKeywords[25].VariableLevel1,SEA ICE MOTION
+ScienceKeywords[26].Category,EARTH SCIENCE
+ScienceKeywords[26].Topic,CRYOSPHERE
+ScienceKeywords[26].Term,SNOW/ICE
+ScienceKeywords[26].VariableLevel1,ICE EXTENT
+ScienceKeywords[27].Category,EARTH SCIENCE
+ScienceKeywords[27].Topic,CRYOSPHERE
+ScienceKeywords[27].Term,SNOW/ICE
+ScienceKeywords[27].VariableLevel1,ICE GROWTH/MELT
+ScienceKeywords[28].Category,EARTH SCIENCE
+ScienceKeywords[28].Topic,CRYOSPHERE
+ScienceKeywords[28].Term,SNOW/ICE
+ScienceKeywords[28].VariableLevel1,ICE MOTION
+ScienceKeywords[29].Category,EARTH SCIENCE
+ScienceKeywords[29].Topic,CRYOSPHERE
+ScienceKeywords[29].Term,SNOW/ICE
+ScienceKeywords[29].VariableLevel1,ICE VELOCITY
+ScienceKeywords[30].Category,EARTH SCIENCE
+ScienceKeywords[30].Topic,CRYOSPHERE
+ScienceKeywords[30].Term,SNOW/ICE
+ScienceKeywords[30].VariableLevel1,LAKE ICE
+ScienceKeywords[31].Category,EARTH SCIENCE
+ScienceKeywords[31].Topic,CRYOSPHERE
+ScienceKeywords[31].Term,SNOW/ICE
+ScienceKeywords[31].VariableLevel1,PERMAFROST
+ScienceKeywords[32].Category,EARTH SCIENCE
+ScienceKeywords[32].Topic,CRYOSPHERE
+ScienceKeywords[32].Term,SNOW/ICE
+ScienceKeywords[32].VariableLevel1,RIVER ICE
+ScienceKeywords[33].Category,EARTH SCIENCE
+ScienceKeywords[33].Topic,CRYOSPHERE
+ScienceKeywords[33].Term,SNOW/ICE
+ScienceKeywords[33].VariableLevel1,SNOW COVER
+ScienceKeywords[34].Category,EARTH SCIENCE
+ScienceKeywords[34].Topic,LAND SURFACE
+ScienceKeywords[34].Term,EROSION/SEDIMENTATION
+ScienceKeywords[34].VariableLevel1,LANDSLIDES
+ScienceKeywords[35].Category,EARTH SCIENCE
+ScienceKeywords[35].Topic,LAND SURFACE
+ScienceKeywords[35].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[35].VariableLevel1,AEOLIAN LANDFORMS
+ScienceKeywords[36].Category,EARTH SCIENCE
+ScienceKeywords[36].Topic,LAND SURFACE
+ScienceKeywords[36].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[36].VariableLevel1,COASTAL LANDFORMS
+ScienceKeywords[37].Category,EARTH SCIENCE
+ScienceKeywords[37].Topic,LAND SURFACE
+ScienceKeywords[37].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[37].VariableLevel1,FLUVIAL LANDFORMS
+ScienceKeywords[38].Category,EARTH SCIENCE
+ScienceKeywords[38].Topic,LAND SURFACE
+ScienceKeywords[38].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[38].VariableLevel1,GLACIAL LANDFORMS
+ScienceKeywords[39].Category,EARTH SCIENCE
+ScienceKeywords[39].Topic,LAND SURFACE
+ScienceKeywords[39].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[39].VariableLevel1,KARST LANDFORMS
+ScienceKeywords[40].Category,EARTH SCIENCE
+ScienceKeywords[40].Topic,LAND SURFACE
+ScienceKeywords[40].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[40].VariableLevel1,TECTONIC LANDFORMS
+ScienceKeywords[41].Category,EARTH SCIENCE
+ScienceKeywords[41].Topic,LAND SURFACE
+ScienceKeywords[41].Term,LAND USE/LAND COVER
+ScienceKeywords[41].VariableLevel1,LAND USE/LAND COVER CLASSIFICATION
+ScienceKeywords[42].Category,EARTH SCIENCE
+ScienceKeywords[42].Topic,LAND SURFACE
+ScienceKeywords[42].Term,LANDSCAPE
+ScienceKeywords[42].VariableLevel1,LANDSCAPE ECOLOGY
+ScienceKeywords[43].Category,EARTH SCIENCE
+ScienceKeywords[43].Topic,LAND SURFACE
+ScienceKeywords[43].Term,LANDSCAPE
+ScienceKeywords[43].VariableLevel1,LANDSCAPE ECOLOGY
+ScienceKeywords[44].Category,EARTH SCIENCE
+ScienceKeywords[44].Topic,LAND SURFACE
+ScienceKeywords[44].Term,LANDSCAPE
+ScienceKeywords[44].VariableLevel1,LANDSCAPE PATTERNS
+ScienceKeywords[45].Category,EARTH SCIENCE
+ScienceKeywords[45].Topic,LAND SURFACE
+ScienceKeywords[45].Term,LANDSCAPE
+ScienceKeywords[45].VariableLevel1,LANDSCAPE PROCESSES
+ScienceKeywords[46].Category,EARTH SCIENCE
+ScienceKeywords[46].Topic,LAND SURFACE
+ScienceKeywords[46].Term,LANDSCAPE
+ScienceKeywords[46].VariableLevel1,REFORESTATION
+ScienceKeywords[47].Category,EARTH SCIENCE
+ScienceKeywords[47].Topic,LAND SURFACE
+ScienceKeywords[47].Term,TOPOGRAPHY
+ScienceKeywords[47].VariableLevel1,SURFACE ROUGHNESS
+ScienceKeywords[48].Category,EARTH SCIENCE
+ScienceKeywords[48].Topic,LAND SURFACE
+ScienceKeywords[48].Term,TOPOGRAPHY
+ScienceKeywords[48].VariableLevel1,TERRAIN ELEVATION
+ScienceKeywords[49].Category,EARTH SCIENCE
+ScienceKeywords[49].Topic,LAND SURFACE
+ScienceKeywords[49].Term,TOPOGRAPHY
+ScienceKeywords[49].VariableLevel1,TOPOGRAPHIC EFFECTS
+ScienceKeywords[50].Category,EARTH SCIENCE
+ScienceKeywords[50].Topic,OCEANS
+ScienceKeywords[50].Term,COASTAL PROCESSES
+ScienceKeywords[50].VariableLevel1,BARRIER ISLANDS
+ScienceKeywords[51].Category,EARTH SCIENCE
+ScienceKeywords[51].Topic,OCEANS
+ScienceKeywords[51].Term,COASTAL PROCESSES
+ScienceKeywords[51].VariableLevel1,BEACHES
+ScienceKeywords[52].Category,EARTH SCIENCE
+ScienceKeywords[52].Topic,OCEANS
+ScienceKeywords[52].Term,COASTAL PROCESSES
+ScienceKeywords[52].VariableLevel1,DELTAS
+ScienceKeywords[53].Category,EARTH SCIENCE
+ScienceKeywords[53].Topic,OCEANS
+ScienceKeywords[53].Term,COASTAL PROCESSES
+ScienceKeywords[53].VariableLevel1,DUNES
+ScienceKeywords[54].Category,EARTH SCIENCE
+ScienceKeywords[54].Topic,OCEANS
+ScienceKeywords[54].Term,COASTAL PROCESSES
+ScienceKeywords[54].VariableLevel1,ESTUARIES
+ScienceKeywords[55].Category,EARTH SCIENCE
+ScienceKeywords[55].Topic,OCEANS
+ScienceKeywords[55].Term,COASTAL PROCESSES
+ScienceKeywords[55].VariableLevel1,FJORDS
+ScienceKeywords[56].Category,EARTH SCIENCE
+ScienceKeywords[56].Topic,OCEANS
+ScienceKeywords[56].Term,COASTAL PROCESSES
+ScienceKeywords[56].VariableLevel1,INLETS
+ScienceKeywords[57].Category,EARTH SCIENCE
+ScienceKeywords[57].Topic,OCEANS
+ScienceKeywords[57].Term,COASTAL PROCESSES
+ScienceKeywords[57].VariableLevel1,LAGOONS
+ScienceKeywords[58].Category,EARTH SCIENCE
+ScienceKeywords[58].Topic,OCEANS
+ScienceKeywords[58].Term,COASTAL PROCESSES
+ScienceKeywords[58].VariableLevel1,MANGROVES
+ScienceKeywords[59].Category,EARTH SCIENCE
+ScienceKeywords[59].Topic,OCEANS
+ScienceKeywords[59].Term,COASTAL PROCESSES
+ScienceKeywords[59].VariableLevel1,MARSHES
+ScienceKeywords[60].Category,EARTH SCIENCE
+ScienceKeywords[60].Topic,OCEANS
+ScienceKeywords[60].Term,COASTAL PROCESSES
+ScienceKeywords[60].VariableLevel1,ROCKY COASTS
+ScienceKeywords[61].Category,EARTH SCIENCE
+ScienceKeywords[61].Topic,OCEANS
+ScienceKeywords[61].Term,COASTAL PROCESSES
+ScienceKeywords[61].VariableLevel1,SHORELINES
+ScienceKeywords[62].Category,EARTH SCIENCE
+ScienceKeywords[62].Topic,OCEANS
+ScienceKeywords[62].Term,OCEAN WAVES
+ScienceKeywords[62].VariableLevel1,WIND WAVES
+ScienceKeywords[63].Category,EARTH SCIENCE
+ScienceKeywords[63].Topic,OCEANS
+ScienceKeywords[63].Term,OCEAN WINDS
+ScienceKeywords[63].VariableLevel1,SURFACE WINDS
+ScienceKeywords[64].Category,EARTH SCIENCE
+ScienceKeywords[64].Topic,OCEANS
+ScienceKeywords[64].Term,SEA ICE
+ScienceKeywords[64].VariableLevel1,ICE DEFORMATION
+ScienceKeywords[65].Category,EARTH SCIENCE
+ScienceKeywords[65].Topic,OCEANS
+ScienceKeywords[65].Term,SEA ICE
+ScienceKeywords[65].VariableLevel1,ICE DEPTH/THICKNESS
+ScienceKeywords[66].Category,EARTH SCIENCE
+ScienceKeywords[66].Topic,OCEANS
+ScienceKeywords[66].Term,SEA ICE
+ScienceKeywords[66].VariableLevel1,ICE EDGES
+ScienceKeywords[67].Category,EARTH SCIENCE
+ScienceKeywords[67].Topic,OCEANS
+ScienceKeywords[67].Term,SEA ICE
+ScienceKeywords[67].VariableLevel1,ICE EXTENT
+ScienceKeywords[68].Category,EARTH SCIENCE
+ScienceKeywords[68].Topic,OCEANS
+ScienceKeywords[68].Term,SEA ICE
+ScienceKeywords[68].VariableLevel1,ICE FLOES
+ScienceKeywords[69].Category,EARTH SCIENCE
+ScienceKeywords[69].Topic,OCEANS
+ScienceKeywords[69].Term,SEA ICE
+ScienceKeywords[69].VariableLevel1,ICE ROUGHNESS
+ScienceKeywords[70].Category,EARTH SCIENCE
+ScienceKeywords[70].Topic,OCEANS
+ScienceKeywords[70].Term,SEA ICE
+ScienceKeywords[70].VariableLevel1,ICE TYPES
+ScienceKeywords[71].Category,EARTH SCIENCE
+ScienceKeywords[71].Topic,OCEANS
+ScienceKeywords[71].Term,SEA ICE
+ScienceKeywords[71].VariableLevel1,ICEBERGS
+ScienceKeywords[72].Category,EARTH SCIENCE
+ScienceKeywords[72].Topic,OCEANS
+ScienceKeywords[72].Term,SEA ICE
+ScienceKeywords[72].VariableLevel1,LEADS
+ScienceKeywords[73].Category,EARTH SCIENCE
+ScienceKeywords[73].Topic,OCEANS
+ScienceKeywords[73].Term,SEA ICE
+ScienceKeywords[73].VariableLevel1,PACK ICE
+ScienceKeywords[74].Category,EARTH SCIENCE
+ScienceKeywords[74].Topic,OCEANS
+ScienceKeywords[74].Term,SEA ICE
+ScienceKeywords[74].VariableLevel1,POLYNYAS
+ScienceKeywords[75].Category,EARTH SCIENCE
+ScienceKeywords[75].Topic,OCEANS
+ScienceKeywords[75].Term,SEA ICE
+ScienceKeywords[75].VariableLevel1,SEA ICE MOTION
+ScienceKeywords[76].Category,EARTH SCIENCE
+ScienceKeywords[76].Topic,SOLID EARTH
+ScienceKeywords[76].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[76].VariableLevel1,GLACIAL LANDFORMS
+ScienceKeywords[77].Category,EARTH SCIENCE
+ScienceKeywords[77].Topic,SOLID EARTH
+ScienceKeywords[77].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[77].VariableLevel1,TECTONIC LANDFORMS
+ScienceKeywords[77].VariableLevel2,CALDERA
+ScienceKeywords[78].Category,EARTH SCIENCE
+ScienceKeywords[78].Topic,SOLID EARTH
+ScienceKeywords[78].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[78].VariableLevel1,TECTONIC LANDFORMS
+ScienceKeywords[78].VariableLevel2,CINDER CONE
+ScienceKeywords[79].Category,EARTH SCIENCE
+ScienceKeywords[79].Topic,SOLID EARTH
+ScienceKeywords[79].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[79].VariableLevel1,TECTONIC LANDFORMS
+ScienceKeywords[79].VariableLevel2,FAULTS
+ScienceKeywords[80].Category,EARTH SCIENCE
+ScienceKeywords[80].Topic,SOLID EARTH
+ScienceKeywords[80].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[80].VariableLevel1,TECTONIC LANDFORMS
+ScienceKeywords[80].VariableLevel2,FOLDS
+ScienceKeywords[81].Category,EARTH SCIENCE
+ScienceKeywords[81].Topic,SOLID EARTH
+ScienceKeywords[81].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[81].VariableLevel1,TECTONIC LANDFORMS
+ScienceKeywords[81].VariableLevel2,GEYSER
+ScienceKeywords[82].Category,EARTH SCIENCE
+ScienceKeywords[82].Topic,SOLID EARTH
+ScienceKeywords[82].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[82].VariableLevel1,TECTONIC LANDFORMS
+ScienceKeywords[82].VariableLevel2,GRABEN
+ScienceKeywords[83].Category,EARTH SCIENCE
+ScienceKeywords[83].Topic,SOLID EARTH
+ScienceKeywords[83].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[83].VariableLevel1,TECTONIC LANDFORMS
+ScienceKeywords[83].VariableLevel2,HORST
+ScienceKeywords[84].Category,EARTH SCIENCE
+ScienceKeywords[84].Topic,SOLID EARTH
+ScienceKeywords[84].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[84].VariableLevel1,TECTONIC LANDFORMS
+ScienceKeywords[84].VariableLevel2,LAVA DOME
+ScienceKeywords[85].Category,EARTH SCIENCE
+ScienceKeywords[85].Topic,SOLID EARTH
+ScienceKeywords[85].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[85].VariableLevel1,TECTONIC LANDFORMS
+ScienceKeywords[85].VariableLevel2,LAVA PLAIN
+ScienceKeywords[86].Category,EARTH SCIENCE
+ScienceKeywords[86].Topic,SOLID EARTH
+ScienceKeywords[86].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[86].VariableLevel1,TECTONIC LANDFORMS
+ScienceKeywords[86].VariableLevel2,MAAR
+ScienceKeywords[87].Category,EARTH SCIENCE
+ScienceKeywords[87].Topic,SOLID EARTH
+ScienceKeywords[87].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[87].VariableLevel1,TECTONIC LANDFORMS
+ScienceKeywords[87].VariableLevel2,MOUNTAINS
+ScienceKeywords[88].Category,EARTH SCIENCE
+ScienceKeywords[88].Topic,SOLID EARTH
+ScienceKeywords[88].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[88].VariableLevel1,TECTONIC LANDFORMS
+ScienceKeywords[88].VariableLevel2,PLATEAU
+ScienceKeywords[89].Category,EARTH SCIENCE
+ScienceKeywords[89].Topic,SOLID EARTH
+ScienceKeywords[89].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[89].VariableLevel1,TECTONIC LANDFORMS
+ScienceKeywords[89].VariableLevel2,RIDGE
+ScienceKeywords[90].Category,EARTH SCIENCE
+ScienceKeywords[90].Topic,SOLID EARTH
+ScienceKeywords[90].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[90].VariableLevel1,TECTONIC LANDFORMS
+ScienceKeywords[90].VariableLevel2,RIFT VALLEY
+ScienceKeywords[91].Category,EARTH SCIENCE
+ScienceKeywords[91].Topic,SOLID EARTH
+ScienceKeywords[91].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[91].VariableLevel1,TECTONIC LANDFORMS
+ScienceKeywords[91].VariableLevel2,TUYA
+ScienceKeywords[92].Category,EARTH SCIENCE
+ScienceKeywords[92].Topic,SOLID EARTH
+ScienceKeywords[92].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[92].VariableLevel1,TECTONIC LANDFORMS
+ScienceKeywords[92].VariableLevel2,VOLCANO
+ScienceKeywords[93].Category,EARTH SCIENCE
+ScienceKeywords[93].Topic,SOLID EARTH
+ScienceKeywords[93].Term,GEOMORPHIC LANDFORMS/PROCESSES
+ScienceKeywords[93].VariableLevel1,TECTONIC LANDFORMS
+ScienceKeywords[94].Category,EARTH SCIENCE
+ScienceKeywords[94].Topic,SOLID EARTH
+ScienceKeywords[94].Term,TECTONICS
+ScienceKeywords[94].VariableLevel1,EARTHQUAKES
+ScienceKeywords[95].Category,EARTH SCIENCE
+ScienceKeywords[95].Topic,SOLID EARTH
+ScienceKeywords[95].Term,TECTONICS
+ScienceKeywords[95].VariableLevel1,EARTHQUAKES
+ScienceKeywords[96].Category,EARTH SCIENCE
+ScienceKeywords[96].Topic,SOLID EARTH
+ScienceKeywords[96].Term,TECTONICS
+ScienceKeywords[96].VariableLevel1,PLATE TECTONICS
+ScienceKeywords[97].Category,EARTH SCIENCE
+ScienceKeywords[97].Topic,SOLID EARTH
+ScienceKeywords[97].Term,TECTONICS
+ScienceKeywords[97].VariableLevel1,PLATE TECTONICS
+ScienceKeywords[98].Category,EARTH SCIENCE
+ScienceKeywords[98].Topic,SOLID EARTH
+ScienceKeywords[98].Term,TECTONICS
+ScienceKeywords[98].VariableLevel1,VOLCANIC ACTIVITY
+ScienceKeywords[99].Category,EARTH SCIENCE
+ScienceKeywords[99].Topic,SOLID EARTH
+ScienceKeywords[99].Term,TECTONICS
+ScienceKeywords[99].VariableLevel1,VOLCANIC ACTIVITY
+ScienceKeywords[100].Category,EARTH SCIENCE
+ScienceKeywords[100].Topic,TERRESTRIAL HYDROSPHERE
+ScienceKeywords[100].Term,GLACIERS/ICE SHEETS
+ScienceKeywords[100].VariableLevel1,GLACIER ELEVATION/ICE SHEET ELEVATION
+ScienceKeywords[101].Category,EARTH SCIENCE
+ScienceKeywords[101].Topic,TERRESTRIAL HYDROSPHERE
+ScienceKeywords[101].Term,GLACIERS/ICE SHEETS
+ScienceKeywords[101].VariableLevel1,GLACIER MOTION/ICE SHEET MOTION
+ScienceKeywords[102].Category,EARTH SCIENCE
+ScienceKeywords[102].Topic,TERRESTRIAL HYDROSPHERE
+ScienceKeywords[102].Term,GLACIERS/ICE SHEETS
+ScienceKeywords[102].VariableLevel1,GLACIER TOPOGRAPHY/ICE SHEET TOPOGRAPHY
+ScienceKeywords[103].Category,EARTH SCIENCE
+ScienceKeywords[103].Topic,TERRESTRIAL HYDROSPHERE
+ScienceKeywords[103].Term,GLACIERS/ICE SHEETS
+ScienceKeywords[103].VariableLevel1,GLACIERS
+ScienceKeywords[104].Category,EARTH SCIENCE
+ScienceKeywords[104].Topic,TERRESTRIAL HYDROSPHERE
+ScienceKeywords[104].Term,GLACIERS/ICE SHEETS
+ScienceKeywords[104].VariableLevel1,ICE SHEETS
+ScienceKeywords[105].Category,EARTH SCIENCE
+ScienceKeywords[105].Topic,TERRESTRIAL HYDROSPHERE
+ScienceKeywords[105].Term,GLACIERS/ICE SHEETS
+ScienceKeywords[105].VariableLevel1,ICEBERGS
+ScienceKeywords[106].Category,EARTH SCIENCE
+ScienceKeywords[106].Topic,TERRESTRIAL HYDROSPHERE
+ScienceKeywords[106].Term,SNOW/ICE
+ScienceKeywords[106].VariableLevel1,ICE EXTENT
+ScienceKeywords[107].Category,EARTH SCIENCE
+ScienceKeywords[107].Topic,TERRESTRIAL HYDROSPHERE
+ScienceKeywords[107].Term,SNOW/ICE
+ScienceKeywords[107].VariableLevel1,ICE GROWTH/MELT
+ScienceKeywords[108].Category,EARTH SCIENCE
+ScienceKeywords[108].Topic,TERRESTRIAL HYDROSPHERE
+ScienceKeywords[108].Term,SNOW/ICE
+ScienceKeywords[108].VariableLevel1,ICE MOTION
+ScienceKeywords[109].Category,EARTH SCIENCE
+ScienceKeywords[109].Topic,TERRESTRIAL HYDROSPHERE
+ScienceKeywords[109].Term,SNOW/ICE
+ScienceKeywords[109].VariableLevel1,ICE VELOCITY
+ScienceKeywords[110].Category,EARTH SCIENCE
+ScienceKeywords[110].Topic,TERRESTRIAL HYDROSPHERE
+ScienceKeywords[110].Term,SNOW/ICE
+ScienceKeywords[110].VariableLevel1,LAKE ICE
+ScienceKeywords[111].Category,EARTH SCIENCE
+ScienceKeywords[111].Topic,TERRESTRIAL HYDROSPHERE
+ScienceKeywords[111].Term,SNOW/ICE
+ScienceKeywords[111].VariableLevel1,PERMAFROST
+ScienceKeywords[112].Category,EARTH SCIENCE
+ScienceKeywords[112].Topic,TERRESTRIAL HYDROSPHERE
+ScienceKeywords[112].Term,SNOW/ICE
+ScienceKeywords[112].VariableLevel1,RIVER ICE
+TemporalExtents[0].RangeDateTimes[0].BeginningDateTime,2006-03-23T16:10:55.000Z
+TemporalExtents[0].RangeDateTimes[0].EndingDateTime,2011-04-22T20:23:36.000Z
+TemporalExtents[0].PrecisionOfSeconds,1
+TemporalExtents[0].EndsAtPresentFlag,false
+ProcessingLevel.Id,0
+ProcessingLevel.ProcessingLevelDescription,Data expanded from original packed L0 data. Bit realignment and other editing performed. Multi-polarized data aligned in time series for respective polarization. Single-polarization SCANSAR data aligned in time series for respective scanning.
+DOI.DOI,10.5067/J4JVCFDDPEW1
+DOI.Authority,https://doi.org/
+ShortName,ALOS_PSR_L1.0
+EntryTitle,ALOS PALSAR Level 1.0 Product
+RelatedUrls[0].Description,Search and download data granules using the ASF Data Search graphical search interface Vertex.
+RelatedUrls[0].URLContentType,DistributionURL
+RelatedUrls[0].Type,GET DATA
+RelatedUrls[0].URL,https://search.asf.alaska.edu/
+RelatedUrls[0].Subtype,VERTEX
+RelatedUrls[1].URLContentType,DistributionURL
+RelatedUrls[1].Description,Search and download data granules using NASA Earthdata Search interface.
+RelatedUrls[1].Type,GET DATA
+RelatedUrls[1].Subtype,Earthdata Search
+RelatedUrls[1].URL,https://search.earthdata.nasa.gov/search/granules?p=C1206485320-ASF
+RelatedUrls[2].URL,https://www.eorc.jaxa.jp/ALOS/en/doc/fdata/PALSAR_L10_J_ENa.zip
+RelatedUrls[2].URLContentType,PublicationURL
+RelatedUrls[2].Type,VIEW RELATED INFORMATION
+RelatedUrls[2].Subtype,DATA PRODUCT SPECIFICATION
+RelatedUrls[2].Description,Product format specification for the ALOS PALSAR Level 1.0 product
+RelatedUrls[3].URL,https://www.eorc.jaxa.jp/ALOS/en/alos/a1_calval_e.htm
+RelatedUrls[3].URLContentType,PublicationURL
+RelatedUrls[3].Type,VIEW RELATED INFORMATION
+RelatedUrls[3].Subtype,INSTRUMENT/SENSOR CALIBRATION DOCUMENTATION
+RelatedUrls[3].Description,ALOS calibration information
+DataDates[0].Type,CREATE
+DataDates[0].Date,2010-03-01T21:23:55.000Z
+DataDates[1].Type,UPDATE
+DataDates[1].Date,2018-03-20T20:24:18.000Z
+Abstract,ALOS PALSAR Level 1.0
+MetadataDates[0].Type,CREATE
+MetadataDates[0].Date,2023-04-12T21:06:00.000Z
+MetadataDates[1].Type,UPDATE
+MetadataDates[1].Date,2026-02-07T21:00:00.000Z
+Version,1
+UseConstraints.EULAIdentifiers[0],1b454cfb-c298-4072-ae3c-3c133ce810c8
+UseConstraints.LicenseText,"ALOS/PALSAR/AVNIR-2 and ALOS-2 ScanSAR data products usage conditions
+
+(i) JAXA does not guarantee any specific quality and the timely provision of the ALOS/PALSAR/AVNIR-2 and ALOS-2 ScanSAR data products and shall not be liable for any damage caused by using them.
+
+(ii) The intellectual property rights, including but not limited to copyrights, of the ALOS/PALSAR/AVNIR-2 and ALOS-2 ScanSAR data Products belong to JAXA.
+
+(iii) The user shall retain the ownership of value-added products (modified products with high-level processing which are irreversible to standard data. High-level data processing includes data analysis or combining multiple- ALOS/PALSAR/AVNIR-2 and ALOS-2 ScanSAR data Product, image processing based on external information, and physical quantity conversion).
+
+(iv) When the user publish and/or redistribute their-generated value-added products based on the  ALOS/PALSAR/AVNIR-2 and ALOS-2 ScanSAR data Product, users will indicate, “the original ALOS/PALSAR/AVNIR-2 and ALOS-2 ScanSAR data products are provided by JAXA”.
+
+(v) When the user intends to publish the results directly using or indirectly based on the ALOS/PALSAR/AVNIR-2 and ALOS-2 ScanSAR data products, the user will indicate owner of the Data Products as “©JAXA [year of acquisition]. All rights reserved”."
+UseConstraints.FreeAndOpenData,true
+DataCenters[0].Roles[0],ORIGINATOR
+DataCenters[0].ContactInformation.RelatedUrls[0].Description,"Home Page for the Earth Observation Research Center, Japan Aerospace Exploration Agency, Japan"
+DataCenters[0].ContactInformation.RelatedUrls[0].URL,http://www.eorc.jaxa.jp/en/index.html
+DataCenters[0].ContactInformation.RelatedUrls[0].URLContentType,DataCenterURL
+DataCenters[0].ContactInformation.RelatedUrls[0].Type,HOME PAGE
+DataCenters[0].ShortName,JP/JAXA/EORC
+DataCenters[0].LongName,"Earth Observation Research Center, Japan Aerospace Exploration Agency, Japan"
+DataCenters[1].Roles[0],ARCHIVER
+DataCenters[1].Roles[1],DISTRIBUTOR
+DataCenters[1].Roles[2],PROCESSOR
+DataCenters[1].ContactInformation.RelatedUrls[0].Description,Home Page for the Alaska Satellite Facility
+DataCenters[1].ContactInformation.RelatedUrls[0].URLContentType,DataCenterURL
+DataCenters[1].ContactInformation.RelatedUrls[0].Type,HOME PAGE
+DataCenters[1].ContactInformation.RelatedUrls[0].URL,https://www.asf.alaska.edu/
+DataCenters[1].ContactInformation.ContactMechanisms[0].Type,Email
+DataCenters[1].ContactInformation.ContactMechanisms[0].Value,uso@asf.alaska.edu
+DataCenters[1].ShortName,ASF
+DataCenters[1].LongName,Alaska Satellite Facility
+Platforms[0].Type,Earth Observation Satellites
+Platforms[0].ShortName,ALOS
+Platforms[0].LongName,Advanced Land Observing Satellite
+Platforms[0].Instruments[0].ShortName,PALSAR
+Platforms[0].Instruments[0].LongName,Phased Array type L-band Synthetic Aperture Radar
+Platforms[0].Instruments[0].ComposedOf[0].ShortName,DSN
+Platforms[0].Instruments[0].ComposedOf[1].ShortName,FBD
+Platforms[0].Instruments[0].ComposedOf[2].ShortName,WB2
+Platforms[0].Instruments[0].ComposedOf[3].ShortName,PLR
+Platforms[0].Instruments[0].ComposedOf[4].ShortName,WB1
+Platforms[0].Instruments[0].ComposedOf[5].ShortName,FBS
+Platforms[0].Instruments[0].OperationalModes[0],Arctic
+Platforms[0].Instruments[0].OperationalModes[1],Antarctic
+MetadataSpecification.URL,https://cdn.earthdata.nasa.gov/umm/collection/v1.18.5
+MetadataSpecification.Name,UMM-C
+MetadataSpecification.Version,1.18.5

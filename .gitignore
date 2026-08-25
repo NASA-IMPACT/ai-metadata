@@ -222,8 +222,35 @@ __marimo__/
 
 # airm: cache + local env
 data/cmr_cache/*.json
+# Renderings of the above, rebuilt in ~15s by `airm.format_cache --build`.
+data/format_cache/
+data/format_cache_unfaceted/
 data/embed_cache/
+data/chroma/
 .env
+
+# airm: generated data artifacts — rebuilt deterministically (seeded) via
+# `airm.queries --build`, `airm.corpus --build`, `airm.synth`.
+# data/prices.json is user-authored config and stays trackable.
+data/corpus.jsonl
+data/corpus_report.json
+data/gt.jsonl
+data/gt_dropped.json
+data/queries.jsonl
+data/synthetic_report.json
 
 # experiment run outputs (timestamped)
 experiments/*/results/
+/runs/
+logs/
+
+# Excel lock files
+~$*.xlsx
+
+# LLM-summary caches + summary-appended renderings (regenerable via
+# scripts/summary_retrieval.py generate + scripts/summary_append_eval.py cache;
+# new chroma dbs live under data/chroma/, already ignored above)
+data/format_cache_summary/
+data/format_cache_unfaceted_summary/
+data/format_cache_plus_summary/
+data/format_cache_unfaceted_plus_summary/

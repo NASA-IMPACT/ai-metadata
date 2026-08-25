@@ -1,0 +1,375 @@
+{
+  "generator": "openai:gpt-5.4-nano",
+  "requested": {
+    "LAND SURFACE": 125,
+    "OCEANS": 125,
+    "ATMOSPHERE": 125,
+    "CRYOSPHERE": 12,
+    "BIOSPHERE": 12,
+    "BIOLOGICAL CLASSIFICATION": 12,
+    "TERRESTRIAL HYDROSPHERE": 12,
+    "HUMAN DIMENSIONS": 11,
+    "SOLID EARTH": 11,
+    "AGRICULTURE": 11,
+    "SUN-EARTH INTERACTIONS": 11,
+    "CLIMATE INDICATORS": 11,
+    "SPECTRAL/ENGINEERING": 11,
+    "PALEOCLIMATE": 11
+  },
+  "produced": {
+    "AGRICULTURE": 11,
+    "ATMOSPHERE": 125,
+    "BIOLOGICAL CLASSIFICATION": 12,
+    "BIOSPHERE": 12,
+    "CLIMATE INDICATORS": 11,
+    "CRYOSPHERE": 12,
+    "HUMAN DIMENSIONS": 11,
+    "LAND SURFACE": 125,
+    "OCEANS": 125,
+    "PALEOCLIMATE": 11,
+    "SOLID EARTH": 11,
+    "SPECTRAL/ENGINEERING": 11,
+    "SUN-EARTH INTERACTIONS": 11,
+    "TERRESTRIAL HYDROSPHERE": 12
+  },
+  "total": 500,
+  "retries": 131,
+  "dropped": [
+    {
+      "concept_id": "C1243477382-GES_DISC",
+      "topic": "ATMOSPHERE",
+      "reason": "not retrievable by any format",
+      "query": "How do the vertical profiles of mid-tropospheric air temperature and carbon monoxide concentrations over the tropical western Pacific (e.g., 120–160°E, 5°S–5°N) change during El Niño versus La Niña years from 2002 to 2024? Use the retrieved vertical distribution and associated cloud properties to control for differences in cloud fraction and cloud top conditions that may affect the sounder retrievals."
+    },
+    {
+      "concept_id": "C1238517268-GES_DISC",
+      "topic": "ATMOSPHERE",
+      "reason": "not retrievable by any format",
+      "query": "How have upper-tropospheric temperatures near the tropopause and total precipitable water over the tropical Pacific (10°S–10°N, 120°E–80°W) changed on an 8-day timescale from 2003 to the present, and do these changes coincide with shifts in surface pressure?"
+    },
+    {
+      "concept_id": "C1214313319-AU_AADC",
+      "topic": "ATMOSPHERE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='mean monthly surface air pressure'"
+      ],
+      "query": "How has mean monthly surface air pressure over the Antarctic and adjacent Southern Ocean regions (roughly 80°S–17°S) varied from 1901 to 1998, and are there consistent seasonal trends (e.g., austral summer vs. winter) across the occupied stations?"
+    },
+    {
+      "concept_id": "C2162185379-ORNL_CLOUD",
+      "topic": "ATMOSPHERE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='co co2 and ch4 concentrations'"
+      ],
+      "query": "How did the vertical profiles (from the surface to ~6 km) of atmospheric CO, CO2, and CH4 concentrations over Alaska and the Yukon/Northwest Territories evolve during the 2017 Arctic-CAP campaign season (late April through early November), and are there corresponding changes in upper-air temperature, humidity, and wind speed that could explain the timing of these carbon-trace-gas variations?"
+    },
+    {
+      "concept_id": "C1214610513-SCIOPS",
+      "topic": "ATMOSPHERE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='the shelf and slope off'"
+      ],
+      "query": "How do longshore currents and upwelling/downwelling signals along the shelf and slope off central Chile (around 30–35°S) vary seasonally and from year to year between 1970 and the available observational period, and are these variations linked to changes in surface/sea-level pressure anomalies (e.g., shifts in atmospheric forcing)?"
+    },
+    {
+      "concept_id": "C2105107978-NOAA_NCEI",
+      "topic": "ATMOSPHERE",
+      "reason": "not retrievable by any format",
+      "query": "How have atmospheric temperature, near-surface water vapor, and precipitation patterns over the Arctic (e.g., 60–80°N) changed during boreal winter (December–February) from 1975 to 2005, and are these changes accompanied by shifts in snow/ice extent and cloud cover?"
+    },
+    {
+      "concept_id": "C2231550400-CEOS_EXTRA",
+      "topic": "BIOLOGICAL CLASSIFICATION",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='in the lower mississippi river'"
+      ],
+      "query": "How did amphibian frog/toad community structure and use of feeding habitats vary across different bottomland hardwood forest sites in the Lower Mississippi River Alluvial Valley during the fall (Sep–Dec) of 1999, and which habitats supported the highest amphibian abundance?"
+    },
+    {
+      "concept_id": "C2231549635-CEOS_EXTRA",
+      "topic": "BIOSPHERE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='agate fossil beds national monument'"
+      ],
+      "query": "How does the shrubland/scrub vegetation cover and plant phenology observed in field releve plots (July–mid August 1995) vary among different land-use/land-cover classes within the Agate Fossil Beds National Monument area (around 42.41–42.44°N, 103.7–103.8°W)?"
+    },
+    {
+      "concept_id": "C2262496056-ORNL_CLOUD",
+      "topic": "BIOSPHERE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='top cover by plant functional'"
+      ],
+      "query": "How has modeled vegetation top cover by plant functional type (e.g., conifer/broadleaf trees, deciduous/evergreen shrubs, graminoids, forbs, and light macrolichens) changed across Alaska and Yukon between 1985 and 2020, and do the dominant shifts differ between forests versus alpine/tundra areas?"
+    },
+    {
+      "concept_id": "C1213926777-ASF",
+      "topic": "LAND SURFACE",
+      "reason": "not retrievable by any format",
+      "query": "How did the spatial distribution of land surface elevation and terrain features in the study area change between 1993 and 2004, and are there any systematic elevation differences that could be linked to land-surface change processes (e.g., erosion or land-use driven landscape modification)?"
+    },
+    {
+      "concept_id": "C1214590771-SCIOPS",
+      "topic": "LAND SURFACE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='around maxwell bay south shetland'"
+      ],
+      "query": "How do the elevations and optically stimulated luminescence (OSL) ages of raised beach terraces around Maxwell Bay (South Shetland Islands) vary alongshore, and what does that pattern imply about relative sea-level change and coastal uplift since the mid-to-late Holocene?"
+    },
+    {
+      "concept_id": "C1213925022-ASF",
+      "topic": "LAND SURFACE",
+      "reason": "not retrievable by any format",
+      "query": "How did land-surface topography in the coastal mountain region of Central America (e.g., around Guatemala–Honduras) evolve between 1993 and 2004, as reflected by changes in derived elevation and terrain slope from radar-based digital elevation models?"
+    },
+    {
+      "concept_id": "C1214620677-SCIOPS",
+      "topic": "LAND SURFACE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='the james ross basin antarctic'"
+      ],
+      "query": "How did tectonically driven changes in coastal and onshore erosion/sedimentation in the James Ross Basin (Antarctic Peninsula) during the Late Cretaceous–Paleogene affect sea-level and air-temperature conditions, and what do the associated terrestrial and marine vertebrate macrofossils imply about timing and routes of faunal migration across the former land bridge to southern South America?"
+    },
+    {
+      "concept_id": "C2162141870-ORNL_CLOUD",
+      "topic": "LAND SURFACE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='burned and unburned spruce forest'"
+      ],
+      "query": "How do soil nitrogen and sulfur availability, soil temperature, and organic matter content differ between burned and unburned spruce forest sites near Tanana, Alaska, and do these differences relate to depth to permafrost (active layer thickness) and terrain elevation in late July 2017?"
+    },
+    {
+      "concept_id": "C179001730-ASF",
+      "topic": "LAND SURFACE",
+      "reason": "not retrievable by any format",
+      "query": "How did the surface elevation and terrain morphology of the coastal lowlands of Bangladesh change between 1993 and 2004, as indicated by successive SAR-derived digital elevation models? Specifically, what trends in elevation distribution and slope/relief can be detected over this period?"
+    },
+    {
+      "concept_id": "C2231551049-CEOS_EXTRA",
+      "topic": "LAND SURFACE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='the big thompson river valley'"
+      ],
+      "query": "How does the thickness and stratigraphic layering of alluvial sediments vary across the Big Thompson River Valley in Colorado, based on S-wave refraction cross sections collected along roads crossing the valley?"
+    },
+    {
+      "concept_id": "C3235688636-ORNL_CLOUD",
+      "topic": "LAND SURFACE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='ethiopia nigeria and south africa'"
+      ],
+      "query": "From 2016 to 2020, how did the extent and spatial distribution of urban land cover change in Ethiopia, Nigeria, and South Africa, and were there year-to-year acceleration patterns in urban expansion? Identify which urban land cover classes show the largest increases or decreases over the five-year period."
+    },
+    {
+      "concept_id": "C1214584799-SCIOPS",
+      "topic": "LAND SURFACE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='the u s east coast'"
+      ],
+      "query": "How have shoreline position (shoreline displacement) and coastal elevation along the U.S. East Coast (e.g., from Virginia to Massachusetts) changed over the 1970–1990 period, and how are those changes related to local subsidence trends and sea level rise signals? Quantify whether grid cells with higher subsidence show greater erosion and landward shoreline retreat during this time window."
+    },
+    {
+      "concept_id": "C2532069801-AMD_USAPDC",
+      "topic": "LAND SURFACE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='the antarctic sector of gondwana'"
+      ],
+      "query": "How did sediment provenance and tectonic source-region evolution change for the Devonian–Triassic foreland basins in the Antarctic sector of Gondwana (around 83–85°S, 159–166°E), as inferred from detrital zircon Hf–O isotopes and sandstone stratigraphic sequences?"
+    },
+    {
+      "concept_id": "C1213927035-ASF",
+      "topic": "LAND SURFACE",
+      "reason": "not retrievable by any format",
+      "query": "How did land-surface elevation and derived Stokes-based terrain characteristics change in coastal lowlands (e.g., near major river deltas) between 1993 and 2004, and are the observed differences consistent with land-use or land-cover change in that period?"
+    },
+    {
+      "concept_id": "C1214313477-AU_AADC",
+      "topic": "LAND SURFACE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='the george v and terre'"
+      ],
+      "query": "How does the seafloor depth and bathymetric terrain on the George V and Terre Adélie continental shelf vary across the grounding-line/coastal-glacier and ice-shelf margins (e.g., identifying any channels, troughs, or steep slope breaks) based on the available depth-derived elevation models from 2008 to 2010?"
+    },
+    {
+      "concept_id": "C2532075280-AMD_USAPDC",
+      "topic": "LAND SURFACE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='in the mcmurdo dry valleys'"
+      ],
+      "query": "How did meltwater stream deposition (sediment accumulation and grain characteristics) in the McMurdo Dry Valleys change over the late Pleistocene to Holocene as glaciers advanced and retreated, and how do these sediment records align with periods when the large valleys were inundated by high lake levels?"
+    },
+    {
+      "concept_id": "C1267618552-AU_AADC",
+      "topic": "LAND SURFACE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='antarctic specially protected areas aspas'"
+      ],
+      "query": "Between 2010 and early 2012, how did the geographic locations and spatial extents of Antarctic Specially Protected Areas (ASPAs) within roughly 90–55°S change (e.g., which areas were added, removed, or had boundaries redrawn), and what does that imply for shifts in environmental governance over the period?"
+    },
+    {
+      "concept_id": "C2216863966-ORNL_CLOUD",
+      "topic": "LAND SURFACE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='soil microbial biomass carbon nitrogen'"
+      ],
+      "query": "How do soil microbial biomass carbon, nitrogen, and phosphorus concentrations (primarily in the 0–15 cm layer) vary across major land biomes globally, and are there systematic differences between temperate versus tropical regions from the late 1970s through the early 2010s?"
+    },
+    {
+      "concept_id": "C1214584741-SCIOPS",
+      "topic": "LAND SURFACE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='the u s gulf coast'"
+      ],
+      "query": "How have shoreline positions along the U.S. Gulf Coast (roughly −100 to −80° longitude, 25 to 33° latitude) changed over the past decades, and how do those shoreline displacement trends relate to local terrain/coastal elevation and relative sea-level rise for assessing coastal erosion vulnerability?"
+    },
+    {
+      "concept_id": "C2231551890-CEOS_EXTRA",
+      "topic": "OCEANS",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='port fourchon and timbalier bay'"
+      ],
+      "query": "How do the sub-seafloor sediment and nearshore geomorphic structures inferred from chirp seismic reflection profiles off Port Fourchon and Timbalier Bay, Louisiana (early August 2005), relate to the mapped seafloor bathymetry/water-depth gradients and shoreline/coastal landform patterns?"
+    },
+    {
+      "concept_id": "C2147478146-POCLOUD",
+      "topic": "OCEANS",
+      "reason": "not retrievable by any format",
+      "query": "How does the sea surface skin temperature (top few microns of the ocean) vary along the Gulf Stream between the Sargasso Sea and the North Atlantic from January to March 2019, and are there clear day–night differences in the observed skin temperature during this period?"
+    },
+    {
+      "concept_id": "C1214594314-SCIOPS",
+      "topic": "OCEANS",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='abundances of algae bacteria viruses'"
+      ],
+      "query": "During January–February 2007 in the Southern Ocean south of Tasmania (about 43–54°S and 140–155°E), how did the abundances of algae, bacteria, viruses, and heterotrophic nanoflagellates vary across the different sampled stations (e.g., SAZ vs PFZ vs productive SAZ), and what do the measurements imply about the relative importance of grazing versus viral lysis in controlling algal abundance?"
+    },
+    {
+      "concept_id": "C2698129972-JAXA",
+      "topic": "OCEANS",
+      "reason": "not retrievable by any format",
+      "query": "How did the surface ocean chlorophyll concentration and sea-surface temperature vary across the global open ocean between November 1996 and July 1997, and were there consistent regional patterns (e.g., high-chlorophyll upwelling zones versus oligotrophic gyres) during this period?"
+    },
+    {
+      "concept_id": "C2089378385-NOAA_NCEI",
+      "topic": "OCEANS",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='total dissolved inorganic carbon dic'"
+      ],
+      "query": "How does the global monthly distribution of ocean total dissolved inorganic carbon (DIC) vary over the seasonal cycle (e.g., January–December) from about 1957 to 2018, and which ocean basins or latitude bands show the largest seasonal amplitudes?"
+    },
+    {
+      "concept_id": "C2105865667-NOAA_NCEI",
+      "topic": "OCEANS",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='june 15 1896 tsunami event'"
+      ],
+      "query": "For the June 15, 1896 tsunami event, how did coastal sea-surface height (tide-gauge records) and the timing/amplitude of tsunami-induced wave arrivals vary across tide-gauge locations in the Pacific/Indian Ocean region during 1896-06-13 to 1896-06-21?"
+    },
+    {
+      "concept_id": "C2698132483-JAXA",
+      "topic": "OCEANS",
+      "reason": "not retrievable by any format",
+      "query": "How did surface ocean chlorophyll concentration and sea-surface temperature vary across major ocean basins between November 1996 and July 1997, and were there consistent seasonal patterns that differed between subtropical and equatorial regions?"
+    },
+    {
+      "concept_id": "C1625714095-AU_AADC",
+      "topic": "OCEANS",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='2013 antarctic blue whale voyage'"
+      ],
+      "query": "During the 2013 Antarctic blue whale voyage (late January to mid-March) in the Southern Ocean sector near ~70–40°S and 140–170°E/W, how did ambient underwater sound levels vary in space and time, and were any changes correlated with the local abundance of krill (euphausiids) and the presence of baleen whales?"
+    },
+    {
+      "concept_id": "C1214594404-SCIOPS",
+      "topic": "PALEOCLIMATE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='the james ross basin antarctica'"
+      ],
+      "query": "How did the composition and stratigraphic distribution of marine macrofossils in the James Ross Basin (Antarctica) change across the Late Cretaceous to early Paleogene (Santonian–Danian), and what do these shifts imply about the transition from warm-temperate to colder Neogene-like paleoclimate conditions?"
+    },
+    {
+      "concept_id": "C2532070587-AMD_USAPDC",
+      "topic": "PALEOCLIMATE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='the beardmore glacier region of'"
+      ],
+      "query": "How did the Early Jurassic vertebrate community composition (especially dinosaur macrofossils) in the Beardmore Glacier region of Antarctica change between 2013 and 2016 as new fossil specimens were prepared and identified, and what does that imply about paleoclimate and habitat conditions at these high paleolatitudes?"
+    },
+    {
+      "concept_id": "C2532072149-AMD_USAPDC",
+      "topic": "PALEOCLIMATE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='the last 10 000 years'"
+      ],
+      "query": "How did atmospheric nitrous oxide and carbon dioxide concentrations over the last 10,000 years vary in relation to large-scale climate shifts, and were the long-term changes in N2O and CO2 in the South Pole ice core more strongly linked to changes during the early 10,000-to-8,000-year interval versus the gradual trend after ~8,000 years?"
+    },
+    {
+      "concept_id": "C1214594147-SCIOPS",
+      "topic": "SOLID EARTH",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='the koettlitz blue glacier and'"
+      ],
+      "query": "How do the concentrations of major, minor, and trace elements (including metals such as copper and zinc) in soil and sampled rocks vary across the Koettlitz-Blue Glacier and Taylor Valley region, particularly near suspected mineralised contacts (e.g., marble–amphibolite and granite–marble/skarn zones) during the 1964–1965 survey period?"
+    },
+    {
+      "concept_id": "C1214594516-SCIOPS",
+      "topic": "SOLID EARTH",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='through the drake passage scotia'"
+      ],
+      "query": "How do the stable isotope ratios and major-element compositions of dredged igneous rocks from the West Scotia Ridge (Scotia Sea, roughly Feb–Mar 2004) vary along the eastern ridge segments, and what mantle-flow or magma-source differences do those geochemical tracers imply for Pacific-to-Atlantic exchange through the Drake Passage/Scotia Sea gateway?"
+    },
+    {
+      "concept_id": "C2231553039-CEOS_EXTRA",
+      "topic": "SOLID EARTH",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='the santa maria basin province'"
+      ],
+      "query": "In the Santa Maria Basin Province (central California), how did the spatial distribution of natural gas vs. oil-producing vs. dry well outcomes vary across 1/4-mile cells, and what does that imply about exploration maturity across different petroleum plays during the assessment period around December 1990?"
+    },
+    {
+      "concept_id": "C1214590116-SCIOPS",
+      "topic": "SUN-EARTH INTERACTIONS",
+      "reason": "not retrievable by any format",
+      "query": "How did high-latitude auroral activity and the associated cosmic-ray flux vary over the period January 2003 to January 2004 in the South Greenland to northern Atlantic region (approximately 40–165°W longitude and 75–55°S latitude), and do changes track with periods of enhanced solar-driven ionospheric forcing?"
+    },
+    {
+      "concept_id": "C1214305650-AU_AADC",
+      "topic": "TERRESTRIAL HYDROSPHERE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='the larsemann hills princess elizabeth'"
+      ],
+      "query": "How do the physical and chemical properties of lakes in the Larsemann Hills (Princess Elizabeth Land, Antarctica)—including water depth, temperature, pH, conductivity, and nutrient concentrations—vary across lakes with different thawing behavior during the austral summer (1987-01 to 1987-02)?"
+    }
+  ]
+}
