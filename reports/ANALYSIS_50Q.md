@@ -18,7 +18,7 @@ answering (CSV, JSON-LD and TOON are measurably worse than JSON by 0.03–0.04)
 even though it matters a lot for retrieval and for cost. The cheapest
 configurations are also the most accurate.
 
-- Script: [`scripts/analyze_50q.py`](scripts/analyze_50q.py)
+- Script: [`scripts/analyze_50q.py`](../scripts/analyze_50q.py)
 - Data: `runs/20260814T210927Z/{answers,judgements}.jsonl`,
   `runs/{20260814T205849Z,20260814T205912Z}/chunked_retrieval.jsonl`
 - Tables: `runs/20260814T210927Z/analysis.json` · Charts:

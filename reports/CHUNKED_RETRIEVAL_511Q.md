@@ -6,7 +6,7 @@ UMM document.
 
 No LLM is involved in the measurement. It is exact, free and repeatable.
 
-- Script: [`scripts/unfaceted_chunked_eval.py`](scripts/unfaceted_chunked_eval.py)
+- Script: [`scripts/unfaceted_chunked_eval.py`](../scripts/unfaceted_chunked_eval.py)
 - Queries: `data/queries_full.jsonl` — 511 (11 SME, 500 synthetic)
 - Indexes: `data/chroma/faceted_chunked/` · `data/chroma/unfaceted_chunked/`
 - Runs: `runs/{faceted,unfaceted}_full_{max,mean}/`

@@ -256,7 +256,7 @@ Read literally: a local 32B beats both cloud models, and the small cloud model b
 
 The best representation is not universal — and now that's a measurement, not a slogan.
 
-- Pipeline & analysis: `ai-metadata` repo — `STAGED_PIPELINE.md`, `ANALYSIS_300Q.md`
-- Retrieval study: `CHUNKED_RETRIEVAL_511Q.md`
-- Literature synthesis: `Report.md`
+- Pipeline & analysis: `ai-metadata` repo — `reports/STAGED_PIPELINE.md`, `reports/ANALYSIS_300Q.md`
+- Retrieval study: `reports/CHUNKED_RETRIEVAL_511Q.md`
+- Literature synthesis: `reports/Report.md`
 - Contact: Bernard Benson
