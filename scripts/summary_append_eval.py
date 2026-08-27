@@ -72,6 +72,8 @@ BASELINE_RUNS = {"faceted": "20260814T205849Z", "unfaceted": "20260814T205912Z"}
 QUERIES_PATH = Path("data/queries_full.jsonl")
 OUT_DIR = Path("runs/summary_append")
 SEPARATOR = "\n\nSummary: "
+RUN_TAG = "summary_append"   # provenance tag; overridden by summary_replace_eval
+LABEL = "+summary"          # payload label in index reports
 
 
 # --------------------------------------------------------------------------- #
@@ -94,7 +96,7 @@ def cache(args) -> int:
                 n += 1
             print(f"{payload:<10}{fmt:<8}{n} files -> {out}")
         (PLUS[payload] / "manifest.json").write_text(json.dumps({
-            **provenance("summary_append"),
+            **provenance(RUN_TAG),
             "source_cache": str(ORIG[payload]),
             "summary_cache": str(SUMMARY[payload]),
             "separator": SEPARATOR,
@@ -127,7 +129,7 @@ def tokens(args) -> int:
                   f"{entry['plus_total']:>13,}")
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     (OUT_DIR / "tokens.json").write_text(json.dumps(
-        {**provenance("summary_append"), "tokenizer": "o200k_base",
+        {**provenance(RUN_TAG), "tokenizer": "o200k_base",
          "cells": report}, indent=2) + "\n")
     print(f"\nwrote {OUT_DIR / 'tokens.json'}")
     return 0
@@ -179,8 +181,8 @@ def build(args) -> int:
                   f"{stats[fmt]['chunks_per_record_mean']:>6.2f}/record  "
                   f"{stats[fmt]['seconds']:>7.1f}s", flush=True)
         (db / "chunked_index_report.json").write_text(json.dumps({
-            **provenance("summary_append"),
-            "payload": f"{payload}+summary",
+            **provenance(RUN_TAG),
+            "payload": f"{payload}{LABEL}",
             "cache": str(PLUS[payload]),
             "embed_model": uce.EMBED_MODEL,
             "chunk_tokens": uce.CHUNK_TOKENS, "overlap": uce.OVERLAP,
@@ -244,7 +246,7 @@ def evaluate(args) -> int:
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     (OUT_DIR / "retrieval_eval.json").write_text(json.dumps({
-        **provenance("summary_append"),
+        **provenance(RUN_TAG),
         "queries": len(queries),
         "results": all_results,
         "baselines_max": {p: baseline(p) for p in args.payloads},

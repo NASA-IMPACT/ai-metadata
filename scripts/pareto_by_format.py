@@ -94,52 +94,52 @@ def chart(arms: dict, path: Path, metric: str, metric_label: str,
                            facecolors="none", zorder=3, edgecolors=color,
                            linewidths=1.8)
         ax.set_ylim(ymin, ymax)
-        ax.set_title(MODEL_LABEL.get(model, model), fontsize=10.5, color=INK,
-                     pad=8)
+        ax.set_title(MODEL_LABEL.get(model, model), fontsize=14, color=INK,
+                     pad=10)
         ax.set_xlabel("mean prompt tokens per query (thousands)",
-                      fontsize=8.5, color=INK_MUTED)
+                      fontsize=12, color=INK_MUTED)
         ax.grid(color=GRID, linewidth=0.8, zorder=0)
         ax.set_axisbelow(True)
-        ax.tick_params(colors=INK_MUTED, labelsize=8)
+        ax.tick_params(colors=INK_MUTED, labelsize=11)
         for side in ("top", "right"):
             ax.spines[side].set_visible(False)
         for side in ("left", "bottom"):
             ax.spines[side].set_color(BASELINE)
 
-    axes[0].set_ylabel(f"{metric_label} (nano-judged)", fontsize=8.5,
+    axes[0].set_ylabel(f"{metric_label} (nano-judged)", fontsize=12,
                        color=INK_MUTED)
 
     # legend 1: payload by fill (first panel)
     payload_handles = [
-        Line2D([], [], marker="o", ls="", color=INK_SECONDARY, markersize=8,
-               label="faceted (32-field projection)"),
+        Line2D([], [], marker="o", ls="", color=INK_SECONDARY, markersize=10,
+               label="subsetted records (32-field projection)"),
         Line2D([], [], marker="o", ls="", markerfacecolor="none",
                markeredgecolor=INK_SECONDARY, markeredgewidth=1.6,
-               markersize=8, label="unfaceted (raw UMM record)"),
+               markersize=10, label="full records (raw UMM record)"),
     ]
-    axes[0].legend(handles=payload_handles, frameon=False, fontsize=8.5,
-                   loc="lower left", labelcolor=INK_SECONDARY)
+    axes[0].legend(handles=payload_handles, frameon=False, fontsize=11.5,
+                   loc="upper right", labelcolor=INK_SECONDARY)
 
     # legend 2: format by color (last panel)
     fmt_handles = [
-        Line2D([], [], marker="o", ls="", color=FMT_COLOR[f], markersize=8,
+        Line2D([], [], marker="o", ls="", color=FMT_COLOR[f], markersize=10,
                label=FMT_LABEL[f])
         for f in FORMATS
     ]
-    axes[-1].legend(handles=fmt_handles, frameon=False, fontsize=8.5,
+    axes[-1].legend(handles=fmt_handles, frameon=False, fontsize=11.5,
                     loc="lower right", labelcolor=INK_SECONDARY, ncols=2,
                     columnspacing=1.2, handletextpad=0.4)
 
     fig.suptitle(f"Answer {metric_label} vs context cost — {n_queries} "
                  "queries, top-10 records in context",
-                 fontsize=12, color=INK, x=0.008, ha="left", y=0.99)
+                 fontsize=16, color=INK, x=0.008, ha="left", y=0.99)
     fig.text(0.008, 0.012,
-             "One color per format; the filled circle is the faceted payload, "
-             "the open circle its unfaceted partner, joined by the gray "
+             "One color per format; the filled circle is the subsetted record, "
+             "the open circle its full-record partner, joined by the gray "
              f"connector. Judge: gpt-5.4-nano; {metric_label} pooled over "
              f"{n_sme} SME + {n_syn} synthetic queries.",
-             fontsize=6.8, color=INK_MUTED)
-    fig.tight_layout(rect=(0, 0.05, 1, 0.94))
+             fontsize=9.5, color=INK_MUTED)
+    fig.tight_layout(rect=(0, 0.06, 1, 0.93))
     fig.savefig(path, facecolor=SURFACE)
     plt.close(fig)
     return path

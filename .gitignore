@@ -254,3 +254,9 @@ data/format_cache_summary/
 data/format_cache_unfaceted_summary/
 data/format_cache_plus_summary/
 data/format_cache_unfaceted_plus_summary/
+# Summary-replaces-abstract renderings (scripts/summary_replace_eval.py cache)
+data/format_cache_replace_summary/
+data/format_cache_unfaceted_replace_summary/
+# Abstract-removed renderings (scripts/abstract_drop_eval.py cache)
+data/format_cache_no_summary/
+data/format_cache_unfaceted_no_abstract/

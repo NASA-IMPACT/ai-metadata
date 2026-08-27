@@ -444,7 +444,74 @@ caches carry `manifest.json` with model, prompt hash, and call-log path.
 
 ---
 
-## 8. What to do about it — the AI-readiness playbook
+## 8. Answers to the research questions
+
+The four hypotheses were the falsifiable form of two broader research
+questions. Mapping the findings back:
+
+**RQ1 — How do LLMs interact with and utilize domain-specific metadata in
+complex archives like CMR?**
+
+In two distinct modes with different preferences — and the bottleneck is
+what reaches the model, not how it is spelled.
+
+- **Consumption is two-stage, and the stages disagree (H3).** The embedding
+  stage prefers prose (MaT first in all four retrieval conditions); the
+  reasoning stage prefers explicit structure when the record is large and
+  deeply nested (JSON wins raw-record reasoning for 3 of 3 models). No
+  single representation serves both stages best.
+- **Retrieval gates everything.** Per-query correctness correlates with
+  exact Recall@10 at r = 0.74–0.81; a retrieved record yields 0.83–0.93
+  correctness, a missed one 0.33–0.43. An LLM's "use" of metadata is
+  mostly determined before it ever sees a token of it.
+- **Models are robust to serialization but sensitive to content bloat
+  (H1, H2).** At equal content, the best-to-worst format spread is
+  2.7–5.2% relative; but the raw 45-field record costs −0.045 correctness
+  at 2.5× the tokens versus a curated projection. Format sensitivity
+  roughly doubles on the raw record — structure earns its keep only when
+  there are hundreds of paths to navigate.
+- **Placeholders are consumed as anti-signal.** ~40-token "Not provided"
+  stubs recur verbatim across 600–1,900+ records, pulling unrelated
+  records together in embedding space — and they *inflate* faithfulness
+  while informing no one, since echoing a placeholder is perfectly
+  grounded.
+- **Preferences are model-conditional (H4), and domain vocabulary is the
+  hard part.** Three models produced three different curated-payload
+  winners, and SME-written queries score ~0.3–0.4 below synthetic ones —
+  the vocabulary gap between how experts ask and how records are written
+  dwarfs every representation effect measured.
+
+**RQ2 — How can metadata architectures be optimized to improve AI search,
+retrieval, and accuracy?**
+
+Curate the content, serve mode-specific representations, and fix
+informativeness before format — the full prescription is §9; the evidence
+in one breath:
+
+- **Serve a curated projection as the AI-facing representation.** The
+  32-field faceted payload is the one intervention that wins every axis
+  at once: +0.045 correctness, +8.4% Recall@10, −60% tokens, for every
+  model tested (H1). Keep the canonical record as the record of authority.
+- **Match representation to consumption mode.** Prose (MaT) for anything
+  that gets embedded — best retrieval everywhere and cheapest; structured
+  JSON where an agent must reason over a full raw record; JSON-LD for
+  neither (worst retriever, most expensive rendering).
+- **Optimize informative presence, not schema compliance.** All 13
+  required fields are 100% present but only 7 are reliably informative;
+  placeholder remediation (1,927 processing levels, 1,458 DOIs, 1,170
+  versions) and populating the sparse tail (resolution fields at 2–5%)
+  raise the ceiling no serialization choice can touch.
+- **An appended LLM summary is a cheap retrieval upgrade** — +2.1% to
+  +10.4% Recall@10 in all 12 cells, largest exactly where the base format
+  retrieves worst (reasoning-stage effect still unmeasured).
+- **Institutionalize the measurement, not the winner.** Format rankings
+  are model- and encoder-conditional and reshuffle as models change; the
+  durable asset is the audited evaluation harness re-run at each corpus
+  refresh (H4's real lesson).
+
+---
+
+## 9. What to do about it — the AI-readiness playbook
 
 Ordered by evidence-to-effort. The through-line: **most of AI-readiness is
 not AI work — it is metadata hygiene plus serving a curated, prose-friendly
@@ -496,7 +563,7 @@ projection.**
 
 ---
 
-## 9. Future work
+## 10. Future work
 
 - **Neutral-judge re-run** (mini or glimmer as judge) to bound
   self-preference — the model axis is the most interesting and least
@@ -515,7 +582,7 @@ projection.**
 
 ---
 
-## 10. Where everything lives
+## 11. Where everything lives
 
 | Artifact | Path |
 |---|---|

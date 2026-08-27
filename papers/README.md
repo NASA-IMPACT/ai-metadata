@@ -8,6 +8,7 @@ PDF with headless Chrome; all others are the publishers' or arXiv's own PDFs.
 | File | Reference |
 |---|---|
 | `wilkinson-2016-fair-principles.pdf` | Wilkinson et al. (2016), FAIR Guiding Principles, *Scientific Data* 3:160018 |
+| `greenberg-an-2026-metadata-ecosystem-ai.pdf` | Greenberg & An (2026), The metadata ecosystem and AI: Enabling FAIR and AI-ready data, *AI Magazine* 47:e70060 (added 2026-08-26, manual download) |
 | `greenberg-2023-metadata-as-data-intelligence-editorial.pdf` | Greenberg et al. (2023), editorial, *Data Intelligence* 5(1):1–5 |
 | `wu-2023-crosswalks-research-data-schemas-schemaorg.pdf` | Wu, Richard, et al. (2023), Crosswalks to Schema.org, *DI* 5(1):100–121 |
 | `wu-2023-automated-metadata-annotation-ml.pdf` | Wu, Brandhorst, et al. (2023), Automated metadata annotation, *DI* 5(1):122–138 |
@@ -18,12 +19,6 @@ PDF with headless Chrome; all others are the publishers' or arXiv's own PDFs.
 | `underwood-2023-continuous-metadata.pdf` | Underwood (2023), Continuous Metadata, *DI* 5(1):275–288 |
 | `gillman-2023-achieving-transparency-metadata.pdf` | Gillman (2023), Achieving Transparency, *DI* 5(1):261–274 |
 | `liu-2023-metadata-methodological-commons.pdf` | Liu, Fu & Liu (2023), Metadata as a Methodological Commons, *DI* 5(1):289–302 |
-
-**Missing: Greenberg & An (2026), *The metadata ecosystem and AI*, AI Magazine
-47:e70060.** Wiley's site blocks automated download (Cloudflare) and no
-open-access mirror exists (checked Unpaywall, OpenAlex, Semantic Scholar,
-arXiv, web search). Download manually in a browser:
-https://onlinelibrary.wiley.com/doi/full/10.1002/aaai.70060
 
 ## RAG / LLM-consumption strand
 
