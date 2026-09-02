@@ -111,6 +111,19 @@ EMBED_BATCH = 4
 def embed(
     texts: list[str], name: str = EMBED_MODEL, *, batch_size: int = EMBED_BATCH
 ) -> list[list[float]]:
+    """Embed ``texts``, re-encoding any batch-poisoned rows individually.
+
+    On MPS, a batch of several near-window-length documents (7,500+ tokens,
+    still inside the 8,192 limit) comes back NaN while each of those same
+    documents embeds clean alone -- the instability is in the batched, padded
+    attention, not the input. sentence-transformers sorts by length, which
+    *guarantees* the long documents share a batch. The faceted corpus tops out
+    near 6,300 tokens and never trips this; the unfaceted control does, on its
+    first collection. A NaN that slipped through would be rejected by Chroma at
+    ``add`` time and abort a multi-hour build.
+    """
+    import numpy as np
+
     model = embedder(name)
     vectors = model.encode(
         texts,
@@ -118,6 +131,17 @@ def embed(
         normalize_embeddings=True,
         show_progress_bar=False,
     )
+    for i in range(len(texts)):
+        if np.isfinite(vectors[i]).all():
+            continue
+        vectors[i] = model.encode(
+            [texts[i]], normalize_embeddings=True, show_progress_bar=False
+        )[0]
+        if not np.isfinite(vectors[i]).all():
+            raise RuntimeError(
+                f"embedding of document {i} (of {len(texts)}, "
+                f"{len(texts[i])} chars) is non-finite even when encoded alone"
+            )
     return [v.tolist() for v in vectors]
 
 

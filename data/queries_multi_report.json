@@ -1,0 +1,618 @@
+{
+  "generator": "openai:gpt-5.4-nano",
+  "requested": {
+    "LAND SURFACE": 125,
+    "OCEANS": 125,
+    "ATMOSPHERE": 125,
+    "CRYOSPHERE": 12,
+    "BIOSPHERE": 12,
+    "BIOLOGICAL CLASSIFICATION": 12,
+    "TERRESTRIAL HYDROSPHERE": 12,
+    "HUMAN DIMENSIONS": 11,
+    "SOLID EARTH": 11,
+    "AGRICULTURE": 11,
+    "SUN-EARTH INTERACTIONS": 11,
+    "CLIMATE INDICATORS": 11,
+    "SPECTRAL/ENGINEERING": 11,
+    "PALEOCLIMATE": 11
+  },
+  "produced": {
+    "AGRICULTURE": 11,
+    "ATMOSPHERE": 125,
+    "BIOLOGICAL CLASSIFICATION": 12,
+    "BIOSPHERE": 12,
+    "CLIMATE INDICATORS": 11,
+    "CRYOSPHERE": 12,
+    "HUMAN DIMENSIONS": 11,
+    "LAND SURFACE": 125,
+    "OCEANS": 125,
+    "PALEOCLIMATE": 11,
+    "SOLID EARTH": 11,
+    "SPECTRAL/ENGINEERING": 11,
+    "SUN-EARTH INTERACTIONS": 11,
+    "TERRESTRIAL HYDROSPHERE": 12
+  },
+  "total": 500,
+  "group_sizes": {
+    "3": 197,
+    "2": 303
+  },
+  "retries": 166,
+  "seeds_without_neighbours": 8,
+  "reused_calls": 262,
+  "llm_calls": 448,
+  "dropped": [
+    {
+      "concept_ids": [
+        "C1214584241-SCIOPS",
+        "C1214605489-SCIOPS"
+      ],
+      "topic": "ATMOSPHERE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C1214605489-SCIOPS"
+      ],
+      "query": "Over the Greenland-to-Scandinavia high-latitude sector, how did changes in auroral activity and the associated energetic electron/ion fluxes from 1985–1995 coincide with variations in upper-atmospheric winds, particle densities/speeds, and air/particle temperatures as inferred from ground-based incoherent-scatter radar backscatter?"
+    },
+    {
+      "concept_ids": [
+        "C1214594528-SCIOPS",
+        "C1214594549-SCIOPS",
+        "C1214111006-SCIOPS"
+      ],
+      "topic": "ATMOSPHERE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='rothschild latady and smyley islands'"
+      ],
+      "query": "How did synoptic air-mass and humidity/water-vapor conditions relate to unusually high snowfall and snow-pack buildup at Rothschild, Latady, and Smyley Islands on the Antarctic Peninsula between January–February 2005 and late January–February 2006, and are those conditions consistent with the contemporaneous Arctic reanalysis fields of near-surface temperature, upper-air temperature, winds, and snow depth patterns across the broader polar regions?"
+    },
+    {
+      "concept_ids": [
+        "C2105107978-NOAA_NCEI",
+        "C2107093882-NOAA_NCEI"
+      ],
+      "topic": "ATMOSPHERE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C2105107978-NOAA_NCEI",
+        "C2107093882-NOAA_NCEI"
+      ],
+      "query": "How did hemispheric-scale moisture loading (atmospheric water vapor and cloud properties) and precipitation intensify or weaken in the Northern Hemisphere Arctic from 1992 to 2010, and how do those changes relate to concurrent snow/ice variability and fire-ignition signals over high-latitude regions?"
+    },
+    {
+      "concept_ids": [
+        "C3880544863-LARC_CLOUD",
+        "C1243477383-GES_DISC"
+      ],
+      "topic": "ATMOSPHERE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C3880544863-LARC_CLOUD"
+      ],
+      "query": "For the Arctic region (60–90°N) during 2002–2016, how do year-to-year anomalies in lower-atmosphere temperature and Arctic cloud structure (cloud fraction, height, and cloud-top temperature/pressure) relate to concurrent changes in tropospheric carbon monoxide, when controlling for changes in total solar irradiance from the preceding solar-irradiance record (1991–2001)?"
+    },
+    {
+      "concept_ids": [
+        "C2089387076-NOAA_NCEI",
+        "C2089387444-NOAA_NCEI"
+      ],
+      "topic": "ATMOSPHERE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='in the gulf of mexico'"
+      ],
+      "query": "In the Gulf of Mexico during the fall of 1979 (July–December), how did changes in near-surface conditions (atmospheric pressure and sea-surface salinity/temperature) and bottom-water oxygen relate to shifts in benthic community abundance and distribution across sampled water depths and sediments?"
+    },
+    {
+      "concept_ids": [
+        "C1276812838-GES_DISC",
+        "C1276812863-GES_DISC",
+        "C1276812900-GES_DISC"
+      ],
+      "topic": "ATMOSPHERE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C1276812838-GES_DISC",
+        "C1276812863-GES_DISC"
+      ],
+      "query": "From 1980 to the present, how have Arctic March surface temperature/skin temperature and near-surface moisture and snowfall/evaporation (as diagnosed in an hourly reanalysis), the associated changes in sea-level/surface pressure and total precipitable water (at standard single levels), and the vertical circulation and ozone-related upper-atmosphere state (from 3-hourly 3D model layers) jointly evolved over the Kara Sea region, and what do these combined shifts imply about changes in the timing and intensity of mid-March weather patterns there?"
+    },
+    {
+      "concept_ids": [
+        "C2089373928-NOAA_NCEI",
+        "C2089375179-NOAA_NCEI",
+        "C2143402663-ORNL_CLOUD"
+      ],
+      "topic": "ATMOSPHERE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='in the central beaufort sea'"
+      ],
+      "query": "How did year-to-year variations in fall weather and hydrology (air temperature, precipitation, river/water levels) and vegetation/phenology (NDVI and leaf-drop timing) across interior Alaska during September 2000–2016 relate to observed changes in mammal activity (ringed seals on fast vs pack ice, and harbor seal counts) in nearby Arctic/coastal systems—specifically comparing ice deformation and ice type in the central Beaufort Sea and seal survey abundance in Lake Iliamna over their respective study periods?"
+    },
+    {
+      "concept_ids": [
+        "C1276812863-GES_DISC",
+        "C1276812838-GES_DISC",
+        "C1276812900-GES_DISC"
+      ],
+      "topic": "ATMOSPHERE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C1276812863-GES_DISC",
+        "C1276812900-GES_DISC"
+      ],
+      "query": "How have Arctic surface-to-lower-troposphere conditions over the Kara Sea (e.g., from 1980 to present, focusing on winter months) contributed to changes in the timing and intensity of snowfall/ice accumulation, by linking hour-to-hour surface temperature/skin temperature and specific humidity and evaporation (surface flux diagnostics) to concurrent large-scale circulation patterns such as sea level pressure and vertical motion/transport at multiple model levels (3D assimilated fields)?"
+    },
+    {
+      "concept_ids": [
+        "C2938758021-SCIOPS",
+        "C2773281676-SCIOPS"
+      ],
+      "topic": "ATMOSPHERE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C2773281676-SCIOPS",
+        "C2938758021-SCIOPS"
+      ],
+      "query": "During the Antarctic summer over the Palmer Land–Weddell Sea sector (roughly 63–72°W, 53–63°S), how did near-surface atmospheric wind speed/direction and air temperature co-vary with surface pressure, solar (shortwave) radiation, and humidity indicators between the December 2016–Feb 2017 cruise and the Dec 2022–late Dec 2022 cruise, and what does that imply about changes in atmospheric boundary-layer conditions across these two periods?"
+    },
+    {
+      "concept_ids": [
+        "C3880603998-LARC_CLOUD",
+        "C2859273114-LAADS",
+        "C2698133757-JAXA"
+      ],
+      "topic": "ATMOSPHERE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C3880603998-LARC_CLOUD"
+      ],
+      "query": "How did absorbing aerosol optical thickness (including spectral dependence) over the high-latitude Arctic (e.g., roughly 60–85°N, 0–90°E) evolve across three periods—spring 1992, 2003 (biweekly to monthly averages), and 2019–2022 (10-minute full-disk)—and did the inferred particle size (Angstrom exponent) shift consistently with changes in absorbing aerosol optical thickness?"
+    },
+    {
+      "concept_ids": [
+        "C3880544438-LARC_CLOUD",
+        "C2777841094-ORNL_CLOUD",
+        "C2706347267-ORNL_CLOUD"
+      ],
+      "topic": "ATMOSPHERE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='co2 co ch4 and o3'"
+      ],
+      "query": "How do aircraft-observed boundary-layer and free-tropospheric concentrations of CO2, CO, CH4, and O3 in the eastern United States (2016–2019) compare to concurrent/related atmosphere–land exchange signals of CO2 and trace gases (including CO and N2O/NO) from Brazilian soil–atmosphere flux measurements (1999–2004), and are there comparable spatial patterns (polluted/biogenic influence indicators) when contrasting both regions with the western North Atlantic trace-gas variability sampled during ACTIVATE (2020–2022)?"
+    },
+    {
+      "concept_ids": [
+        "C2532071158-AMD_USAPDC",
+        "C2532071202-AMD_USAPDC"
+      ],
+      "topic": "ATMOSPHERE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='methyl chloride and methyl bromide'"
+      ],
+      "query": "How do atmospheric mixing ratios of carbonyl sulfide, methyl chloride, and methyl bromide recorded in West Antarctic (Siple Dome) versus South Pole ice cores covary with evidence of past Antarctic ice-sheet/firn conditions over the last ~2000 years, and do periods of stronger ice-core gas signatures align between the two core sites?"
+    },
+    {
+      "concept_ids": [
+        "C2231553142-CEOS_EXTRA",
+        "C1214308482-AU_AADC",
+        "C2226653618-CEOS_EXTRA"
+      ],
+      "topic": "BIOLOGICAL CLASSIFICATION",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C2231553142-CEOS_EXTRA"
+      ],
+      "query": "How have coastal crustacean (adult prawn) community composition and population dynamics in Albatross Bay (1986–1992) differed across adjacent latitudinal climate zones compared with contemporaneous high-latitude arthropod assemblages documented elsewhere—specifically northern/subarctic spider fauna in Manitoba (1970–present) and Antarctic/subantarctic collembolan occurrences (1876–2004)—and what does this imply about broader arthropod population responses to regional climate gradients?"
+    },
+    {
+      "concept_ids": [
+        "C2789814963-ENVIDAT",
+        "C3383774605-ENVIDAT",
+        "C3226081770-ENVIDAT"
+      ],
+      "topic": "CLIMATE INDICATORS",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C3226081770-ENVIDAT"
+      ],
+      "query": "In the Swiss Southern Alps (roughly 46–48°N, 8–10°E), how does increasing surface water availability/ice gas-phase processing conditions relate to shifts in arthropod activity and community structure near vineyard landscapes exposed to nighttime LED lighting, and are those ecosystem shifts linked to changes in the seasonal presence of phytoplasma-linked host/vectored plant disease systems (e.g., grapevine “Flavescence dorée” with alder and its insect vector)?"
+    },
+    {
+      "concept_ids": [
+        "C3383774625-ENVIDAT",
+        "C3226081402-ENVIDAT"
+      ],
+      "topic": "CLIMATE INDICATORS",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C3226081402-ENVIDAT"
+      ],
+      "query": "How does the depth-dependent water uptake pathway differ between new snow and layered metamorphic snow types (e.g., rounded snow vs depth hoar vs graupel) in the upper part of a snowpack, as inferred from neutron-radiography measurements of capillary rise dynamics in snow and compared to the geometries assumed in 3D snow models for radiative/flow scaling in a region around ~46–48°N and ~10°E?"
+    },
+    {
+      "concept_ids": [
+        "C2089380124-NOAA_NCEI",
+        "C3550186689-ESDIS"
+      ],
+      "topic": "HUMAN DIMENSIONS",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='gulf of mexico and south'"
+      ],
+      "query": "How do shifts in regional economic resources and human development (e.g., income and economic capacity) relate to changes in recreational angler behavior—such as angler demographics and income—in the Gulf of Mexico and South Atlantic around 2003, when compared to broader global socio-economic baseline patterns for the same period?"
+    },
+    {
+      "concept_ids": [
+        "C1214584799-SCIOPS",
+        "C1214584741-SCIOPS"
+      ],
+      "topic": "LAND SURFACE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='the u s east coast'",
+        "title-phrase='the u s gulf coast'"
+      ],
+      "query": "How have shoreline displacement (erosion vs. accretion) and coastal elevation/terrain elevation–related land subsidence trends contributed to coastal vulnerability along the U.S. East Coast (1970–present) compared with the U.S. Gulf Coast (1993–present) when driven by changes in sea level rise and storm conditions (e.g., sea surface height, tide range/wave height)?"
+    },
+    {
+      "concept_ids": [
+        "C2244296823-AMD_KOPRI",
+        "C2244297301-AMD_KOPRI",
+        "C1214584956-SCIOPS"
+      ],
+      "topic": "LAND SURFACE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C1214584956-SCIOPS"
+      ],
+      "query": "How do differences between the station-scale terrain elevation, the broader circumpolar/Antarctic land–seafloor elevation context, and the vertically sounding retrievals of surface pressure and ozone around Jang Bogo Station vary from the station’s 2011 topographic reference through the 2015–2016 ATOVS observing period?"
+    },
+    {
+      "concept_ids": [
+        "C1214592054-SCIOPS",
+        "C2231550225-CEOS_EXTRA",
+        "C1214306501-AU_AADC"
+      ],
+      "topic": "LAND SURFACE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C2231550225-CEOS_EXTRA"
+      ],
+      "query": "How have late Quaternary glacial and post-glacial landforms (e.g., marine terraces/raised beaches shaped by ice–ocean interaction) and associated terrain geometry changed over time across both the Bunger Hills region (Antarctica) and high-latitude coastal settings near the Allan Hills area, and how do these patterns compare with the bedrock-controlled topography and geologic units mapped at the ground surface (including any evidence of differential uplift or landform elevation/relief)?"
+    },
+    {
+      "concept_ids": [
+        "C3246892554-LPCLOUD",
+        "C2021957295-LPCLOUD",
+        "C2826848340-LPCLOUD"
+      ],
+      "topic": "LAND SURFACE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C2021957295-LPCLOUD",
+        "C3246892554-LPCLOUD"
+      ],
+      "query": "At the Cedar Creek Ecosystem Science Reserve in Minnesota during the 2014 summer growing season, how do changes in vegetation condition and surface reflectance (e.g., NDVI/EVI from harmonized 30 m satellite observations and 30 m BRDF-adjusted reflectance) compare with the spatial patterns of land-cover classification and hyperspectral visible/infrared radiance measured in an airborne hyperspectral mosaic on 2014-08-02 to 2014-08-03?"
+    },
+    {
+      "concept_ids": [
+        "C2021957295-LPCLOUD",
+        "C3246892554-LPCLOUD",
+        "C1965336812-ESA"
+      ],
+      "topic": "LAND SURFACE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C2021957295-LPCLOUD",
+        "C3246892554-LPCLOUD"
+      ],
+      "query": "How do coastal spring phytoplankton blooms and adjacent land vegetation greenness covary across the Mediterranean Sea and surrounding coast during April–May 2005, and how do those patterns differ from the typical monthly ocean/land reflectance conditions in that same period? Use surface reflectance to estimate expected baseline variability for both ocean and land, then combine 30 m land surface reflectance and vegetation indices to track vegetation response alongside bloom-related changes."
+    },
+    {
+      "concept_ids": [
+        "C1214604044-SCIOPS",
+        "C2216863966-ORNL_CLOUD",
+        "C2143402511-ORNL_CLOUD"
+      ],
+      "topic": "LAND SURFACE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C1214604044-SCIOPS"
+      ],
+      "query": "In boreal and Arctic regions of Alaska and nearby Yukon (2016–2019), how did observed soil temperature profiles (down to 1.5 m) relate to the spatial patterns of soil organic carbon and nutrient composition and microbial biomass C/N/P—when using harmonized global soil particle-size, organic carbon, and nutrient fields together with biome-based microbial biomass data?"
+    },
+    {
+      "concept_ids": [
+        "C2143403402-ORNL_CLOUD",
+        "C3565896259-ORNL_CLOUD",
+        "C2143401689-ORNL_CLOUD"
+      ],
+      "topic": "LAND SURFACE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C2143403402-ORNL_CLOUD"
+      ],
+      "query": "Across Alaska’s North Slope tundra and the broader boreal North America region, how did the dominant land-cover/plant functional type shift between 1986 and 2020, and are those shifts associated with changes in summer surface conditions—specifically NDVI-derived tundra vegetation cover, land-surface reflectance, and near-surface air temperature—during the 2010–2015 growing season?"
+    },
+    {
+      "concept_ids": [
+        "C2231551049-CEOS_EXTRA",
+        "C1214610949-SCIOPS"
+      ],
+      "topic": "LAND SURFACE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='in the big thompson river'"
+      ],
+      "query": "How have the physical thickness and stratigraphic character of alluvial deposits in the Big Thompson River Valley, Colorado (derived from layered subsurface structures) changed over time, and how do those changes relate to broader sediment provenance and depositional/chemical signatures by comparing them with regional sediment chemistry and stratigraphic sequences stored in the global EarthRef holdings?"
+    },
+    {
+      "concept_ids": [
+        "C1965336812-ESA",
+        "C3108204639-INPE",
+        "C2192631093-ORNL_CLOUD"
+      ],
+      "topic": "LAND SURFACE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C3108204639-INPE"
+      ],
+      "query": "How have summer (June–August) land surface reflectance and vegetation cover in Alaska and western Canada changed between 2000 and 2017, accounting for consistent viewing/illumination geometry, and how do those historical trends relate to near-real-time reflectance conditions in 2024–2025 from the Amazonia-1 surface reflectance observations? Compare the spectral reflectance behavior from visible into the near-/mid-IR against the global monthly surface reflectance climatologies for the same seasonal months to quantify whether greening/browning or other land-cover changes are outliers relative to expected climatological variability."
+    },
+    {
+      "concept_ids": [
+        "C1214584956-SCIOPS",
+        "C1214594682-SCIOPS"
+      ],
+      "topic": "LAND SURFACE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='palmer land and graham land'"
+      ],
+      "query": "How do exposed geomorphic landform types and elevation contrasts (land surface vs adjacent seafloor topography) along the Antarctic Peninsula—specifically the Palmer Land and Graham Land sectors sampled in the 2001/2002 field season—relate to the spatial distribution of sampled primitive basalt dyke terranes, and what do those combined relationships suggest about lithospheric structure and tectonic emplacement timing during that austral summer (Nov 2001–Feb 2002)?"
+    },
+    {
+      "concept_ids": [
+        "C1214586998-SCIOPS",
+        "C1214594700-SCIOPS",
+        "C1214594483-SCIOPS"
+      ],
+      "topic": "LAND SURFACE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C1214594483-SCIOPS"
+      ],
+      "query": "How did changes in chemical weathering intensity and the timing of tectonic activity along the Antarctic Peninsula–Scotia Arc margin between the early 2000s and the broader multi-decadal record influence the geochemical signatures and lithologic evolution of mafic igneous source materials (e.g., basalt/primitive dykes and sill-derived components) in the Dry Valleys–McMurdo region?"
+    },
+    {
+      "concept_ids": [
+        "C2231555272-CEOS_EXTRA",
+        "C1214610949-SCIOPS",
+        "C2231550059-CEOS_EXTRA"
+      ],
+      "topic": "LAND SURFACE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C1214610949-SCIOPS",
+        "C2231555272-CEOS_EXTRA"
+      ],
+      "query": "How do changes in late Cenozoic to Quaternary depositional environments across Alaska—using fossil assemblage shifts tied to stratigraphic ages from land records, and correlating with sediment stratigraphy/chemistry and marine sediment stratigraphic sequences from offshore settings—reveal the timing and intensity of paleoenvironmental change between roughly 1,000,000 and 50,000 years ago?"
+    },
+    {
+      "concept_ids": [
+        "C1214587190-SCIOPS",
+        "C1214594499-SCIOPS"
+      ],
+      "topic": "LAND SURFACE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C1214587190-SCIOPS"
+      ],
+      "query": "In the late Gondwana breakup region near Dronning Maud Land, how did the timing and geochemical composition of dyke intrusions (as proxies for crustal magmatism) relate to contemporaneous geomorphic landform changes and paleo/solar-climate forcing inferred from cosmic-noise absorption observations at high southern latitudes around 2000–2001?"
+    },
+    {
+      "concept_ids": [
+        "C1214614010-SCIOPS",
+        "C1214620677-SCIOPS",
+        "C1214594353-SCIOPS"
+      ],
+      "topic": "LAND SURFACE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='the james ross basin antarctic'"
+      ],
+      "query": "How did Late Cretaceous–Paleogene sediment delivery and coastal/tectonic topographic evolution across the James Ross Basin (Antarctic Peninsula) and the Austral/Magallanes Basin (southern Patagonia) relate to the timing of vertebrate migrations and changes in terrestrial and marine fossil assemblages (macro- and microfossils), and what paleoclimate/sea-level reconstructions best explain the biogeographic connection across the Drake Passage (~2003 and spanning the full Cretaceous–Paleogene interval)?"
+    },
+    {
+      "concept_ids": [
+        "C1214594523-SCIOPS",
+        "C1214594541-SCIOPS"
+      ],
+      "topic": "LAND SURFACE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='of dark septate fungi in'",
+        "title-phrase='of dark septate fungi in'"
+      ],
+      "query": "How do concentrations and taxonomic identities of dark septate fungi in plant roots/rhizoids, and their inferred symbiotic status, relate to seasonally frozen-ground conditions and soil microbial/biological community composition across the northern Antarctic Peninsula’s 1480 km latitudinal gradient (e.g., South Georgia to Adelaide Island) during 2002–2003, and how do live versus frozen sample handling affect the observed fungal abundances and host-plant responses (Deschampsia antarctica and Colobanthus quitensis)?"
+    },
+    {
+      "concept_ids": [
+        "C3235688636-ORNL_CLOUD",
+        "C2143403402-ORNL_CLOUD"
+      ],
+      "topic": "LAND SURFACE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='ethiopia nigeria and south africa'"
+      ],
+      "query": "From 2016–2020, how did annual dominant vegetation/land-cover types (including forest vs non-forest and tundra/shrub categories) change across the Arctic Boreal Vulnerability Experiment core domain, and how do those changes spatially relate to concurrent expansions or contractions of urban land cover and land-use classes in major cities across Ethiopia, Nigeria, and South Africa during the same years?"
+    },
+    {
+      "concept_ids": [
+        "C1220566261-USGS_LTA",
+        "C1808440897-ASF",
+        "C1214155420-SCIOPS"
+      ],
+      "topic": "LAND SURFACE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C1220566261-USGS_LTA",
+        "C1808440897-ASF"
+      ],
+      "query": "How have land-cover change and surface reflectance (albedo) in the Sahel (e.g., near the Niger–Mali–Burkina Faso belt) related to changes in terrain/relief and modeled hydrologic flow/soil moisture conditions from the early 2000s to the late 2010s, and what evidence is there that these shifts are associated with increased or decreased erosion and geomorphic activity?"
+    },
+    {
+      "concept_ids": [
+        "C1213928843-ASF",
+        "C1213921661-ASF",
+        "C1213926419-ASF"
+      ],
+      "topic": "LAND SURFACE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C1213926419-ASF"
+      ],
+      "query": "How did land-surface morphology and land-cover/land-resource signatures in the boreal transition of northern Eurasia (e.g., ~60–70°N) change from the early 1990s to the early 2000s, and how do those changes relate to topographic elevation patterns by comparing time-varying three-frequency polarimetric measurements with the corresponding SAR-derived DEMs?"
+    },
+    {
+      "concept_ids": [
+        "C3447571026-AMD_USAPDC",
+        "C2244305039-AMD_KOPRI",
+        "C2639396946-AMD_USAPDC"
+      ],
+      "topic": "OCEANS",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C3447571026-AMD_USAPDC"
+      ],
+      "query": "How do changes in sea-ice conditions across the high latitudes of the Arctic–Antarctic (sea-ice presence/dynamics and associated sedimentation) relate to contemporary and last-glacial–to–modern shifts recorded in seafloor sediment cores (e.g., methane-cycle/geochemical and grain/biological indicators), over the period from 2019–2023 in the ~90–120°W/S–180°W/E, 30–60°S/50–90°N bands where these records are sampled? Compare the timing and character of the sediment core signals with the contemporaneous polar marine environment context needed to interpret them (sea-ice variability and cryosphere/ocean coupling) by integrating the marine-sediment core measurements from the Arctic cruise with the Circum-Antarctic core archive and the polar sea-ice/polar-marine process framework spanning 2020–2023."
+    },
+    {
+      "concept_ids": [
+        "C2089385762-NOAA_NCEI",
+        "C2089387603-NOAA_NCEI",
+        "C2231554911-CEOS_EXTRA"
+      ],
+      "topic": "OCEANS",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C2089385762-NOAA_NCEI",
+        "C2089387603-NOAA_NCEI"
+      ],
+      "query": "How did coastal seafloor morphology (seafloor topography/bathymetry) and nearshore sediment transport and depositional patterns change across the inner shelf between ~7 m isobath and ~10 km offshore near Myrtle Beach, South Carolina from November 1999, and how do these changes relate to contemporaneous variations in water-column optical properties (absorption/scattering/attenuation) and sea-surface topography measured by satellite in adjacent Atlantic/nearshore regions during the surrounding multi-year window (mid-1980s to early 1990s)?"
+    },
+    {
+      "concept_ids": [
+        "C2698130286-JAXA",
+        "C2698129155-JAXA",
+        "C2698128801-JAXA"
+      ],
+      "topic": "OCEANS",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C2698128801-JAXA"
+      ],
+      "query": "Over the ADEOS mission period (late 1996 to mid-1997), how did coastal chlorophyll-a concentrations and sea-surface temperature covary across global oceans (−180° to 180°, −90° to 90°), when viewed at daily, weekly, and monthly temporal aggregation—particularly in regions with frequent short-term phytoplankton bloom variability?"
+    },
+    {
+      "concept_ids": [
+        "C2698130444-JAXA",
+        "C2698132483-JAXA",
+        "C2698129238-JAXA"
+      ],
+      "topic": "OCEANS",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C2698129238-JAXA",
+        "C2698130444-JAXA",
+        "C2698132483-JAXA"
+      ],
+      "query": "Across the global oceans from 60°N–60°S during ADEOS’s 1996–1997 operation, how did chlorophyll-derived ocean productivity and sea-surface temperature patterns evolve seasonally and inter-annually when comparing the same regions averaged over daily versus weekly versus annual time windows, and what coherent large-scale changes can be detected despite differences in temporal aggregation?"
+    },
+    {
+      "concept_ids": [
+        "C2916529935-POCLOUD",
+        "C1996881146-POCLOUD"
+      ],
+      "topic": "OCEANS",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C1996881146-POCLOUD"
+      ],
+      "query": "From 2002–2005, how did monthly anomalies in 10 m surface wind patterns in the North Pacific influence sea-surface temperature changes (including skin vs. subskin effects) along the Kuroshio Extension, and are the temperature responses lagged by one to two months relative to the wind anomalies?"
+    },
+    {
+      "concept_ids": [
+        "C2532070261-AMD_USAPDC",
+        "C1214592009-SCIOPS",
+        "C3300834719-OB_CLOUD"
+      ],
+      "topic": "OCEANS",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C3300834719-OB_CLOUD"
+      ],
+      "query": "How did surface phytoplankton biomass (as chlorophyll-a) in the Southern Ocean change during austral spring–summer across the early pack-ice season near Cape Bird (~1969–1970) and later periods (~2011–2015) in the Phaeocystis antarctica study region, and how do these local chlorophyll changes compare with the broader global chlorophyll-a evolution in the mid-1990s (~1996–1997)? Include how concurrent water temperature and conductivity conditions help explain differences between the Cape Bird plankton/chlorophyll time series and the Phaeocystis-associated chlorophyll patterns when contrasted against the global gridded chlorophyll context."
+    },
+    {
+      "concept_ids": [
+        "C1214604653-SCIOPS",
+        "C1219899625-SCIOPS"
+      ],
+      "topic": "PALEOCLIMATE",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='across the permian triassic boundary'",
+        "title-phrase='across the permian triassic boundary'"
+      ],
+      "query": "How do changes in late Paleozoic glaciation and the Permian–Triassic transition in the Beardmore Glacier region of central Antarctica relate to shifts in depositional environments and paleosol/vegetation assemblages across the Permian–Triassic boundary (e.g., around the shift from an ice-age rift basin into a Triassic foreland basin) based on both sedimentology/stratigraphy and the associated fossil plant macroevidence from ~2010–2015 samples?"
+    },
+    {
+      "concept_ids": [
+        "C1214593295-SCIOPS",
+        "C1214622337-SCIOPS"
+      ],
+      "topic": "SOLID EARTH",
+      "reason": "leaked identifiers",
+      "detail": [
+        "title-phrase='marshall valley and walcott bay'"
+      ],
+      "query": "How do the ages of volcanic and sedimentary rock units recorded in southern McMurdo Sound (Western Ross Sea) relate to the timing of formation and evolution of major landforms and ancient lake-level/terrace sequences in the Miers–Marshall Valley and Walcott Bay region (1970s era samples), and what does this imply about when key deltas, moraines, and carbonate/gypsum deposits developed?"
+    },
+    {
+      "concept_ids": [
+        "C2698129497-JAXA",
+        "C2698129918-JAXA",
+        "C2698129325-JAXA"
+      ],
+      "topic": "SPECTRAL/ENGINEERING",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C2698129325-JAXA",
+        "C2698129497-JAXA",
+        "C2698129918-JAXA"
+      ],
+      "query": "How did microwave brightness temperature over the Arctic marginal ice zone (e.g., around the Kara Sea) evolve between April and October 2003, comparing horizontal- vs vertical-polarization signals and contrasting daily versus monthly temporal aggregation?"
+    },
+    {
+      "concept_ids": [
+        "C1386205135-NSIDCV0",
+        "C2698130589-JAXA",
+        "C2698129232-JAXA"
+      ],
+      "topic": "TERRESTRIAL HYDROSPHERE",
+      "reason": "expected ids not retrievable by any format",
+      "detail": [
+        "C2698129232-JAXA",
+        "C2698130589-JAXA"
+      ],
+      "query": "How do snow depth over Arctic sea ice evolve during the early-March period around the Barrow/central Arctic region when comparing high-resolution in-situ measurements from a specific field campaign window (single-day) with the corresponding satellite-derived snow-depth estimates aggregated over 1-month and 1-day intervals for the same years? Quantify whether the satellite snow-depth variations agree with the campaign-observed snow-depth change across the campaign dates and place the result in the broader 2002–2011 seasonal context."
+    }
+  ]
+}
