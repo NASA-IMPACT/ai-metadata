@@ -216,7 +216,10 @@ def get_collection(fmt: str, *, path: str | None = None, payload: str = FACETED)
 
 
 def all_cached_records(
-    *, window: int | None = None, check_parity: bool = True
+    *,
+    window: int | None = None,
+    check_parity: bool = True,
+    embed_model: str = EMBED_MODEL,
 ) -> tuple[list[dict], dict]:
     """Every record in ``cmr_cache``, minus those that would break a hard gate.
 
@@ -246,7 +249,7 @@ def all_cached_records(
     """
     from . import formats
 
-    window = window or max_sequence_tokens()
+    window = window or max_sequence_tokens(embed_model)
     ids = format_cache.cached_concept_ids()
     # Reading cached bytes directly would bypass the staleness guard and measure
     # renderings produced by older code. Check once, then fall back to live
@@ -291,7 +294,7 @@ def all_cached_records(
                 text = rendered[fmt]
                 if len(text.encode()) <= window:
                     continue
-            n = count_wordpieces([text])[0]
+            n = count_wordpieces([text], embed_model)[0]
             if n > window:
                 oversized[fmt] = n
         if oversized:
@@ -311,6 +314,8 @@ def build(
     ground_truth: list[str] | None = None,
     path: str | None = None,
     batch_size: int = 128,
+    embed_model: str = EMBED_MODEL,
+    embed_batch: int = EMBED_BATCH,
 ) -> IndexReport:
     """(Re)build all six collections from the corpus, for one payload.
 
@@ -326,7 +331,11 @@ def build(
         ground_truth = ground_truth_ids(load_queries())
 
     chroma = client(path or str(chroma_dir(payload)))
-    report = IndexReport(payload=payload, max_sequence_tokens=max_sequence_tokens())
+    report = IndexReport(
+        payload=payload,
+        embed_model=embed_model,
+        max_sequence_tokens=max_sequence_tokens(embed_model),
+    )
 
     project = facets if payload == FACETED else unfaceted.payload
     payloads = [(cmr.concept_id(r), topic_of(r), project(r)) for r in records]
@@ -348,7 +357,7 @@ def build(
             for cid, topic, _ in payloads
         ]
 
-        lengths = count_wordpieces(docs)
+        lengths = count_wordpieces(docs, embed_model)
         limit = report.max_sequence_tokens or 10**9
         clipped = [ids[i] for i, n in enumerate(lengths) if n > limit]
         report.truncated[fmt] = len(clipped)
@@ -357,7 +366,7 @@ def build(
         # The document stored in Chroma stays whole; only the text handed to the
         # embedder is cut, so `--probe` and any inspection still show the real
         # rendering rather than a silently shortened one.
-        embeddable = truncate_to_window(docs)
+        embeddable = truncate_to_window(docs, embed_model)
 
         for start in range(0, len(ids), batch_size):
             end = start + batch_size
@@ -365,12 +374,21 @@ def build(
                 ids=ids[start:end],
                 documents=docs[start:end],
                 metadatas=metas[start:end],
-                embeddings=embed(embeddable[start:end]),
+                embeddings=embed(
+                    embeddable[start:end], embed_model, batch_size=embed_batch
+                ),
             )
             _release_accelerator_memory()
 
         report.counts[fmt] = collection.count()
-        present = set(collection.get(ids=list(ground_truth), include=[])["ids"])
+        # Chroma raises on an empty id list rather than returning nothing, so the
+        # lookup is guarded: a caller with no ground truth to check is asking for
+        # no check, not for an error.
+        present = (
+            set(collection.get(ids=list(ground_truth), include=[])["ids"])
+            if ground_truth
+            else set()
+        )
         report.ground_truth_missing[fmt] = [c for c in ground_truth if c not in present]
 
     return report
@@ -383,11 +401,12 @@ def query(
     k: int = TOP_K,
     path: str | None = None,
     payload: str = FACETED,
+    embed_model: str = EMBED_MODEL,
 ) -> list[dict]:
     """Top-``k`` records for ``text`` from the ``fmt`` collection."""
     collection = get_collection(fmt, path=path, payload=payload)
     result = collection.query(
-        query_embeddings=embed([text]),
+        query_embeddings=embed([text], embed_model),
         n_results=k,
         include=["documents", "metadatas", "distances"],
     )
@@ -480,13 +499,41 @@ if __name__ == "__main__":  # pragma: no cover - CLI
         help="database directory; defaults to data/chroma/<payload>. Give an "
         "explicit path with --records all so the corpus index survives.",
     )
+    parser.add_argument(
+        "--embed-model",
+        default=EMBED_MODEL,
+        help="sentence-transformers checkpoint to embed with (default: %(default)s). "
+        "Swapping this changes the vectors, so it needs its own --path: a "
+        "collection built by one encoder cannot be queried by another.",
+    )
+    parser.add_argument(
+        "--embed-batch",
+        type=int,
+        default=EMBED_BATCH,
+        help="documents per forward pass (default: %(default)s, tuned for MPS at "
+        "an 8k window). Raise it on a CUDA box with headroom.",
+    )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=None,
+        help="index only the first N records -- a smoke test, not a study run. "
+        "The corpus-size gate is relaxed accordingly and the report says so.",
+    )
     args = parser.parse_args()
 
     if args.probe:
         for name in (PAYLOADS if args.payload == "both" else [args.payload]):
             print(f"\n=== {name} ===")
             for fmt in FORMATS:
-                hits = query(fmt, args.probe, k=3, payload=name)
+                hits = query(
+                    fmt,
+                    args.probe,
+                    k=3,
+                    payload=name,
+                    path=args.path,
+                    embed_model=args.embed_model,
+                )
                 print(f"  {fmt}:")
                 for h in hits:
                     print(f"    {h['rank']}. {h['concept_id']:<24} d={h['distance']:.4f}")
@@ -498,7 +545,9 @@ if __name__ == "__main__":  # pragma: no cover - CLI
     selection_report: dict | None = None
     if args.records == "all":
         print("selecting from the full record cache ...")
-        corpus_records, selection_report = all_cached_records()
+        corpus_records, selection_report = all_cached_records(
+            embed_model=args.embed_model
+        )
         print(f"  examined         : {selection_report['examined']}")
         print(f"  parity failures  : {len(selection_report['parity_failures'])}")
         for f in selection_report["parity_failures"][:5]:
@@ -513,17 +562,32 @@ if __name__ == "__main__":  # pragma: no cover - CLI
     else:
         corpus_records = cmr.load_corpus()
 
+    if args.limit:
+        corpus_records = corpus_records[: args.limit]
+        print(f"\nSMOKE TEST: {len(corpus_records)} records only -- not a study run.")
+
     # The evaluation set, not just the SME half -- a ground-truth id absent from
     # a collection makes Recall@k unmeasurable for every query naming it.
     from .queries import ground_truth_ids, load_eval_queries
 
     ground_truth = ground_truth_ids(load_eval_queries())
+    if args.limit:
+        # A truncated corpus is missing most ground-truth records by
+        # construction; gating on their presence would fail every smoke test
+        # for the one reason that is not a defect.
+        indexed = {cmr.concept_id(r) for r in corpus_records}
+        ground_truth = [c for c in ground_truth if c in indexed]
     failed = False
 
     for name in (PAYLOADS if args.payload == "both" else [args.payload]):
         out = Path(args.path) if args.path else chroma_dir(name)
         rep = build(
-            corpus_records, payload=name, ground_truth=ground_truth, path=str(out)
+            corpus_records,
+            payload=name,
+            ground_truth=ground_truth,
+            path=str(out),
+            embed_model=args.embed_model,
+            embed_batch=args.embed_batch,
         )
         out.mkdir(parents=True, exist_ok=True)
         if selection_report is not None:
@@ -549,8 +613,9 @@ if __name__ == "__main__":  # pragma: no cover - CLI
             for issue in issues:
                 print(f"  - {issue}")
         else:
+            expected = len(corpus_records) if args.limit or args.records == "all" else CORPUS_SIZE
             print(f"\nall hard gates passed ({len(corpus_records)} records, "
-                  f"expected {CORPUS_SIZE})")
+                  f"expected {expected})")
         print(f"wrote {out}/index_report.json")
 
     raise SystemExit(1 if failed else 0)

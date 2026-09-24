@@ -309,3 +309,29 @@ def test_over_length_documents_are_truncated_not_turned_into_nan():
 def test_documents_within_the_window_are_returned_untouched():
     short = ["a short record", "another short one"]
     assert index.truncate_to_window(short) == short
+
+
+def test_an_empty_ground_truth_list_means_no_check_rather_than_a_crash(tmp_path):
+    """Chroma raises on ``get(ids=[])`` instead of returning nothing.
+
+    A caller can legitimately have nothing to check -- a smoke build over the
+    first N records holds none of the evaluation set's targets. Before this,
+    that aborted the build inside the gate that exists to *report* on ground
+    truth, so the failure looked like a corrupt index rather than an empty list.
+    """
+    report = index.build(RECORDS, ground_truth=[], path=str(tmp_path))
+
+    assert all(report.ground_truth_missing[f] == [] for f in FORMATS)
+    assert index.verify(report, len(RECORDS)) == []
+
+
+def test_the_embedding_model_is_recorded_so_two_databases_can_be_told_apart(tmp_path):
+    """Vectors from different encoders are not interchangeable.
+
+    ``build`` takes the encoder as an argument so a second index can be built
+    beside the first, and the only thing that distinguishes the two on disk is
+    this field.
+    """
+    report = index.build(RECORDS, ground_truth=["C1-SEA"], path=str(tmp_path))
+    assert report.to_dict()["embed_model"] == index.EMBED_MODEL
+    assert report.max_sequence_tokens == index.max_sequence_tokens(index.EMBED_MODEL)

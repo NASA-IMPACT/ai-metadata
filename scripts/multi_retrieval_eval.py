@@ -65,6 +65,13 @@ def main(argv=None) -> int:
     parser.add_argument("--run-id", default=DEFAULT_RUN_ID)
     parser.add_argument("--limit", type=int, default=None, help="first N queries (smoke)")
     parser.add_argument("--no-chart", action="store_true")
+    parser.add_argument(
+        "--embed-model",
+        default=EMBED_MODEL,
+        help="encoder the collections at --db were built with (default: "
+        "%(default)s). It has to match: a mismatch is a wrong answer, not an "
+        "error, whenever the two models happen to share a dimensionality.",
+    )
     args = parser.parse_args(argv)
 
     queries = load_queries(args.queries)
@@ -73,6 +80,8 @@ def main(argv=None) -> int:
 
     sizes = sorted({len(q.expected_concept_ids) for q in queries})
     print(f"queries       : {len(queries)} from {args.queries} (expected ids per query: {sizes})")
+    print(f"index         : {args.db}")
+    print(f"embedding     : {args.embed_model}")
 
     # ``host``/``port`` never see a socket -- the backend is injected below --
     # but the Endpoint still names the collections and labels the summary.
@@ -81,9 +90,9 @@ def main(argv=None) -> int:
     )
     summary = remote_eval.run(
         endpoint=endpoint,
-        backend=local_backend(args.db),
+        backend=local_backend(args.db, args.embed_model),
         queries=queries,
-        embed_model=EMBED_MODEL,
+        embed_model=args.embed_model,
         run_id=args.run_id,
         chart=not args.no_chart,
     )
